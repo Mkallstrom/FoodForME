@@ -13,7 +13,8 @@
         android:text="Scan"
         android:id="@+id/scanButton"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:onClick="scanBarcode"/>
 
     <ListView
         android:layout_width="wrap_content"

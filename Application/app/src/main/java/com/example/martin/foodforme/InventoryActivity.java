@@ -1,9 +1,15 @@
 package com.example.martin.foodforme;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 
 public class InventoryActivity extends ActionBarActivity {
@@ -35,5 +41,33 @@ public class InventoryActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /*
+    * Initiates the barcode scanner via intent
+     */
+    public void scanBarcode(View view) {
+        IntentIntegrator scanIntegrator = new IntentIntegrator(this);
+        scanIntegrator.initiateScan();
+    }
+
+    /*
+    * Gets the scanning result
+    */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult scanningResult =
+                IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+
+        if(scanningResult != null) {
+            if (scanningResult.getContents() == null) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
+            } else {
+                // use the result for something
+                Toast.makeText(this, "Scanned: " +
+                        scanningResult.getContents(), Toast.LENGTH_SHORT).show();
+            }
+        } else { // scanningResult == null
+             Toast.makeText(this, "ERROR: No scan data received!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
