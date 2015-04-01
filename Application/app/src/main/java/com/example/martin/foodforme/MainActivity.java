@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
     public void toInventory(View view){
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
