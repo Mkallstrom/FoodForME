@@ -19,10 +19,17 @@
         <activity
             android:name=".InventoryActivity"
             android:label="@string/title_activity_inventory"
-            android:parentActivityName=".MainActivity">
-            <!-- <meta-data
+            android:parentActivityName=".MainActivity" >
+
+            <!--
+                 <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.martin.foodforme.MainActivity" /> -->
+                android:value="com.example.martin.foodforme.MainActivity" />
+            -->
+        </activity>
+        <activity
+            android:name=".AddProductActivity"
+            android:label="@string/title_activity_add_product" >
         </activity>
     </application>
 
