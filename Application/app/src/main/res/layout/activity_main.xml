@@ -12,7 +12,7 @@
         android:id="@+id/imageButton"
         android:layout_centerHorizontal="true"
         android:onClick="toInventory"
-        android:src="@drawable/inventorybutton"
+        android:src="@drawable/ib"
         android:background="#00ffffff" />
 
 </RelativeLayout>
