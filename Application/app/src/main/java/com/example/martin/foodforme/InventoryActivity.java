@@ -9,10 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -26,7 +26,8 @@ public class InventoryActivity extends ActionBarActivity {
     ArrayAdapter adapter;
     List<String> products;
     SharedPreferences inventory;
-    int numProducts = 0;
+    int index = 0;
+    ArrayList inventoryKeys = new ArrayList();
     ListView listView;
 
     @Override
@@ -34,18 +35,30 @@ public class InventoryActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
         Context context = this;
+
         inventory = getSharedPreferences("inventory",0);
+        SharedPreferences.Editor editor = inventory.edit();
 
         products = new ArrayList();
         adapter = new ArrayAdapter(context,android.R.layout.simple_list_item_1,products);
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(adapter);
 
+        if(!inventory.contains("index"))
+        {
+            editor.putString("index", "0");
+            editor.commit();
+        }
+        index = Integer.parseInt(inventory.getString("index",""));
+
         Map<String,?> keys = inventory.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
-            products.add(entry.getValue().toString());
+            if(!entry.getKey().equals("index"))
+            {
+                products.add(entry.getValue().toString());
+                inventoryKeys.add(entry.getKey());
+            }
         }
-        numProducts = keys.size();
         adapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new OnItemClickListener() {
@@ -55,20 +68,13 @@ public class InventoryActivity extends ActionBarActivity {
                                     int position, long id) {
 
                 SharedPreferences.Editor editor = inventory.edit();
+
                 products.remove(position);
                 adapter.notifyDataSetChanged();
-                numProducts -= 1;
-                position += 1;
-                if(inventory.contains(position+""))
-                {
-                    editor.remove(position + "");
-                    editor.commit();
-                }
-                else
-                {
-                    products.add("Editor could not remove the item with key: " + position);
-                    adapter.notifyDataSetChanged();
-                }
+
+                editor.remove(inventoryKeys.get(position) + "");
+                editor.commit();
+
             }
         });
 
@@ -114,9 +120,11 @@ public class InventoryActivity extends ActionBarActivity {
             if(resultCode == RESULT_OK) {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
 
-                numProducts += 1;
                 SharedPreferences.Editor editor = inventory.edit();
-                editor.putString(numProducts+"", newProduct);       // Adds the product to the saved inventory
+                index+=1;
+                editor.remove("index");
+                editor.putString("index", index+"");
+                editor.putString(index+"", newProduct);       // Adds the product to the saved inventory
                 editor.commit();
 
                 products.add(newProduct);                           // Adds to the inventory activity list
