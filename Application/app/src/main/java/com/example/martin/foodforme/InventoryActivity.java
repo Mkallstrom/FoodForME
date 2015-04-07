@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.view.ContextMenu.ContextMenuInfo;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -47,6 +49,7 @@ public class InventoryActivity extends ActionBarActivity {
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
+        registerForContextMenu(listView);
 
         if(!inventory.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
@@ -71,19 +74,32 @@ public class InventoryActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-                SharedPreferences.Editor editor = inventory.edit();
-
-                products.remove(position);
-                productsAdapter.notifyDataSetChanged();
-
-                editor.remove(inventoryKeys.get(position) + "");
-                editor.commit();
+                openContextMenu(view);
 
             }
         });
 
     }
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        menu.setHeaderTitle("Edit " + products.get(info.position));
+        menu.add(0, 1, 0, "Delete");
+    }
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
+        if(item.getTitle()=="Delete"){
+            products.remove(info.position);
+            productsAdapter.notifyDataSetChanged();
+            SharedPreferences.Editor editor = inventory.edit();
+            editor.remove(inventoryKeys.get(info.position) + "");
+            editor.commit();
+        }
+        else {return false;}
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,6 +146,7 @@ public class InventoryActivity extends ActionBarActivity {
                 editor.putString("index", index+"");
                 editor.putString(index+"", newProduct);       // Adds the product to the saved inventory
                 editor.commit();
+                inventoryKeys.add(index);
 
                 products.add(newProduct);                           // Adds to the inventory activity list
                 productsAdapter.notifyDataSetChanged();
