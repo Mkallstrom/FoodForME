@@ -62,4 +62,15 @@
         android:layout_marginBottom="54dp"
         android:onClick="addProduct" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:id="@+id/cancelButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:onClick="cancelAddProduct"
+        android:nestedScrollingEnabled="false" />
+
 </RelativeLayout>

@@ -150,6 +150,8 @@ public class InventoryActivity extends ActionBarActivity {
 
                 products.add(newProduct);                           // Adds to the inventory activity list
                 productsAdapter.notifyDataSetChanged();
+            } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
+                Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();
             }
         } else {                                                    // Result is from scanning
                 IntentResult scanningResult =

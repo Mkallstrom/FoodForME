@@ -68,6 +68,7 @@ public class AddProductActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
     public void addProduct(View view) {
         productString = productName.getText().toString();
         String barcode = codeView.getText().toString();
@@ -90,6 +91,11 @@ public class AddProductActivity extends ActionBarActivity {
         Intent intent = new Intent();
         intent.putExtra("product",productString);
         setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    public void cancelAddProduct (View view) {
+        setResult(RESULT_CANCELED);
         finish();
     }
 }
