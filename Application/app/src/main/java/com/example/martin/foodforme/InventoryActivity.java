@@ -23,11 +23,14 @@ import java.util.Map;
 
 
 public class InventoryActivity extends ActionBarActivity {
-    ArrayAdapter adapter;
+
     List<String> products;
+    ArrayAdapter productsAdapter;
+
     SharedPreferences inventory;
-    int index = 0;
     ArrayList inventoryKeys = new ArrayList();
+    int index = 0;
+
     ListView listView;
 
     @Override
@@ -36,22 +39,23 @@ public class InventoryActivity extends ActionBarActivity {
         setContentView(R.layout.activity_inventory);
         Context context = this;
 
-        inventory = getSharedPreferences("inventory",0);
-        SharedPreferences.Editor editor = inventory.edit();
-
         products = new ArrayList();
-        adapter = new ArrayAdapter(context,android.R.layout.simple_list_item_1,products);
+        productsAdapter = new ArrayAdapter(context,android.R.layout.simple_list_item_1,products);
+
+        inventory = getSharedPreferences("inventory",0);
+        SharedPreferences.Editor inventoryEditor = inventory.edit();
+
         listView = (ListView) findViewById(R.id.inventoryListView);
-        listView.setAdapter(adapter);
+        listView.setAdapter(productsAdapter);
 
-        if(!inventory.contains("index"))
+        if(!inventory.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
-            editor.putString("index", "0");
-            editor.commit();
+            inventoryEditor.putString("index", "0");
+            inventoryEditor.commit();
         }
-        index = Integer.parseInt(inventory.getString("index",""));
+        index = Integer.parseInt(inventory.getString("index",""));  //Get and save the index.
 
-        Map<String,?> keys = inventory.getAll();
+        Map<String,?> keys = inventory.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
@@ -59,7 +63,7 @@ public class InventoryActivity extends ActionBarActivity {
                 inventoryKeys.add(entry.getKey());
             }
         }
-        adapter.notifyDataSetChanged();
+        productsAdapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -70,7 +74,7 @@ public class InventoryActivity extends ActionBarActivity {
                 SharedPreferences.Editor editor = inventory.edit();
 
                 products.remove(position);
-                adapter.notifyDataSetChanged();
+                productsAdapter.notifyDataSetChanged();
 
                 editor.remove(inventoryKeys.get(position) + "");
                 editor.commit();
@@ -128,7 +132,7 @@ public class InventoryActivity extends ActionBarActivity {
                 editor.commit();
 
                 products.add(newProduct);                           // Adds to the inventory activity list
-                adapter.notifyDataSetChanged();
+                productsAdapter.notifyDataSetChanged();
             }
         } else {                                                    // Result is from scanning
                 IntentResult scanningResult =
@@ -139,12 +143,9 @@ public class InventoryActivity extends ActionBarActivity {
                     if (scanningResult.getContents() == null) {
                         Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
                     } else {
-                        // use the result for something
-                        // Toast.makeText(this, "Scanned: " +
-                        //         scanningResult.getContents(), Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(this, AddProductActivity.class);
                         String message = scanningResult.getContents();
-                        intent.putExtra("result", message);
+                        intent.putExtra("result", message);         //Send the result to the add product activity.
                         startActivityForResult(intent, 100);
                     }
                 } else { // scanningResult == null

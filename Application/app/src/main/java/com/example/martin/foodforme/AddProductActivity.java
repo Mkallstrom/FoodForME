@@ -25,25 +25,24 @@ public class AddProductActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_product);
 
         localBarcodes = getSharedPreferences("localBarcodes", 0);
+
         productName = (EditText)findViewById(R.id.productBox);
+
         Intent callingIntent = getIntent();
         String str = callingIntent.getExtras().getString("result");
         codeView = (TextView)findViewById(R.id.codeView);
         codeView.setText(str);
 
-        if(localBarcodes.contains(str))
+        if(localBarcodes.contains(str))                 //Local database has the code.
         {
             String foundName = localBarcodes.getString(str, "Not found");
             productName.setText(foundName);
         }
         else
         {
+            //CHECK GLOBAL DATABASE HERE
             Toast.makeText(this, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
         }
-
-        // Check local database for code and put name in name box
-        // If not found, check connection and then check global database for code, put code in local database and name in name box
-        // If not found, ask user for name and save in local+global
 
     }
 
@@ -69,28 +68,28 @@ public class AddProductActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    public void addProduct(View view)
-    {
-    productString = productName.getText().toString();
-    String barcode = codeView.getText().toString();
-    SharedPreferences.Editor editor = localBarcodes.edit();
+    public void addProduct(View view) {
+        productString = productName.getText().toString();
+        String barcode = codeView.getText().toString();
+        SharedPreferences.Editor editor = localBarcodes.edit();
 
-    if(localBarcodes.contains(barcode) && !localBarcodes.getString(barcode,"").equals(productString))
-    {
-        editor.remove(codeView.getText().toString());
-        editor.putString(barcode,productString);
-        editor.commit();
-    }
+        if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
+        {                                                                                                    // -> replace with new name.
+
+            editor.remove(codeView.getText().toString());
+            editor.putString(barcode,productString);
+            editor.commit();
+        }
         else
-    if(!localBarcodes.contains(barcode))
-    {
-        editor.putString(barcode,productString);
-        editor.commit();
-    }
+            if(!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
+                {
+                    editor.putString(barcode,productString);
+                    editor.commit();
+                }
 
-    Intent intent = new Intent();
-    intent.putExtra("product",productString);
-    setResult(RESULT_OK, intent);
-    finish();
+        Intent intent = new Intent();
+        intent.putExtra("product",productString);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
