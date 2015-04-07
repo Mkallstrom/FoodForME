@@ -80,24 +80,29 @@ public class InventoryActivity extends ActionBarActivity {
         });
 
     }
-    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo)
-    {
+
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         menu.setHeaderTitle("Edit " + products.get(info.position));
         menu.add(0, 1, 0, "Delete");
+        menu.add(0, 2, 0, "Edit");
     }
+
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int itemID = item.getItemId();
 
-        if(item.getTitle()=="Delete"){
+        if(itemID == 1){
             products.remove(info.position);
             productsAdapter.notifyDataSetChanged();
             SharedPreferences.Editor editor = inventory.edit();
             editor.remove(inventoryKeys.get(info.position) + "");
             editor.commit();
-        }
-        else {return false;}
+        } else if(itemID == 2) {
+            // TODO: Implement some kind of edit functionality
+            Toast.makeText(this, "Edit was pressed on " + products.get(info.position), Toast.LENGTH_SHORT).show();
+        } else {return false;}
         return true;
     }
 
@@ -132,7 +137,7 @@ public class InventoryActivity extends ActionBarActivity {
     }
 
     /*
-    * Gets the scanning result
+    * Results from other activities needs to be handled here (ex. scanner)
     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -157,11 +162,10 @@ public class InventoryActivity extends ActionBarActivity {
                 IntentResult scanningResult =
                         IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-
                 if (scanningResult != null) {
                     if (scanningResult.getContents() == null) {
-                        Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-                    } else {
+                        Toast.makeText(this, "Canceled", Toast.LENGTH_SHORT).show();
+                    } else {                                        // Start addProductActivity
                         Intent intent = new Intent(this, AddProductActivity.class);
                         String message = scanningResult.getContents();
                         intent.putExtra("result", message);         //Send the result to the add product activity.
