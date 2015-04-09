@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/spinnerYear"
             android:layout_weight="1"
-            android:spinnerMode="dropdown" />
+            android:spinnerMode="dropdown"/>
 
         <Spinner
             android:layout_width="wrap_content"

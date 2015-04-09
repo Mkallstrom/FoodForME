@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,22 +15,23 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.view.ContextMenu.ContextMenuInfo;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
 public class InventoryActivity extends ActionBarActivity {
 
-    List<String> products;
+    ArrayList<Product> products;
     ArrayAdapter productsAdapter;
 
     SharedPreferences inventory;
+    SharedPreferences dates;
+    SharedPreferences.Editor inventoryEditor;
+    SharedPreferences.Editor datesEditor;
     ArrayList inventoryKeys = new ArrayList();
     int index = 0;
 
@@ -41,11 +43,13 @@ public class InventoryActivity extends ActionBarActivity {
         setContentView(R.layout.activity_inventory);
         Context context = this;
 
-        products = new ArrayList();
-        productsAdapter = new ArrayAdapter(context,android.R.layout.simple_list_item_1,products);
+        products = new ArrayList<>();
+        productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
         inventory = getSharedPreferences("inventory",0);
-        SharedPreferences.Editor inventoryEditor = inventory.edit();
+        dates = getSharedPreferences("dates",0);
+        inventoryEditor = inventory.edit();
+        datesEditor = dates.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
@@ -62,7 +66,7 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(entry.getValue().toString());
+                products.add(new Product(entry.getValue().toString(),dates.getString(entry.getKey(),"")));
                 inventoryKeys.add(entry.getKey());
             }
         }
@@ -84,7 +88,7 @@ public class InventoryActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-        menu.setHeaderTitle("Edit " + products.get(info.position));
+        menu.setHeaderTitle("Edit " + products.get(info.position).name);
         menu.add(0, 1, 0, "Delete");
         menu.add(0, 2, 0, "Edit");
     }
@@ -96,9 +100,11 @@ public class InventoryActivity extends ActionBarActivity {
         if(itemID == 1){
             products.remove(info.position);
             productsAdapter.notifyDataSetChanged();
-            SharedPreferences.Editor editor = inventory.edit();
-            editor.remove(inventoryKeys.get(info.position) + "");
-            editor.commit();
+            inventoryEditor.remove(inventoryKeys.get(info.position) + "");
+            datesEditor.remove(inventoryKeys.get(info.position) + "");
+            inventoryEditor.commit();
+            datesEditor.commit();
+
         } else if(itemID == 2) {
             // TODO: Implement some kind of edit functionality
             Toast.makeText(this, "Edit was pressed on " + products.get(info.position), Toast.LENGTH_SHORT).show();
@@ -139,6 +145,18 @@ public class InventoryActivity extends ActionBarActivity {
     /*
     * Results from other activities needs to be handled here (ex. scanner)
     */
+
+    protected void addProduct(String name, String date)
+    {
+        inventoryEditor.putString(index+"", name);
+        datesEditor.putString(index+"", date);
+        inventoryEditor.commit();
+        datesEditor.commit();
+        products.add(new Product(name, date));
+        productsAdapter.notifyDataSetChanged();
+        inventoryKeys.add(index);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 100) {                                   // Result is from addproduct
@@ -147,16 +165,11 @@ public class InventoryActivity extends ActionBarActivity {
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
                 // TODO: save expiration date somewhere
 
-                SharedPreferences.Editor editor = inventory.edit();
                 index+=1;
-                editor.remove("index");
-                editor.putString("index", index+"");
-                editor.putString(index+"", newProduct);       // Adds the product to the saved inventory
-                editor.commit();
-                inventoryKeys.add(index);
+                inventoryEditor.remove("index");
+                inventoryEditor.putString("index",index+"");
+                addProduct(newProduct, newProductExpDate);
 
-                products.add(newProduct);                           // Adds to the inventory activity list
-                productsAdapter.notifyDataSetChanged();
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();
             }

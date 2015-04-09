@@ -21,6 +21,12 @@ public class Product {
         setExpiryDate(expiryDate);
     }
 
+    public Product(String productName) {
+        name = productName;
+        expiryDate = getTodaysDate();
+        setExpiryDate(expiryDate);
+    }
+
     public void setName(String productName) {
         name = productName;
     }
