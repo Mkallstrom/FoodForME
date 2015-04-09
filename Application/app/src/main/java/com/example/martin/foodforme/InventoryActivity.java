@@ -144,6 +144,8 @@ public class InventoryActivity extends ActionBarActivity {
         if (requestCode == 100) {                                   // Result is from addproduct
             if(resultCode == RESULT_OK) {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
+                String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
+                // TODO: save expiration date somewhere
 
                 SharedPreferences.Editor editor = inventory.edit();
                 index+=1;

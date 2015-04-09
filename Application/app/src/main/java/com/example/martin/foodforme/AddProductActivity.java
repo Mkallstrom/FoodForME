@@ -7,9 +7,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class AddProductActivity extends ActionBarActivity {
@@ -44,6 +49,14 @@ public class AddProductActivity extends ActionBarActivity {
             Toast.makeText(this, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
         }
 
+        // Fills the spinner with years
+        fillSpinnerYear();
+
+        // Fills the spinner with months
+        fillSpinnerMonth();
+
+        // Fills the spinner with days
+        fillSpinnerDay();
     }
 
 
@@ -90,6 +103,7 @@ public class AddProductActivity extends ActionBarActivity {
 
         Intent intent = new Intent();
         intent.putExtra("product",productString);
+        intent.putExtra("expDate",expDateString());
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -97,5 +111,50 @@ public class AddProductActivity extends ActionBarActivity {
     public void cancelAddProduct (View view) {
         setResult(RESULT_CANCELED);
         finish();
+    }
+
+    // Extracts the expiration date set by the user
+    private String expDateString(){
+        Spinner spinner = (Spinner)findViewById(R.id.spinnerYear);
+        String selectedYear = spinner.getSelectedItem().toString();
+        spinner = (Spinner)findViewById(R.id.spinnerMonth);
+        String selectedMonth = spinner.getSelectedItem().toString();
+        spinner = (Spinner)findViewById(R.id.spinnerDay);
+        String selectedDay = spinner.getSelectedItem().toString();
+        return selectedYear + "-" + selectedMonth + "-" + selectedDay;
+    }
+
+    private void fillSpinnerYear(){
+        ArrayList<String> arrayListYears = new ArrayList<String>();
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int i = thisYear - 5; i <= thisYear + 5; i++) {
+            arrayListYears.add(Integer.toString(i));
+        }
+        ArrayAdapter<String> spinYearAdapter =
+                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListYears);
+        Spinner spinYear = (Spinner)findViewById(R.id.spinnerYear);
+        spinYear.setAdapter(spinYearAdapter);
+    }
+
+    private void fillSpinnerMonth(){
+        ArrayList<String> arrayListMonths = new ArrayList<>();
+        for(int i = 1; i <= 12; i++) {
+            arrayListMonths.add(Integer.toString(i));
+        }
+        ArrayAdapter<String> spinMonthAdapter =
+                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListMonths);
+        Spinner spinMonth = (Spinner)findViewById(R.id.spinnerMonth);
+        spinMonth.setAdapter(spinMonthAdapter);
+    }
+
+    private void fillSpinnerDay(){
+        ArrayList<String> arrayListDays = new ArrayList<>();
+        for(int i = 1; i <= 31; i++) {
+            arrayListDays.add(Integer.toString(i));
+        }
+        ArrayAdapter<String> spinDayAdapter =
+                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListDays);
+        Spinner spinDay = (Spinner)findViewById(R.id.spinnerDay);
+        spinDay.setAdapter(spinDayAdapter);
     }
 }
