@@ -36,10 +36,26 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
 
         TextView title = (TextView)row.findViewById(R.id.title);
         TextView number = (TextView)row.findViewById(R.id.date);
+        TextView remaining = (TextView)row.findViewById(R.id.daysremaining);
 
         title.setText(products.get(position).name);
-        number.setText((products.get(position).expiryDate));
-
+        number.setText(products.get(position).expiryDate);
+        int expiringIn = products.get(position).daysUntilExpired();
+        if(expiringIn == 0)
+        {
+            remaining.setText("Expires today.");
+        }
+        else
+        {
+            if(expiringIn > 0)
+            {
+                remaining.setText("Expires in " + Integer.toString(expiringIn) + " days.");
+            }
+            else
+            {
+                remaining.setText("Expired " + Integer.toString(-expiringIn) + " days ago.");
+            }
+        }
         return row;
     }
 

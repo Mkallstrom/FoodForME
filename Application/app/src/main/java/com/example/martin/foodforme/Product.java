@@ -9,22 +9,18 @@ import java.util.concurrent.TimeUnit;
 public class Product {
 
     public String name;
-
     public String expiryDate;
+    public String key;
+
     public int expiryYear;
     public int expiryMonth;
     public int expiryDay;
 
     // Public constructor
-    public Product(String productName, String expiryDate) {
+    public Product(String productName, String expiryDate, String key) {
         name = productName;
         setExpiryDate(expiryDate);
-    }
-
-    public Product(String productName) {
-        name = productName;
-        expiryDate = getTodaysDate();
-        setExpiryDate(expiryDate);
+        this.key = key;
     }
 
     public void setName(String productName) {

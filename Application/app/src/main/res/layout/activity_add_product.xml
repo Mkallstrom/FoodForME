@@ -86,21 +86,24 @@
             android:layout_height="wrap_content"
             android:id="@+id/spinnerYear"
             android:layout_weight="1"
-            android:spinnerMode="dropdown"/>
+            android:spinnerMode="dropdown"
+            android:background="@color/background_floating_material_light" />
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/spinnerMonth"
             android:layout_weight="1"
-            android:spinnerMode="dropdown" />
+            android:spinnerMode="dropdown"
+            android:background="@color/background_floating_material_light" />
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/spinnerDay"
             android:layout_weight="1"
-            android:spinnerMode="dropdown" />
+            android:spinnerMode="dropdown"
+            android:background="@color/background_floating_material_light" />
 
     </LinearLayout>
 

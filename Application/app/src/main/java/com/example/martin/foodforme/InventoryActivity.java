@@ -66,8 +66,7 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(new Product(entry.getValue().toString(),dates.getString(entry.getKey(),"")));
-                inventoryKeys.add(entry.getKey());
+                products.add(new Product(entry.getValue().toString(),dates.getString(entry.getKey(),""), entry.getKey()));
             }
         }
         productsAdapter.notifyDataSetChanged();
@@ -98,12 +97,13 @@ public class InventoryActivity extends ActionBarActivity {
         int itemID = item.getItemId();
 
         if(itemID == 1){
-            products.remove(info.position);
-            productsAdapter.notifyDataSetChanged();
-            inventoryEditor.remove(inventoryKeys.get(info.position) + "");
-            datesEditor.remove(inventoryKeys.get(info.position) + "");
+            Product product = products.get(info.position);
+            inventoryEditor.remove(product.key);
+            datesEditor.remove(product.key);
             inventoryEditor.commit();
             datesEditor.commit();
+            products.remove(product);
+            productsAdapter.notifyDataSetChanged();
 
         } else if(itemID == 2) {
             // TODO: Implement some kind of edit functionality
@@ -148,13 +148,13 @@ public class InventoryActivity extends ActionBarActivity {
 
     protected void addProduct(String name, String date)
     {
-        inventoryEditor.putString(index+"", name);
-        datesEditor.putString(index+"", date);
+        Product product = new Product(name, date, Integer.toString(index));
+        inventoryEditor.putString(Integer.toString(index), name);
+        datesEditor.putString(Integer.toString(index), date);
         inventoryEditor.commit();
         datesEditor.commit();
-        products.add(new Product(name, date));
+        products.add(product);
         productsAdapter.notifyDataSetChanged();
-        inventoryKeys.add(index);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class InventoryActivity extends ActionBarActivity {
 
                 index+=1;
                 inventoryEditor.remove("index");
-                inventoryEditor.putString("index",index+"");
+                inventoryEditor.putString("index",Integer.toString(index));
                 addProduct(newProduct, newProductExpDate);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
