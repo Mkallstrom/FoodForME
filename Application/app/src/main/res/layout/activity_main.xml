@@ -15,4 +15,15 @@
         android:src="@drawable/ib"
         android:background="#00ffffff" />
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listbutton"
+        android:onClick="toList"
+        android:background="#00ffffff"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/imageButton"
+        android:layout_alignStart="@+id/imageButton"
+        android:src="@drawable/lb" />
+
 </RelativeLayout>

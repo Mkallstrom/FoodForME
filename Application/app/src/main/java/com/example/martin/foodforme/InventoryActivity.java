@@ -32,7 +32,6 @@ public class InventoryActivity extends ActionBarActivity {
     SharedPreferences dates;
     SharedPreferences.Editor inventoryEditor;
     SharedPreferences.Editor datesEditor;
-    ArrayList inventoryKeys = new ArrayList();
     int index = 0;
 
     ListView listView;
@@ -168,6 +167,7 @@ public class InventoryActivity extends ActionBarActivity {
                 index+=1;
                 inventoryEditor.remove("index");
                 inventoryEditor.putString("index",Integer.toString(index));
+                inventoryEditor.commit();
                 addProduct(newProduct, newProductExpDate);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled

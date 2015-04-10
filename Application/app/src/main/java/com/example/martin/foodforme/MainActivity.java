@@ -43,4 +43,9 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
     }
+
+    public void toList(View view){
+        Intent intent = new Intent(this, ListActivity.class);
+        startActivity(intent);
+    }
 }
