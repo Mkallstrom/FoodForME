@@ -7,74 +7,38 @@
     tools:context="com.example.martin.foodforme.ListActivity">
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_centerHorizontal="true"
-        android:weightSum="1">
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.50"
+        android:weightSum="1"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.50"
-            android:weightSum="1">
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Shopping List"
+            android:id="@+id/shoppingTextView"
+            android:layout_gravity="center_horizontal" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Shopping List"
-                android:id="@+id/shoppingTextView"
-                android:layout_gravity="center_horizontal" />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="370dp"
+            android:id="@+id/shoppinglistView"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1" />
 
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="370dp"
-                android:id="@+id/shoppinglistView"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add"
-                android:id="@+id/addtoslbutton"
-                android:layout_gravity="center_horizontal"
-                android:onClick="addShopping" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
+        <Button
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0.50">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Must-have List"
-                android:id="@+id/musthaveTextView"
-                android:layout_gravity="center_horizontal" />
-
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="370dp"
-                android:id="@+id/musthavelistView"
-                android:layout_weight="1"
-                android:layout_gravity="center_horizontal" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add"
-                android:id="@+id/addtomhlbutton"
-                android:layout_gravity="center_horizontal"
-                android:onClick="addMusthave" />
-
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:id="@+id/addtoslbutton"
+            android:layout_gravity="center_horizontal"
+            android:onClick="addShopping" />
 
     </LinearLayout>
 

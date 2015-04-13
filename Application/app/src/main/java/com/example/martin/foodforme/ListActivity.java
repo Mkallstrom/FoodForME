@@ -22,15 +22,15 @@ import java.util.Map;
 public class ListActivity extends ActionBarActivity {
 
     ArrayList<ShoppingItem> shoppingList;
-    ArrayList<ShoppingItem> musthaveList;
+    ArrayList<ShoppingItem> requiredList;
     ArrayAdapter shoppingAdapter;
-    ArrayAdapter musthaveAdapter;
+    ArrayAdapter requiredAdapter;
     SharedPreferences shoppingSP;
-    SharedPreferences musthaveSP;
+    SharedPreferences requiredSP;
     SharedPreferences.Editor shoppingEditor;
-    SharedPreferences.Editor musthaveEditor;
+    SharedPreferences.Editor requiredEditor;
     ListView shoppingListView;
-    ListView musthaveListView;
+    ListView requiredListView;
     int sindex = 0;
     int mindex = 0;
     private static final String TAG = "MyActivity";
@@ -42,25 +42,24 @@ public class ListActivity extends ActionBarActivity {
         Context context = this;
 
         shoppingList = new ArrayList();
-        musthaveList = new ArrayList();
+        requiredList = new ArrayList();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
-        musthaveAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,musthaveList);
+        requiredAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,requiredList);
 
         shoppingSP = getSharedPreferences("shoppingSP",0);
-        musthaveSP = getSharedPreferences("musthaveSP",0);
+        requiredSP = getSharedPreferences("requiredSP",0);
 
         shoppingEditor = shoppingSP.edit();
-        musthaveEditor = musthaveSP.edit();
+        requiredEditor = requiredSP.edit();
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
-        musthaveListView = (ListView) findViewById(R.id.musthavelistView);
 
-        musthaveListView.setAdapter(musthaveAdapter);
+        requiredListView.setAdapter(requiredAdapter);
         shoppingListView.setAdapter(shoppingAdapter);
 
         registerForContextMenu(shoppingListView);
-        registerForContextMenu(musthaveListView);
+        registerForContextMenu(requiredListView);
 
         if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
@@ -68,12 +67,12 @@ public class ListActivity extends ActionBarActivity {
             shoppingEditor.commit();
         }
         sindex = Integer.parseInt(shoppingSP.getString("index",""));
-        if(!musthaveSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
-            musthaveEditor.putString("index", "0");
-            musthaveEditor.commit();
+            requiredEditor.putString("index", "0");
+            requiredEditor.commit();
         }
-        mindex = Integer.parseInt(musthaveSP.getString("index",""));
+        mindex = Integer.parseInt(requiredSP.getString("index",""));
         Map<String,?> keys = shoppingSP.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
@@ -81,15 +80,15 @@ public class ListActivity extends ActionBarActivity {
                 shoppingList.add(new ShoppingItem(Integer.toString(Integer.parseInt(entry.getValue().toString().substring(0, 3))), entry.getValue().toString().substring(3), entry.getKey()));
             }
         }
-        keys = musthaveSP.getAll();
+        keys = requiredSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                musthaveList.add(new ShoppingItem(entry.getValue().toString().substring(0,3),entry.getValue().toString().substring(3), entry.getKey()));
+                requiredList.add(new ShoppingItem(entry.getValue().toString().substring(0,3),entry.getValue().toString().substring(3), entry.getKey()));
             }
         }
 
-        musthaveAdapter.notifyDataSetChanged();
+        requiredAdapter.notifyDataSetChanged();
         shoppingAdapter.notifyDataSetChanged();
 
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -102,7 +101,7 @@ public class ListActivity extends ActionBarActivity {
 
             }
         });
-        musthaveListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        requiredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -217,7 +216,7 @@ public class ListActivity extends ActionBarActivity {
                 })
                 .show();
     }
-    public void addMusthave(View view)
+    public void addrequired(View view)
     {
 
     }
