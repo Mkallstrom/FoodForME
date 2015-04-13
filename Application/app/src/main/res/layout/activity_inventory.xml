@@ -13,16 +13,16 @@
         android:layout_height="wrap_content"
         android:text="Scan"
         android:id="@+id/scanButton"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="scanBarcode"/>
+        android:onClick="scanBarcode"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/inventoryListView"
-        android:layout_below="@+id/scanButton"
-        android:layout_centerHorizontal="true"
-        tools:listitem="@android:layout/simple_list_item_2" />
+        tools:listitem="@android:layout/simple_list_item_2"
+        android:layout_above="@+id/scanButton"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
