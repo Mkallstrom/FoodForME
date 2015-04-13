@@ -17,7 +17,7 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
 
     private Context context;
     private int resource;
-    private ArrayList<ShoppingItem> products;
+    private ArrayList<Product> products;
     private int amount = 1;
     LayoutInflater inflater;
 
@@ -38,8 +38,8 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
         TextView title = (TextView)row.findViewById(R.id.title);
         TextView number = (TextView)row.findViewById(R.id.number);
 
-        title.setText(products.get(position).name);
-        number.setText(products.get(position).amount);
+        title.setText(products.get(position).getName());
+        number.setText(products.get(position).getAmount());
 
         return row;
     }
