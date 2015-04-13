@@ -29,15 +29,18 @@
         </activity>
         <activity
             android:name=".AddProductActivity"
-            android:label="@string/title_activity_add_product" >
+            android:label="@string/title_activity_add_product"
+            android:parentActivityName=".InventoryActivity" >
         </activity>
         <activity
             android:name=".ListActivity"
-            android:label="@string/title_activity_list" >
+            android:label="@string/title_activity_list"
+            android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".RequirementActivity"
-            android:label="@string/title_activity_required_list" >
+            android:label="@string/title_activity_required_list"
+            android:parentActivityName=".MainActivity" >
         </activity>
     </application>
 
