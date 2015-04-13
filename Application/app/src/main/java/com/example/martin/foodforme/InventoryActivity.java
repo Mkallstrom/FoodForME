@@ -30,8 +30,10 @@ public class InventoryActivity extends ActionBarActivity {
 
     SharedPreferences inventory;
     SharedPreferences dates;
+    SharedPreferences codes;
     SharedPreferences.Editor inventoryEditor;
     SharedPreferences.Editor datesEditor;
+    SharedPreferences.Editor codesEditor;
     int index = 0;
 
     ListView listView;
@@ -47,8 +49,10 @@ public class InventoryActivity extends ActionBarActivity {
 
         inventory = getSharedPreferences("inventory",0);
         dates = getSharedPreferences("dates",0);
+        codes = getSharedPreferences("codes",0);
         inventoryEditor = inventory.edit();
         datesEditor = dates.edit();
+        codesEditor = dates.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
@@ -65,7 +69,7 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(new Product(entry.getValue().toString(),dates.getString(entry.getKey(),""), entry.getKey()));
+                products.add(new Product(entry.getValue().toString().substring(4),dates.getString(entry.getKey(),""), entry.getKey(),Integer.parseInt(entry.getValue().toString().substring(0,3)), codes.getString(entry.getKey(),"")));
             }
         }
         productsAdapter.notifyDataSetChanged();
@@ -86,7 +90,7 @@ public class InventoryActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-        menu.setHeaderTitle("Edit " + products.get(info.position).name);
+        menu.setHeaderTitle("Edit " + products.get(info.position).getName());
         menu.add(0, 1, 0, "Delete");
         menu.add(0, 2, 0, "Edit");
     }
@@ -97,8 +101,8 @@ public class InventoryActivity extends ActionBarActivity {
 
         if(itemID == 1){
             Product product = products.get(info.position);
-            inventoryEditor.remove(product.key);
-            datesEditor.remove(product.key);
+            inventoryEditor.remove(product.getKey());
+            datesEditor.remove(product.getKey());
             inventoryEditor.commit();
             datesEditor.commit();
             products.remove(product);
@@ -145,13 +149,15 @@ public class InventoryActivity extends ActionBarActivity {
     * Results from other activities needs to be handled here (ex. scanner)
     */
 
-    protected void addProduct(String name, String date)
+    protected void addProduct(String name, String date, String code)
     {
-        Product product = new Product(name, date, Integer.toString(index));
-        inventoryEditor.putString(Integer.toString(index), name);
+        Product product = new Product(name, date, Integer.toString(index), 1, code);
+        inventoryEditor.putString(Integer.toString(index), "001" + name);
         datesEditor.putString(Integer.toString(index), date);
+        codesEditor.putString(Integer.toString(index), code);
         inventoryEditor.commit();
         datesEditor.commit();
+        codesEditor.commit();
         products.add(product);
         productsAdapter.notifyDataSetChanged();
     }
@@ -162,13 +168,14 @@ public class InventoryActivity extends ActionBarActivity {
             if(resultCode == RESULT_OK) {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
+                String newCode = data.getStringExtra("code");
                 // TODO: save expiration date somewhere
 
                 index+=1;
                 inventoryEditor.remove("index");
                 inventoryEditor.putString("index",Integer.toString(index));
                 inventoryEditor.commit();
-                addProduct(newProduct, newProductExpDate);
+                addProduct(newProduct, newProductExpDate, newCode);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();

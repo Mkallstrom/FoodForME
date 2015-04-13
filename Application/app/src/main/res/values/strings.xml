@@ -7,5 +7,6 @@
     <string name="title_activity_add_product">AddProductActivity</string>
     <string name="title_activity_list">ListActivity</string>
     <string name="title_activity_shopping_list_addition">ShoppingListAdditionActivity</string>
+    <string name="title_activity_required_list">RequiredList</string>
 
 </resources>

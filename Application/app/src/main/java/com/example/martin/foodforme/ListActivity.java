@@ -21,18 +21,17 @@ import java.util.Map;
 
 public class ListActivity extends ActionBarActivity {
 
-    ArrayList<ShoppingItem> shoppingList;
-    ArrayList<ShoppingItem> requiredList;
+    ArrayList<Product> shoppingList;
+    ArrayList<Product> requiredList;
+    ArrayList<Product> inventoryList;
     ArrayAdapter shoppingAdapter;
-    ArrayAdapter requiredAdapter;
     SharedPreferences shoppingSP;
     SharedPreferences requiredSP;
+    SharedPreferences inventorySP;
+    SharedPreferences localBarcodes;
     SharedPreferences.Editor shoppingEditor;
-    SharedPreferences.Editor requiredEditor;
     ListView shoppingListView;
-    ListView requiredListView;
     int sindex = 0;
-    int mindex = 0;
     private static final String TAG = "MyActivity";
 
     @Override
@@ -43,23 +42,22 @@ public class ListActivity extends ActionBarActivity {
 
         shoppingList = new ArrayList();
         requiredList = new ArrayList();
+        inventoryList = new ArrayList();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
-        requiredAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,requiredList);
 
         shoppingSP = getSharedPreferences("shoppingSP",0);
         requiredSP = getSharedPreferences("requiredSP",0);
+        inventorySP = getSharedPreferences("inventory",0);
+        localBarcodes = getSharedPreferences("localBarcodes", 0);
 
         shoppingEditor = shoppingSP.edit();
-        requiredEditor = requiredSP.edit();
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
 
-        requiredListView.setAdapter(requiredAdapter);
         shoppingListView.setAdapter(shoppingAdapter);
 
         registerForContextMenu(shoppingListView);
-        registerForContextMenu(requiredListView);
 
         if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
@@ -67,41 +65,33 @@ public class ListActivity extends ActionBarActivity {
             shoppingEditor.commit();
         }
         sindex = Integer.parseInt(shoppingSP.getString("index",""));
-        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            requiredEditor.putString("index", "0");
-            requiredEditor.commit();
-        }
-        mindex = Integer.parseInt(requiredSP.getString("index",""));
+
         Map<String,?> keys = shoppingSP.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                shoppingList.add(new ShoppingItem(Integer.toString(Integer.parseInt(entry.getValue().toString().substring(0, 3))), entry.getValue().toString().substring(3), entry.getKey()));
+                shoppingList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0, 3)), entry.getValue().toString().substring(3), entry.getKey()));
             }
         }
         keys = requiredSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                requiredList.add(new ShoppingItem(entry.getValue().toString().substring(0,3),entry.getValue().toString().substring(3), entry.getKey()));
+                requiredList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0,3)), entry.getValue().toString().substring(3), entry.getKey()));
             }
         }
 
-        requiredAdapter.notifyDataSetChanged();
+        keys = inventorySP.getAll();
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                inventoryList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0,3)), entry.getValue().toString().substring(3), entry.getKey()));
+            }
+        }
+
         shoppingAdapter.notifyDataSetChanged();
 
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-
-                openContextMenu(view);
-
-            }
-        });
-        requiredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -120,7 +110,7 @@ public class ListActivity extends ActionBarActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         if(v == findViewById(R.id.shoppinglistView))
         {
-            menu.setHeaderTitle("Edit " + shoppingList.get(info.position).name);
+            menu.setHeaderTitle("Edit " + shoppingList.get(info.position).getName());
             menu.add(0, 1, 0, "Edit");
             menu.add(0, 2, 0, "Delete");
         }
@@ -136,18 +126,18 @@ public class ListActivity extends ActionBarActivity {
 
 
             new AlertDialog.Builder(this)
-                    .setTitle(shoppingList.get(info.position).name)
+                    .setTitle(shoppingList.get(info.position).getName())
                     .setView(txtUrl)
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
-                            ShoppingItem item = shoppingList.get(info.position);
+                            Product item = shoppingList.get(info.position);
                             shoppingList.remove(item);
-                            item.amount = Integer.toString(amount);
+                            item.setAmount(Integer.toString(amount));
                             shoppingList.add(info.position,item);
                             shoppingAdapter.notifyDataSetChanged();
-                            shoppingEditor.remove(item.key);
-                            shoppingEditor.putString(item.key, (String.format("%03d", amount) + item.name));
+                            shoppingEditor.remove(item.getKey());
+                            shoppingEditor.putString(item.getKey(), (String.format("%03d", amount) + item.getName()));
                             shoppingEditor.commit();
                         }
                     })
@@ -158,10 +148,10 @@ public class ListActivity extends ActionBarActivity {
                     .show();
 
         } else if(itemID == 2) {
-            ShoppingItem shoppingItem = shoppingList.get(info.position);
+            Product shoppingItem = shoppingList.get(info.position);
             shoppingList.remove(shoppingItem);
             shoppingAdapter.notifyDataSetChanged();
-            shoppingEditor.remove(shoppingItem.key);
+            shoppingEditor.remove(shoppingItem.getKey());
             shoppingEditor.commit();
 
 
@@ -202,7 +192,7 @@ public class ListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = txtUrl.getText().toString();
                         sindex++;
-                        shoppingList.add(new ShoppingItem("1", name, Integer.toString(sindex)));
+                        shoppingList.add(new Product(1, name, Integer.toString(sindex)));
                         shoppingAdapter.notifyDataSetChanged();
                         shoppingEditor.remove("index");
                         shoppingEditor.putString("index", Integer.toString(sindex));
@@ -215,9 +205,5 @@ public class ListActivity extends ActionBarActivity {
                     }
                 })
                 .show();
-    }
-    public void addrequired(View view)
-    {
-
     }
 }

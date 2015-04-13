@@ -35,6 +35,10 @@
             android:name=".ListActivity"
             android:label="@string/title_activity_list" >
         </activity>
+        <activity
+            android:name=".RequirementActivity"
+            android:label="@string/title_activity_required_list" >
+        </activity>
     </application>
 
 </manifest>

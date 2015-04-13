@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.PatternSyntaxException;
 
 public class Product {
 
@@ -13,24 +12,33 @@ public class Product {
     private String expiryDate;
     private String key;
     private String amount;
+    private String code;
 
     private int expiryYear;
     private int expiryMonth;
     private int expiryDay;
 
     // Public constructor
-    public Product(String productName, String expiryDate, String key) {
+    public Product(String productName, String expiryDate, String key, String code) {
         name = productName;
         setExpiryDate(expiryDate);
         this.key = key;
+        this.code = code;
     }
 
     // Constructor including amount
-    public Product(String productName, String expiryDate, String key, String amount) {
+    public Product(String productName, String expiryDate, String key, int amount, String code) {
         name = productName;
         setExpiryDate(expiryDate);
         this.key = key;
-        this.amount = amount;
+        this.amount = Integer.toString(amount);
+        this.code = code;
+    }
+    // Constructor for shopping and requirements
+    public Product(int amount, String key, String name) {
+        this.name = name;
+        this.key = key;
+        this.amount = Integer.toString(amount);
     }
 
     public void setName(String productName) {

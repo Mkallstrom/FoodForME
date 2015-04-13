@@ -104,6 +104,7 @@ public class AddProductActivity extends ActionBarActivity {
         Intent intent = new Intent();
         intent.putExtra("product",productString);
         intent.putExtra("expDate",expDateString());
+        intent.putExtra("code", barcode);
         setResult(RESULT_OK, intent);
         finish();
     }

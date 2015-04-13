@@ -38,8 +38,8 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         TextView number = (TextView)row.findViewById(R.id.date);
         TextView remaining = (TextView)row.findViewById(R.id.daysremaining);
 
-        title.setText(products.get(position).name);
-        number.setText(products.get(position).expiryDate);
+        title.setText(products.get(position).getName());
+        number.setText(products.get(position).getExpiryDate());
         int expiringIn = products.get(position).daysUntilExpired();
         if(expiringIn == 0)
         {
