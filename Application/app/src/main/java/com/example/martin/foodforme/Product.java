@@ -19,11 +19,12 @@ public class Product implements Comparable<Product>{
     private int expiryDay;
 
     // Public constructor
-    public Product(String productName, String expiryDate, String key, String code) {
+    public Product(String productName, String key, int amount) {
         name = productName;
-        setExpiryDate(expiryDate);
+        setExpiryDate(getTodaysDate());
         this.key = key;
-        this.code = code;
+        this.code = "0";
+        this.amount = Integer.toString(amount);
     }
 
     // Constructor including amount
@@ -34,12 +35,7 @@ public class Product implements Comparable<Product>{
         this.amount = Integer.toString(amount);
         this.code = code;
     }
-    // Constructor for shopping and requirements
-    public Product(int amount, String key, String name) {
-        this.name = name;
-        this.key = key;
-        this.amount = Integer.toString(amount);
-    }
+
 
     public void setName(String productName) {
         name = productName;

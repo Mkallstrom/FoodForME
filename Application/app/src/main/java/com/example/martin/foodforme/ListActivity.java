@@ -70,14 +70,14 @@ public class ListActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                shoppingList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0, 3)), entry.getValue().toString().substring(3), entry.getKey()));
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
         keys = requiredSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                requiredList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0,3)), entry.getValue().toString().substring(3), entry.getKey()));
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
 
@@ -85,25 +85,37 @@ public class ListActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                inventoryList.add(new Product(Integer.parseInt(entry.getValue().toString().substring(0,3)), entry.getValue().toString().substring(3), entry.getKey()));
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
 
         ArrayList codes = new ArrayList();
-        for(Product p : inventoryList)
-        {
-            codes.add(p.getCode());
-        }
+        for(Product p : inventoryList) codes.add(p.getCode());
+        for(Product p : shoppingList) codes.add(p.getCode());
         for(Product p : requiredList)
         {
             String code = p.getCode();
             int req = Integer.parseInt(p.getAmount());
             if(!codes.contains(code))
-                shoppingList.add(p);
+            {
+                Product newProduct = new Product(p.getName(), p.getExpiryDate(), p.getKey(), Integer.parseInt(p.getAmount()), p.getCode());
+                shoppingList.add(newProduct);
+            }
+            int totalAmount = 0;
+            Product shoppingItem = null;
             for(Product r : inventoryList)
-             {
-                if(r.getCode() == code && req>Integer.parseInt(r.getAmount())) { r.setAmount(Integer.toString(req)); }
-             }
+            {
+                if(r.getCode() == code && req>Integer.parseInt(r.getAmount())) { totalAmount += Integer.parseInt(r.getAmount()); }
+            }
+            for(Product r : shoppingList)
+            {
+                if(r.getCode() == code && req>Integer.parseInt(r.getAmount()))
+                {
+                    totalAmount += Integer.parseInt(r.getAmount());
+                    shoppingItem = r;
+                }
+            }
+            if(Integer.parseInt(p.getAmount()) > totalAmount) { shoppingItem.setAmount(Integer.toString(req)); }
 
         }
 
@@ -210,11 +222,12 @@ public class ListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = txtUrl.getText().toString();
                         sindex++;
-                        shoppingList.add(new Product(1, name, Integer.toString(sindex)));
+                        Product newProduct = new Product(name, Integer.toString(sindex), 1);
+                        shoppingList.add(newProduct);
                         shoppingAdapter.notifyDataSetChanged();
                         shoppingEditor.remove("index");
                         shoppingEditor.putString("index", Integer.toString(sindex));
-                        shoppingEditor.putString(Integer.toString(sindex), "001" + name);
+                        shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode());
                         shoppingEditor.commit();
                     }
                 })
@@ -223,5 +236,11 @@ public class ListActivity extends ActionBarActivity {
                     }
                 })
                 .show();
+    }
+    public Product parseSharedPreferences(String string, String key)
+    {  String[] strings = string.split("|");
+        // Namn, date, key, amount, code
+        return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
+
     }
 }

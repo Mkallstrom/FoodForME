@@ -20,7 +20,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -30,12 +29,10 @@ public class InventoryActivity extends ActionBarActivity {
     ArrayList<Product> products;
     ArrayAdapter productsAdapter;
 
+
     SharedPreferences inventory;
-    SharedPreferences dates;
-    SharedPreferences codes;
     SharedPreferences.Editor inventoryEditor;
-    SharedPreferences.Editor datesEditor;
-    SharedPreferences.Editor codesEditor;
+
     int index = 0;
 
     ListView listView;
@@ -50,11 +47,8 @@ public class InventoryActivity extends ActionBarActivity {
         productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
         inventory = getSharedPreferences("inventory",0);
-        dates = getSharedPreferences("dates",0);
-        codes = getSharedPreferences("codes",0);
+
         inventoryEditor = inventory.edit();
-        datesEditor = dates.edit();
-        codesEditor = dates.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
@@ -71,7 +65,7 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(new Product(entry.getValue().toString().substring(4),dates.getString(entry.getKey(),""), entry.getKey(),Integer.parseInt(entry.getValue().toString().substring(0, 3)), codes.getString(entry.getKey(), "")));
+                products.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
         Collections.sort(products);
@@ -105,9 +99,7 @@ public class InventoryActivity extends ActionBarActivity {
         if(itemID == 1){
             Product product = products.get(info.position);
             inventoryEditor.remove(product.getKey());
-            datesEditor.remove(product.getKey());
             inventoryEditor.commit();
-            datesEditor.commit();
             products.remove(product);
             productsAdapter.notifyDataSetChanged();
 
@@ -155,12 +147,9 @@ public class InventoryActivity extends ActionBarActivity {
     protected void addProduct(String name, String date, String code)
     {
         Product product = new Product(name, date, Integer.toString(index), 1, code);
-        inventoryEditor.putString(Integer.toString(index), "001" + name);
-        datesEditor.putString(Integer.toString(index), date);
-        codesEditor.putString(Integer.toString(index), code);
+        // Namn, date, key, amount, code
+        inventoryEditor.putString(Integer.toString(index), name + "|" + date + "|1|" + code);
         inventoryEditor.commit();
-        datesEditor.commit();
-        codesEditor.commit();
         products.add(product);
         productsAdapter.notifyDataSetChanged();
     }
@@ -201,5 +190,10 @@ public class InventoryActivity extends ActionBarActivity {
                 }
             }
 
+    }
+    public Product parseSharedPreferences(String string, String key) {
+        String[] strings = string.split("|");
+        // Namn, date, key, amount, code
+        return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3]);
     }
 }
