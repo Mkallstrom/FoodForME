@@ -60,5 +60,4 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
     }
 
 
-
 }

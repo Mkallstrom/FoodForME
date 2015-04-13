@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class Product {
+public class Product implements Comparable<Product>{
 
     private String name;
     private String expiryDate;
@@ -146,5 +146,17 @@ public class Product {
             e.printStackTrace();
             return new int[]{0, 0, 0};
         }
+    }
+
+    /**
+     * Compare the expire dates
+     * @param product - Product to compare with this
+     * @return - Positive value if product expire later.
+     */
+    @Override
+    public int compareTo(Product product){
+        int thisExpireDate = this.daysUntilExpired();
+        int otherExpireDate = product.daysUntilExpired();
+        return thisExpireDate - otherExpireDate;
     }
 }

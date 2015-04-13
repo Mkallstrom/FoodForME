@@ -20,6 +20,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -69,9 +71,10 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(new Product(entry.getValue().toString().substring(4),dates.getString(entry.getKey(),""), entry.getKey(),Integer.parseInt(entry.getValue().toString().substring(0,3)), codes.getString(entry.getKey(),"")));
+                products.add(new Product(entry.getValue().toString().substring(4),dates.getString(entry.getKey(),""), entry.getKey(),Integer.parseInt(entry.getValue().toString().substring(0, 3)), codes.getString(entry.getKey(), "")));
             }
         }
+        Collections.sort(products);
         productsAdapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new OnItemClickListener() {
