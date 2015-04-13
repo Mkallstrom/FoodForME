@@ -18,7 +18,12 @@ public class Product implements Comparable<Product>{
     private int expiryMonth;
     private int expiryDay;
 
-    // Public constructor
+    /**
+     * Public constructor for a Product object
+     * @param productName   the anem of the Product.
+     * @param key           the key (used in the SharedPreferences) of the Product.
+     * @param amount        the amount of the same Product.
+     */
     public Product(String productName, String key, int amount) {
         name = productName;
         setExpiryDate(getTodaysDate());
@@ -27,7 +32,14 @@ public class Product implements Comparable<Product>{
         this.amount = Integer.toString(amount);
     }
 
-    // Constructor including amount
+    /**
+     * Public constructor for a Product object.
+     * @param productName   the name of the Product.
+     * @param expiryDate    the expiration date of the Product.
+     * @param key           the key (used in the SharedPreferences) of the Product.
+     * @param amount        the amount of the same Product.
+     * @param code          the barcode of the Product.
+     */
     public Product(String productName, String expiryDate, String key, int amount, String code) {
         name = productName;
         setExpiryDate(expiryDate);
@@ -36,11 +48,18 @@ public class Product implements Comparable<Product>{
         this.code = code;
     }
 
-
+    /**
+     * Sets the name of the Product
+     * @param productName   the name of the Product.
+     */
     public void setName(String productName) {
         name = productName;
     }
 
+    /**
+     * Sets the expiration date of the Product
+     * @param expDate   the expiration date as a String "year-month-day" (yyyy-MM-dd).
+     */
     public void setExpiryDate(String expDate) {
         expiryDate = expDate;
         int[] extractedDate = dateStringToArray(expDate);
@@ -100,8 +119,11 @@ public class Product implements Comparable<Product>{
     }
 
     public String getCode() { return code; }
-    // Calculates days until the product expires (assuming format: yyyy-MM-dd)
-    // If already expired it will return a negative number
+
+    /**
+     * Calculates how many days left until the product will pass it's expiration date.
+     * @return  days until the product expires.
+     */
     public int daysUntilExpired() {
         String todaysDate = getTodaysDate();
         int[] todaysDateArray = dateStringToArray(todaysDate);
@@ -122,14 +144,21 @@ public class Product implements Comparable<Product>{
         }
     }
 
-    // Gets todays date in string format yyyy-MM-dd
+    /**
+     * Finds today's date and returns it as a String in the format "year-month-day" (yyyy-MM-dd).
+     * @return  A string representing today's date.
+     */
     private String getTodaysDate() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         return dateFormat.format(date);
     }
 
-    // Extracts year, month and day into an array (assuming format: yyyy-MM-dd)
+    /**
+     * Splits the date string representation into three integers returned as an int array.
+     * @param date  A date in the format "year-month-day" (yyyy-MM-dd).
+     * @return      if successful int array [year,month,day], else [0,0,0]
+     */
     private int[] dateStringToArray(String date) {
         try {
             String[] splitDate = date.split("-");
@@ -145,9 +174,10 @@ public class Product implements Comparable<Product>{
     }
 
     /**
-     * Compare the expire dates
-     * @param product - Product to compare with this
-     * @return - Positive value if product expire later.
+     * Compare the expiration dates between two products
+     * @param product   The Product to compare this Product with
+     * @return          Positive if the Product (this) expires after the Product it is compared with,
+     *                  else the returned value is negative.
      */
     @Override
     public int compareTo(Product product){
@@ -156,6 +186,10 @@ public class Product implements Comparable<Product>{
         return thisExpireDate - otherExpireDate;
     }
 
+    /**
+     * Returns this Product in string format.
+     * @return  String with name, expiryDate, amount and code separated with '|'.
+     */
     public String toString()
     {
         return name + "|" + expiryDate + "|" + amount + "|" + code;

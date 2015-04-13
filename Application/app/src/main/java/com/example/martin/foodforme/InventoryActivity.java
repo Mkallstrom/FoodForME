@@ -197,6 +197,7 @@ public class InventoryActivity extends ActionBarActivity {
         inventoryEditor.putString(Integer.toString(index), name + "|" + date + "|1|" + code);
         inventoryEditor.commit();
         products.add(product);
+        Collections.sort(products);
         productsAdapter.notifyDataSetChanged();
     }
 
