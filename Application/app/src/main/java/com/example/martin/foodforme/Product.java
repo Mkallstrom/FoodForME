@@ -5,16 +5,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.PatternSyntaxException;
 
 public class Product {
 
-    public String name;
-    public String expiryDate;
-    public String key;
+    private String name;
+    private String expiryDate;
+    private String key;
+    private String amount;
 
-    public int expiryYear;
-    public int expiryMonth;
-    public int expiryDay;
+    private int expiryYear;
+    private int expiryMonth;
+    private int expiryDay;
 
     // Public constructor
     public Product(String productName, String expiryDate, String key) {
@@ -23,16 +25,72 @@ public class Product {
         this.key = key;
     }
 
+    // Constructor including amount
+    public Product(String productName, String expiryDate, String key, String amount) {
+        name = productName;
+        setExpiryDate(expiryDate);
+        this.key = key;
+        this.amount = amount;
+    }
+
     public void setName(String productName) {
         name = productName;
     }
 
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
-        int[] extractedDate = dateStringToArray(expiryDate);
+    public void setExpiryDate(String expDate) {
+        expiryDate = expDate;
+        int[] extractedDate = dateStringToArray(expDate);
         expiryYear = extractedDate[0];
         expiryMonth = extractedDate[1];
         expiryDay = extractedDate[2];
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public void setExpiryYear(int expiryYear) {
+        this.expiryYear = expiryYear;
+    }
+
+    public void setExpiryMonth(int expiryMonth) {
+        this.expiryMonth = expiryMonth;
+    }
+
+    public void setExpiryDay(int expiryDay) {
+        this.expiryDay = expiryDay;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getExpiryDate() {
+        return expiryDate;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public int getExpiryYear() {
+        return expiryYear;
+    }
+
+    public int getExpiryMonth() {
+        return expiryMonth;
+    }
+
+    public int getExpiryDay() {
+        return expiryDay;
     }
 
     // Calculates days until the product expires (assuming format: yyyy-MM-dd)
@@ -51,9 +109,9 @@ public class Product {
             Date date2 = myDateFormat.parse(expiryDate);
             long diff = date2.getTime() - date1.getTime();
             return (int)TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-        } catch(ParseException e) {
+        } catch(ParseException e) { // String could not get parsed to a date
             e.printStackTrace();
-            return -9001;
+            return -9001; // Setting a trash value
         }
     }
 
@@ -66,14 +124,16 @@ public class Product {
 
     // Extracts year, month and day into an array (assuming format: yyyy-MM-dd)
     private int[] dateStringToArray(String date) {
-        String[] splitDate = date.split("-");
-        int yearToday = Integer.parseInt(splitDate[0]);
-        int monthToday = Integer.parseInt(splitDate[1]);
-        int dayToday = Integer.parseInt(splitDate[2]);
+        try {
+            String[] splitDate = date.split("-");
+            int parsedYear = Integer.parseInt(splitDate[0]);
+            int parsedMonth = Integer.parseInt(splitDate[1]);
+            int parsedDay = Integer.parseInt(splitDate[2]);
 
-        int[] expDate = {yearToday, monthToday, dayToday};
-
-        return expDate;
-
+            return new int[] {parsedYear, parsedMonth, parsedDay};
+        } catch (Exception e) {  // If it fails to parse the date, return [0,0,0]
+            e.printStackTrace();
+            return new int[]{0, 0, 0};
+        }
     }
 }
