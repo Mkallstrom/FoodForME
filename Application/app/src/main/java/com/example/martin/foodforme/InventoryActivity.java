@@ -31,13 +31,12 @@ public class InventoryActivity extends ActionBarActivity {
 
 
     SharedPreferences inventory;
+    SharedPreferences requiredSP;
     SharedPreferences.Editor inventoryEditor;
-    SharedPreferences inventory2;
-    SharedPreferences.Editor inventoryEditor2;
-    SharedPreferences inventory3;
-    SharedPreferences.Editor inventoryEditor3;
+    SharedPreferences.Editor requiredEditor;
 
     int index = 0;
+    int rindex = 0;
 
     ListView listView;
 
@@ -51,7 +50,9 @@ public class InventoryActivity extends ActionBarActivity {
         productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
         inventory = getSharedPreferences("inventory",0);
+        requiredSP = getSharedPreferences("requiredSP",0);
         inventoryEditor = inventory.edit();
+        requiredEditor = requiredSP.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
@@ -62,7 +63,13 @@ public class InventoryActivity extends ActionBarActivity {
             inventoryEditor.putString("index", "0");
             inventoryEditor.commit();
         }
+        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            requiredEditor.putString("index", "0");
+            requiredEditor.commit();
+        }
         index = Integer.parseInt(inventory.getString("index",""));  //Get and save the index.
+        rindex = Integer.parseInt(requiredSP.getString("index",""));
 
         Map<String,?> keys = inventory.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
@@ -71,6 +78,7 @@ public class InventoryActivity extends ActionBarActivity {
                 products.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
+
         Collections.sort(products);
         productsAdapter.notifyDataSetChanged();
 
@@ -91,8 +99,9 @@ public class InventoryActivity extends ActionBarActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         menu.setHeaderTitle("Edit " + products.get(info.position).getName());
-        menu.add(0, 1, 0, "Delete");
+        menu.add(0, 1, 0, "Remove");
         menu.add(0, 2, 0, "Edit");
+        menu.add(0, 3, 0, "Add to requirements");
     }
 
     public boolean onContextItemSelected(MenuItem item) {
@@ -109,7 +118,16 @@ public class InventoryActivity extends ActionBarActivity {
         } else if(itemID == 2) {
             // TODO: Implement some kind of edit functionality
             Toast.makeText(this, "Edit was pressed on " + products.get(info.position), Toast.LENGTH_SHORT).show();
-        } else {return false;}
+        }
+        else if(itemID == 3) {
+            rindex++;
+            requiredEditor.putString(Integer.toString(rindex), products.get(info.position).toString());
+            requiredEditor.commit();
+        }
+        else
+        {
+            return false;
+        }
         return true;
     }
 

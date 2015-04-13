@@ -95,30 +95,41 @@ public class ListActivity extends ActionBarActivity {
         for(Product p : requiredList)
         {
             String code = p.getCode();
+            Product changedItem = null;
             int req = Integer.parseInt(p.getAmount());
             if(!codes.contains(code))
             {
                 Product newProduct = new Product(p.getName(), p.getExpiryDate(), p.getKey(), Integer.parseInt(p.getAmount()), p.getCode());
                 shoppingList.add(newProduct);
+                changedItem = newProduct;
+                shoppingEditor.putString(Integer.toString(sindex), changedItem.toString());
             }
             int totalAmount = 0;
-            Product shoppingItem = null;
+
             for(Product r : inventoryList)
             {
-                if(r.getCode() == code && req>Integer.parseInt(r.getAmount())) { totalAmount += Integer.parseInt(r.getAmount()); }
+                if(r.getCode().equals(code))
+                {
+                    totalAmount += Integer.parseInt(r.getAmount());
+                }
             }
             for(Product r : shoppingList)
             {
-                if(r.getCode() == code && req>Integer.parseInt(r.getAmount()))
+                if(r.getCode().equals(code))
                 {
                     totalAmount += Integer.parseInt(r.getAmount());
-                    shoppingItem = r;
+                    changedItem = r;
                 }
             }
-            if(Integer.parseInt(p.getAmount()) > totalAmount) { shoppingItem.setAmount(Integer.toString(req)); }
+            if(Integer.parseInt(p.getAmount()) > totalAmount) // Increase amount
+            {
+                changedItem.setAmount(Integer.toString(req));
+                shoppingEditor.remove(changedItem.getKey());
+                shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
+            }
 
         }
-
+        shoppingEditor.commit();
         shoppingAdapter.notifyDataSetChanged();
 
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -238,7 +249,7 @@ public class ListActivity extends ActionBarActivity {
                 .show();
     }
     public Product parseSharedPreferences(String string, String key)
-    {  String[] strings = string.split("|");
+    {  String[] strings = string.split("\\|");
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
 
