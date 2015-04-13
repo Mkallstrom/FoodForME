@@ -49,7 +49,6 @@ public class MainActivity extends ActionBarActivity {
         startActivity(intent);
     }
 
-    //
     public void toRequirement(View view){
         Intent intent = new Intent(this, RequirementActivity.class);
         startActivity(intent);
