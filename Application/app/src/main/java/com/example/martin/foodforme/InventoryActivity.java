@@ -192,7 +192,7 @@ public class InventoryActivity extends ActionBarActivity {
 
     }
     public Product parseSharedPreferences(String string, String key) {
-        String[] strings = string.split("|");
+        String[] strings = string.split("\\|"); // The double backslash is needed for some characters
         // Namn, date, key, amount, code
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3]);
     }

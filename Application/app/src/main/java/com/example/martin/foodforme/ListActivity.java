@@ -237,8 +237,8 @@ public class ListActivity extends ActionBarActivity {
                 })
                 .show();
     }
-    public Product parseSharedPreferences(String string, String key)
-    {  String[] strings = string.split("|");
+    public Product parseSharedPreferences(String string, String key) {
+        String[] strings = string.split("\\|"); // The double backslash is needed for some characters
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
 
