@@ -1,6 +1,8 @@
 package com.example.martin.foodforme;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -105,7 +108,7 @@ public class InventoryActivity extends ActionBarActivity {
     }
 
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int itemID = item.getItemId();
 
         if(itemID == 1){
@@ -116,8 +119,30 @@ public class InventoryActivity extends ActionBarActivity {
             productsAdapter.notifyDataSetChanged();
 
         } else if(itemID == 2) {
-            // TODO: Implement some kind of edit functionality
-            Toast.makeText(this, "Edit was pressed on " + products.get(info.position), Toast.LENGTH_SHORT).show();
+            final EditText txtUrl = new EditText(this);
+
+
+            new AlertDialog.Builder(this)
+                    .setTitle(products.get(info.position).getName())
+                    .setView(txtUrl)
+                    .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            int amount = Integer.parseInt(txtUrl.getText().toString());
+                            Product item = products.get(info.position);
+                            products.remove(item);
+                            item.setAmount(Integer.toString(amount));
+                            products.add(info.position,item);
+                            productsAdapter.notifyDataSetChanged();
+                            inventoryEditor.remove(item.getKey());
+                            inventoryEditor.putString(item.getKey(), item.toString());
+                            inventoryEditor.commit();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                        }
+                    })
+                    .show();
         }
         else if(itemID == 3) {
             rindex++;

@@ -96,7 +96,6 @@ public class ListActivity extends ActionBarActivity {
         {
             String code = p.getCode();
             Product changedItem = null;
-            int req = Integer.parseInt(p.getAmount());
             if(!codes.contains(code))
             {
                 Product newProduct = new Product(p.getName(), p.getExpiryDate(), p.getKey(), Integer.parseInt(p.getAmount()), p.getCode());
@@ -104,26 +103,28 @@ public class ListActivity extends ActionBarActivity {
                 changedItem = newProduct;
                 shoppingEditor.putString(Integer.toString(sindex), changedItem.toString());
             }
-            int totalAmount = 0;
+
+            int inventoryAmount = 0;
+            int shoppinglistAmount = 0;
 
             for(Product r : inventoryList)
             {
                 if(r.getCode().equals(code))
                 {
-                    totalAmount += Integer.parseInt(r.getAmount());
+                    inventoryAmount += Integer.parseInt(r.getAmount());
                 }
             }
             for(Product r : shoppingList)
             {
                 if(r.getCode().equals(code))
                 {
-                    totalAmount += Integer.parseInt(r.getAmount());
+                    shoppinglistAmount += Integer.parseInt(r.getAmount());
                     changedItem = r;
                 }
             }
-            if(Integer.parseInt(p.getAmount()) > totalAmount) // Increase amount
+            if(Integer.parseInt(p.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
             {
-                changedItem.setAmount(Integer.toString(req));
+                changedItem.setAmount(Integer.toString(Integer.parseInt(p.getAmount())-inventoryAmount));
                 shoppingEditor.remove(changedItem.getKey());
                 shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
             }
@@ -178,7 +179,7 @@ public class ListActivity extends ActionBarActivity {
                             shoppingList.add(info.position,item);
                             shoppingAdapter.notifyDataSetChanged();
                             shoppingEditor.remove(item.getKey());
-                            shoppingEditor.putString(item.getKey(), (String.format("%03d", amount) + item.getName()));
+                            shoppingEditor.putString(item.getKey(), item.toString());
                             shoppingEditor.commit();
                         }
                     })
