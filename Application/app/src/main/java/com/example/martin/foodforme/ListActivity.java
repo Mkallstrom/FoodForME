@@ -89,6 +89,24 @@ public class ListActivity extends ActionBarActivity {
             }
         }
 
+        ArrayList codes = new ArrayList();
+        for(Product p : inventoryList)
+        {
+            codes.add(p.getCode());
+        }
+        for(Product p : requiredList)
+        {
+            String code = p.getCode();
+            int req = Integer.parseInt(p.getAmount());
+            if(!codes.contains(code))
+                shoppingList.add(p);
+            for(Product r : inventoryList)
+             {
+                if(r.getCode() == code && req>Integer.parseInt(r.getAmount())) { r.setAmount(Integer.toString(req)); }
+             }
+
+        }
+
         shoppingAdapter.notifyDataSetChanged();
 
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

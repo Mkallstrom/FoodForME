@@ -73,6 +73,8 @@ public class Product {
         this.expiryDay = expiryDay;
     }
 
+    public void setCode(String code) { this.code = code; }
+
     public String getName() {
         return name;
     }
@@ -101,6 +103,7 @@ public class Product {
         return expiryDay;
     }
 
+    public String getCode() { return code; }
     // Calculates days until the product expires (assuming format: yyyy-MM-dd)
     // If already expired it will return a negative number
     public int daysUntilExpired() {
