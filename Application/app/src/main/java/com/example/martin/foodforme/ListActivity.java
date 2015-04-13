@@ -51,6 +51,9 @@ public class ListActivity extends ActionBarActivity {
         inventorySP = getSharedPreferences("inventory",0);
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
+
+
+
         shoppingEditor = shoppingSP.edit();
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
@@ -167,7 +170,7 @@ public class ListActivity extends ActionBarActivity {
                             shoppingList.add(info.position,item);
                             shoppingAdapter.notifyDataSetChanged();
                             shoppingEditor.remove(item.getKey());
-                            shoppingEditor.putString(item.getKey(), (String.format("%03d", amount) + item.getName()));
+                            shoppingEditor.putString(item.getKey(), item.toString());
                             shoppingEditor.commit();
                         }
                     })
@@ -227,7 +230,8 @@ public class ListActivity extends ActionBarActivity {
                         shoppingAdapter.notifyDataSetChanged();
                         shoppingEditor.remove("index");
                         shoppingEditor.putString("index", Integer.toString(sindex));
-                        shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode());
+                        String newString = name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode();
+                        shoppingEditor.putString(Integer.toString(sindex), newString);
                         shoppingEditor.commit();
                     }
                 })
@@ -238,7 +242,7 @@ public class ListActivity extends ActionBarActivity {
                 .show();
     }
     public Product parseSharedPreferences(String string, String key)
-    {  String[] strings = string.split("|");
+    {  String[] strings = string.split("\\|");
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
 

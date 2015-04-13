@@ -155,4 +155,9 @@ public class Product implements Comparable<Product>{
         int otherExpireDate = product.daysUntilExpired();
         return thisExpireDate - otherExpireDate;
     }
+
+    public String toString()
+    {
+        return name + "|" + expiryDate + "|" + amount + "|" + code;
+    }
 }

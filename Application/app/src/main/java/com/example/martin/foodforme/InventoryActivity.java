@@ -32,6 +32,10 @@ public class InventoryActivity extends ActionBarActivity {
 
     SharedPreferences inventory;
     SharedPreferences.Editor inventoryEditor;
+    SharedPreferences inventory2;
+    SharedPreferences.Editor inventoryEditor2;
+    SharedPreferences inventory3;
+    SharedPreferences.Editor inventoryEditor3;
 
     int index = 0;
 
@@ -47,7 +51,6 @@ public class InventoryActivity extends ActionBarActivity {
         productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
         inventory = getSharedPreferences("inventory",0);
-
         inventoryEditor = inventory.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
