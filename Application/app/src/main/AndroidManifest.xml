@@ -33,7 +33,7 @@
             android:parentActivityName=".InventoryActivity" >
         </activity>
         <activity
-            android:name=".ListActivity"
+            android:name=".ShoppingListActivity"
             android:label="@string/title_activity_list"
             android:parentActivityName=".MainActivity" >
         </activity>

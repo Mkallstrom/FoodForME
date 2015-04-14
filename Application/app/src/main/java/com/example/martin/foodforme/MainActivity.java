@@ -46,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void toList(View view){
-        Intent intent = new Intent(this, ListActivity.class);
+        Intent intent = new Intent(this, ShoppingListActivity.class);
         startActivity(intent);
     }
 

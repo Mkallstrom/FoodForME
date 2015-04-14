@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
-public class ListActivity extends ActionBarActivity {
+public class ShoppingListActivity extends ActionBarActivity {
 
     ArrayList<Product> shoppingList;
     ArrayList<Product> requiredList;
