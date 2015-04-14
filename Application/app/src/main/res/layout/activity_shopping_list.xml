@@ -38,14 +38,15 @@
                 android:text="Add"
                 android:id="@+id/addtoslbutton"
                 android:layout_gravity="center_horizontal"
-                android:onClick="addShopping" />
+                android:onClick="addShopping"
+                android:layout_weight="0.5" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Scan"
                 android:id="@+id/scanButton"
-                android:layout_weight="1"
+                android:layout_weight="0.5"
                 android:onClick="scanBarcode" />
 
         </LinearLayout>

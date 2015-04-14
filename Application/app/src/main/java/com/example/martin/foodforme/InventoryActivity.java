@@ -19,9 +19,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -267,7 +264,7 @@ public class InventoryActivity extends ActionBarActivity {
         {
             boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
             shoppingEditor.remove(boughtItem.getKey());
-            if(Integer.parseInt(boughtItem.getAmount()) <= 0)
+            if(Integer.parseInt(boughtItem.getAmount()) > 0)
             {
                 shoppingEditor.putString(boughtItem.getKey(), boughtItem.toString());
             }

@@ -34,7 +34,7 @@ public class Scanner extends ActionBarActivity {
 
         if (scanningResult != null) {
             if (scanningResult.getContents() == null) {
-                Toast.makeText(this, "Canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(sendingActivity, "Canceled", Toast.LENGTH_SHORT).show();
             } else {                                        // Start addProductActivity
                 Intent intent = new Intent(sendingActivity, AddProductActivity.class);
                 String message = scanningResult.getContents();
@@ -42,7 +42,7 @@ public class Scanner extends ActionBarActivity {
                 sendingActivity.startActivityForResult(intent, 100);
             }
         } else { // scanningResult == null
-            Toast.makeText(this, "ERROR: No scan data received!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(sendingActivity, "ERROR: No scan data received!", Toast.LENGTH_SHORT).show();
         }
 
     }

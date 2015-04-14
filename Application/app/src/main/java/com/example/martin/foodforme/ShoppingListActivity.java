@@ -33,8 +33,10 @@ public class ShoppingListActivity extends ActionBarActivity {
     SharedPreferences inventorySP;
     SharedPreferences localBarcodes;
     SharedPreferences.Editor shoppingEditor;
+    SharedPreferences.Editor inventoryEditor;
     ListView shoppingListView;
     int sindex = 0;
+    int index = 0;
 
     private static final String TAG = "MyActivity";
 
@@ -56,7 +58,9 @@ public class ShoppingListActivity extends ActionBarActivity {
         inventorySP = getSharedPreferences("inventory",0);
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
+
         shoppingEditor = shoppingSP.edit();
+        inventoryEditor = inventorySP.edit();
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
 
@@ -69,7 +73,13 @@ public class ShoppingListActivity extends ActionBarActivity {
             shoppingEditor.putString("index", "0");
             shoppingEditor.commit();
         }
+        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            inventoryEditor.putString("index", "0");
+            inventoryEditor.commit();
+        }
         sindex = Integer.parseInt(shoppingSP.getString("index",""));
+        index = Integer.parseInt(inventorySP.getString("index",""));
 
         Map<String,?> keys = shoppingSP.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
@@ -266,6 +276,41 @@ public class ShoppingListActivity extends ActionBarActivity {
    */
     public void scanBarcode(View view) {
         scanner.scan();
+    }
+
+    protected void addProduct(String name, String date, String code)
+    {
+        Product product = new Product(name, date, Integer.toString(index), 1, code);
+        // Namn, date, key, amount, code
+        inventoryEditor.putString(Integer.toString(index), product.toString());
+        inventoryEditor.commit();
+        Product boughtItem = null;
+        if(!shoppingList.isEmpty())
+        {
+            for (Product p : shoppingList)
+            {
+                if (code.equals(p.getCode()))
+                {
+                    boughtItem = p;
+                }
+            }
+        }
+
+        if(boughtItem!=null)
+        {
+            boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
+            shoppingEditor.remove(boughtItem.getKey());
+            if(Integer.parseInt(boughtItem.getAmount()) > 0)
+            {
+                shoppingEditor.putString(boughtItem.getKey(), boughtItem.toString());
+            }
+            else
+            {
+                shoppingList.remove(boughtItem);
+            }
+            shoppingEditor.commit();
+            shoppingAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
