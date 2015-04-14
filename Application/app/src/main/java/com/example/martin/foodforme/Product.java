@@ -20,7 +20,7 @@ public class Product implements Comparable<Product>{
 
     /**
      * Public constructor for a Product object
-     * @param productName   the anem of the Product.
+     * @param productName   the name of the Product.
      * @param key           the key (used in the SharedPreferences) of the Product.
      * @param amount        the amount of the same Product.
      */

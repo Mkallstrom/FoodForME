@@ -20,6 +20,9 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
     private int resource;
     private ArrayList<Product> products;
     LayoutInflater inflater;
+    int expiredColor = Color.rgb(255, 178, 178);
+    int expiringColor = Color.rgb(255, 255, 178);
+    int notexpiringColor = Color.rgb(178, 255, 178);
 
     public ListArrayAdapter (Context context, int resource, ArrayList products)
     {
@@ -47,20 +50,20 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         if(expiringIn == 0)
         {
             remaining.setText("Expires today.");
-            row.setBackgroundColor(Color.YELLOW);
+            row.setBackgroundColor(expiringColor);
         }
         else
         {
             if(expiringIn > 0)
             {
                 remaining.setText("Expires in " + Integer.toString(expiringIn) + " days.");
-                if(expiringIn < 8) row.setBackgroundColor(Color.YELLOW);
-                else row.setBackgroundColor(Color.GREEN);
+                if(expiringIn < 8) row.setBackgroundColor(expiringColor);
+                else row.setBackgroundColor(notexpiringColor);
             }
             else
             {
                 remaining.setText("Expired " + Integer.toString(-expiringIn) + " days ago.");
-                row.setBackgroundColor(Color.RED);
+                row.setBackgroundColor(expiredColor);
             }
         }
         return row;
