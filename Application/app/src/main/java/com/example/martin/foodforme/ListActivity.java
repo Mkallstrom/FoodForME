@@ -37,7 +37,7 @@ public class ListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_shoppingList);
+        setContentView(R.layout.activity_shopping_list);
         Context context = this;
 
         shoppingList = new ArrayList();
