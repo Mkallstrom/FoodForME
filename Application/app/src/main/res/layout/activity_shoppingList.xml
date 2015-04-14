@@ -25,13 +25,30 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1" />
 
-        <Button
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add"
-            android:id="@+id/addtoslbutton"
             android:layout_gravity="center_horizontal"
-            android:onClick="addShopping" />
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add"
+                android:id="@+id/addtoslbutton"
+                android:layout_gravity="center_horizontal"
+                android:onClick="addShopping" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Button"
+                android:id="@+id/scanButton"
+                android:layout_weight="1"
+                android:onClick="scanBarcode" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
