@@ -3,6 +3,7 @@ package com.example.martin.foodforme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -264,5 +266,29 @@ public class ShoppingListActivity extends ActionBarActivity {
    */
     public void scanBarcode(View view) {
         scanner.scan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {                                   // Result is from addproduct
+            if(resultCode == RESULT_OK) {
+                String newProduct = data.getStringExtra("product"); // Gets the name of the product
+                String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
+                String newCode = data.getStringExtra("code");
+                // TODO: save expiration date somewhere
+
+                index+=1;
+                inventoryEditor.remove("index");
+                inventoryEditor.putString("index",Integer.toString(index));
+                inventoryEditor.commit();
+                addProduct(newProduct, newProductExpDate, newCode);
+
+            } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
+                Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();
+            }
+        } else {                                                    // Result is from scanning
+            scanner.scannerResult(requestCode, resultCode, data);
+        }
+
     }
 }
