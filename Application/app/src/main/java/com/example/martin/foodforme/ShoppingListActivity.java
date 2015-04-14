@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -183,7 +184,7 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         if(itemID == 1){
             final EditText txtUrl = new EditText(this);
-
+            txtUrl.setInputType(InputType.TYPE_CLASS_NUMBER);
 
             new AlertDialog.Builder(this)
                     .setTitle(shoppingList.get(info.position).getName())
