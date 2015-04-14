@@ -294,6 +294,7 @@ public class InventoryActivity extends ActionBarActivity {
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();
             }
         } else {                                                    // Result is from scanning
+            /*
                 IntentResult scanningResult =
                         IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
@@ -308,7 +309,8 @@ public class InventoryActivity extends ActionBarActivity {
                     }
                 } else { // scanningResult == null
                     Toast.makeText(this, "ERROR: No scan data received!", Toast.LENGTH_SHORT).show();
-                }
+                }*/
+                scanner.scannerResult(requestCode, resultCode, data);
             }
 
     }
