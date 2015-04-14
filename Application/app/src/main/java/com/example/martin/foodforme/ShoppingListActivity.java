@@ -134,10 +134,12 @@ public class ShoppingListActivity extends ActionBarActivity {
                 {
                     Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode());
                     shoppingList.add(newProduct);
+                    Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
                 }
                 else if (changedItem != null)
                 {
+                    Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
                     shoppingEditor.remove(changedItem.getKey());
                     shoppingEditor.putString(changedItem.getKey(), changedItem.toString());

@@ -2,6 +2,7 @@ package com.example.martin.foodforme;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,16 +47,20 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         if(expiringIn == 0)
         {
             remaining.setText("Expires today.");
+            if(expiringIn < 3) row.setBackgroundColor(Color.YELLOW);
         }
         else
         {
             if(expiringIn > 0)
             {
                 remaining.setText("Expires in " + Integer.toString(expiringIn) + " days.");
+                if(expiringIn < 8) row.setBackgroundColor(Color.YELLOW);
+                else row.setBackgroundColor(Color.GREEN);
             }
             else
             {
                 remaining.setText("Expired " + Integer.toString(-expiringIn) + " days ago.");
+                row.setBackgroundColor(Color.RED);
             }
         }
         return row;

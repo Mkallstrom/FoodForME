@@ -195,6 +195,8 @@ public class InventoryActivity extends ActionBarActivity {
             else
             {
                 rindex++;
+                Product reqProduct = products.get(info.position);
+                requiredList.add(new Product(reqProduct.getName(),reqProduct.getExpiryDate(),reqProduct.getKey(),1,reqProduct.getCode()));
                 requiredEditor.putString(Integer.toString(rindex), products.get(info.position).toString());
                 requiredEditor.commit();
             }
