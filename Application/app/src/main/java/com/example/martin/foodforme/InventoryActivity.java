@@ -32,12 +32,16 @@ public class InventoryActivity extends ActionBarActivity {
     ArrayList<Product> products;
     ArrayAdapter productsAdapter;
     private Scanner scanner;
+    ArrayList<Product> shoppingList;
+    ArrayList<Product> requiredList;
 
 
     SharedPreferences inventory;
     SharedPreferences requiredSP;
+    SharedPreferences shoppingSP;
     SharedPreferences.Editor inventoryEditor;
     SharedPreferences.Editor requiredEditor;
+    SharedPreferences.Editor shoppingEditor;
 
     int index = 0;
     int rindex = 0;
@@ -52,12 +56,16 @@ public class InventoryActivity extends ActionBarActivity {
         Context context = this;
 
         products = new ArrayList<>();
+        shoppingList = new ArrayList<>();
+        requiredList = new ArrayList<>();
         productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
         inventory = getSharedPreferences("inventory",0);
         requiredSP = getSharedPreferences("requiredSP",0);
+        shoppingSP = getSharedPreferences("shoppingSP",0);
         inventoryEditor = inventory.edit();
         requiredEditor = requiredSP.edit();
+        shoppingEditor = shoppingSP.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(productsAdapter);
@@ -73,6 +81,11 @@ public class InventoryActivity extends ActionBarActivity {
             requiredEditor.putString("index", "0");
             requiredEditor.commit();
         }
+        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            shoppingEditor.putString("index", "0");
+            shoppingEditor.commit();
+        }
         index = Integer.parseInt(inventory.getString("index",""));  //Get and save the index.
         rindex = Integer.parseInt(requiredSP.getString("index",""));
 
@@ -83,6 +96,21 @@ public class InventoryActivity extends ActionBarActivity {
                 products.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
+        keys = shoppingSP.getAll();                    //Get the products into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+            }
+        }
+        keys = requiredSP.getAll();                    //Get the products into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+            }
+        }
+
 
         Collections.sort(products);
         productsAdapter.notifyDataSetChanged();
@@ -147,9 +175,32 @@ public class InventoryActivity extends ActionBarActivity {
                     .show();
         }
         else if(itemID == 3) {
-            rindex++;
-            requiredEditor.putString(Integer.toString(rindex), products.get(info.position).toString());
-            requiredEditor.commit();
+
+            Product requiredItem = null;
+            if(!requiredList.isEmpty())
+            {
+                for (Product p : requiredList)
+                {
+                    if (products.get(info.position).getCode().equals(p.getCode()))
+                    {
+                        requiredItem = p;
+                    }
+                }
+            }
+
+            if(requiredItem!=null)
+            {
+                requiredItem.setAmount(Integer.toString(Integer.parseInt(requiredItem.getAmount())+1));
+                requiredEditor.remove(requiredItem.getKey());
+                requiredEditor.putString(requiredItem.getKey(), requiredItem.toString());
+                requiredEditor.commit();
+            }
+            else
+            {
+                rindex++;
+                requiredEditor.putString(Integer.toString(rindex), products.get(info.position).toString());
+                requiredEditor.commit();
+            }
         }
         else
         {
@@ -200,11 +251,33 @@ public class InventoryActivity extends ActionBarActivity {
     {
         Product product = new Product(name, date, Integer.toString(index), 1, code);
         // Namn, date, key, amount, code
-        inventoryEditor.putString(Integer.toString(index), name + "|" + date + "|1|" + code);
+        inventoryEditor.putString(Integer.toString(index), product.toString());
         inventoryEditor.commit();
         products.add(product);
         Collections.sort(products);
         productsAdapter.notifyDataSetChanged();
+        Product boughtItem = null;
+        if(!shoppingList.isEmpty())
+        {
+            for (Product p : shoppingList)
+            {
+                if (code.equals(p.getCode()))
+                {
+                    boughtItem = p;
+                }
+            }
+        }
+
+        if(boughtItem!=null)
+        {
+            boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
+            shoppingEditor.remove(boughtItem.getKey());
+            if(Integer.parseInt(boughtItem.getAmount()) <= 0)
+            {
+                shoppingEditor.putString(boughtItem.getKey(), boughtItem.toString());
+            }
+            shoppingEditor.commit();
+        }
     }
 
     @Override

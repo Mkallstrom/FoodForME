@@ -89,44 +89,44 @@ public class ShoppingListActivity extends ActionBarActivity {
             }
         }
 
-        ArrayList codes = new ArrayList();
-        for(Product p : inventoryList) codes.add(p.getCode());
-        for(Product p : shoppingList) codes.add(p.getCode());
-        for(Product p : requiredList)
+        ArrayList shoppingCodes = new ArrayList();
+        for(Product p : shoppingList) { shoppingCodes.add(p.getCode()); }
+        for(Product requiredProduct : requiredList)
         {
-            String code = p.getCode();
+            String requiredCode = requiredProduct.getCode();
             Product changedItem = null;
-            if(!codes.contains(code))
-            {
-                Product newProduct = new Product(p.getName(), p.getExpiryDate(), p.getKey(), Integer.parseInt(p.getAmount()), p.getCode());
-                shoppingList.add(newProduct);
-                changedItem = newProduct;
-                shoppingEditor.putString(Integer.toString(sindex), changedItem.toString());
-            }
+            int inventoryAmount = 0, shoppinglistAmount = 0;
 
-            int inventoryAmount = 0;
-            int shoppinglistAmount = 0;
-
-            for(Product r : inventoryList)
+            for(Product inventoryProduct : inventoryList)
             {
-                if(r.getCode().equals(code))
+                if(inventoryProduct.getCode().equals(requiredCode))
                 {
-                    inventoryAmount += Integer.parseInt(r.getAmount());
+                    inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
                 }
             }
-            for(Product r : shoppingList)
+            for(Product shoppinglistProduct : shoppingList)
             {
-                if(r.getCode().equals(code))
+                if(shoppinglistProduct.getCode().equals(requiredCode))
                 {
-                    shoppinglistAmount += Integer.parseInt(r.getAmount());
-                    changedItem = r;
+                    shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
+                    changedItem = shoppinglistProduct;
                 }
             }
-            if(Integer.parseInt(p.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
+
+            if(Integer.parseInt(requiredProduct.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
             {
-                changedItem.setAmount(Integer.toString(Integer.parseInt(p.getAmount())-inventoryAmount));
-                shoppingEditor.remove(changedItem.getKey());
-                shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
+                if(!shoppingCodes.contains(requiredCode))
+                {
+                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode());
+                    shoppingList.add(newProduct);
+                    shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
+                }
+                else if (changedItem != null)
+                {
+                    changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
+                    shoppingEditor.remove(changedItem.getKey());
+                    shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
+                }
             }
 
         }

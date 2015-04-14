@@ -55,7 +55,6 @@ public class RequirementActivity extends ActionBarActivity {
             if(!entry.getKey().equals("index"))
             {
                 requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
-                Log.d(TAG, "found thing");
             }
         }
 
@@ -81,7 +80,7 @@ public class RequirementActivity extends ActionBarActivity {
         {
             menu.setHeaderTitle("Edit " + requiredList.get(info.position).getName());
             menu.add(0, 1, 0, "Edit");
-            menu.add(0, 2, 0, "Delete");
+            menu.add(0, 2, 0, "Remove");
         }
 
     }
