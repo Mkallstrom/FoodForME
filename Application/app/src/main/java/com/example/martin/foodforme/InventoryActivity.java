@@ -31,6 +31,7 @@ public class InventoryActivity extends ActionBarActivity {
 
     ArrayList<Product> products;
     ArrayAdapter productsAdapter;
+    private Scanner scanner;
 
 
     SharedPreferences inventory;
@@ -45,6 +46,7 @@ public class InventoryActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.scanner = new Scanner();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
         Context context = this;
@@ -181,9 +183,13 @@ public class InventoryActivity extends ActionBarActivity {
     /*
     * Initiates the barcode scanner via intent
      */
-    public void scanBarcode(View view) {
+    /*public void scanBarcode(View view) {
         IntentIntegrator scanIntegrator = new IntentIntegrator(this);
         scanIntegrator.initiateScan();
+    }*/
+
+    public void scanBarcode(View view) {
+        scanner.scan();
     }
 
     /*
