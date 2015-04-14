@@ -47,7 +47,7 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         if(expiringIn == 0)
         {
             remaining.setText("Expires today.");
-            if(expiringIn < 3) row.setBackgroundColor(Color.YELLOW);
+            row.setBackgroundColor(Color.YELLOW);
         }
         else
         {
