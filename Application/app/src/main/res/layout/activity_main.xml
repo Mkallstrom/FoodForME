@@ -17,16 +17,18 @@
 
         <ImageButton
             android:layout_width="145dp"
-            android:layout_height="113dp"
+            android:layout_height="125dp"
             android:id="@+id/inventoryButton"
             android:layout_centerHorizontal="true"
             android:onClick="toInventory"
             android:src="@drawable/ib"
             android:background="#00ffffff"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="false"
+            android:layout_margin="10dp" />
 
         <ImageButton
-            android:layout_width="125dp"
+            android:layout_width="145dp"
             android:layout_height="125dp"
             android:id="@+id/listbutton"
             android:onClick="toList"
@@ -35,18 +37,21 @@
             android:layout_alignLeft="@+id/inventoryButton"
             android:layout_alignStart="@+id/inventoryButton"
             android:src="@drawable/lb"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="0.13"
+            android:layout_margin="10dp" />
 
         <ImageButton
-            android:layout_width="142dp"
-            android:layout_height="118dp"
+            android:layout_width="145dp"
+            android:layout_height="125dp"
             android:id="@+id/requirementButton"
             android:src="@drawable/lb"
             android:layout_below="@+id/inventoryButton"
             android:layout_centerHorizontal="true"
             android:cropToPadding="false"
             android:layout_gravity="center_horizontal"
-            android:onClick="toRequirement" />
+            android:onClick="toRequirement"
+            android:layout_margin="10dp" />
 
         <Button
             android:layout_width="wrap_content"
