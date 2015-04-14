@@ -302,5 +302,5 @@ public class InventoryActivity extends ActionBarActivity {
         // Namn, date, key, amount, code
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3]);
     }
-    //
+
 }
