@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class ShoppingListActivity extends ActionBarActivity {
 
+    private Scanner scanner;
     ArrayList<Product> shoppingList;
     ArrayList<Product> requiredList;
     ArrayList<Product> inventoryList;
@@ -32,10 +33,12 @@ public class ShoppingListActivity extends ActionBarActivity {
     SharedPreferences.Editor shoppingEditor;
     ListView shoppingListView;
     int sindex = 0;
+
     private static final String TAG = "MyActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        this.scanner = new Scanner(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
         Context context = this;
@@ -254,5 +257,12 @@ public class ShoppingListActivity extends ActionBarActivity {
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
 
+    }
+
+    /*
+  * Initiates the barcode scanner via intent
+   */
+    public void scanBarcode(View view) {
+        scanner.scan();
     }
 }
