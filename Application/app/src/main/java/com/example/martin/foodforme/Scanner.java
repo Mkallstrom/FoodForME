@@ -3,13 +3,10 @@ package com.example.martin.foodforme;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import java.util.Objects;
 
 /**
  * Created by Andreas on 2015-04-14.
