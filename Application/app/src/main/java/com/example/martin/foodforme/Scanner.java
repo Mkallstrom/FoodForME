@@ -39,7 +39,7 @@ public class Scanner extends ActionBarActivity {
             if (scanningResult.getContents() == null) {
                 Toast.makeText(this, "Canceled", Toast.LENGTH_SHORT).show();
             } else {                                        // Start addProductActivity
-                Intent intent = new Intent(this, AddProductActivity.class);
+                Intent intent = new Intent(sendingActivity, AddProductActivity.class);
                 String message = scanningResult.getContents();
                 intent.putExtra("result", message);         //Send the result to the add product activity.
                 startActivityForResult(intent, 100);
