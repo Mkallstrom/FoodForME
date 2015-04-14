@@ -51,6 +51,7 @@ public class InventoryActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
         Context context = this;
+        setTitle("Inventory");
 
         products = new ArrayList<>();
         shoppingList = new ArrayList<>();
