@@ -240,7 +240,7 @@ public class InventoryActivity extends ActionBarActivity {
     }*/
 
     public void scanBarcode(View view) {
-        scanner.scan();
+        scanner.scan(this);
     }
 
     /*
