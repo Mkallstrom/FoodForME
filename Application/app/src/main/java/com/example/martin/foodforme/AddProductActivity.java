@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -209,6 +210,8 @@ public class AddProductActivity extends ActionBarActivity {
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
                         if (success == 1) {
+                            CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+                            checkBox.setChecked(true);
                             // check your log for json response
                             Log.d("Single Product Details", json.toString());
                             // successfully received product details

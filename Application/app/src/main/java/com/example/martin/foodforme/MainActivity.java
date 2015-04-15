@@ -1,7 +1,6 @@
 package com.example.martin.foodforme;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -54,21 +53,4 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, RequirementActivity.class);
         startActivity(intent);
     }
-
-    public void clearSharedPreferences(View view)
-    {
-        SharedPreferences inventory = getSharedPreferences("inventory",0);
-        SharedPreferences inventory2 = getSharedPreferences("shoppingSP",0);
-        SharedPreferences inventory3 = getSharedPreferences("requiredSP",0);
-        SharedPreferences.Editor inventoryEditor = inventory.edit();
-        SharedPreferences.Editor inventoryEditor2 = inventory2.edit();
-        SharedPreferences.Editor inventoryEditor3 = inventory3.edit();
-        inventoryEditor.clear();
-        inventoryEditor.commit();
-        inventoryEditor2.clear();
-        inventoryEditor2.commit();
-        inventoryEditor3.clear();
-        inventoryEditor3.commit();
-    }
-
 }

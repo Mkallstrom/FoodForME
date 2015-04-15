@@ -103,7 +103,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:id="@+id/linearLayout2">
 
         <Button
             android:layout_width="158dp"
@@ -135,13 +136,21 @@
             android:layout_toRightOf="@+id/productText"
             android:layout_weight="0.5" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Database"
-            android:id="@+id/databaseButton"
-            android:layout_weight="0.50"
-            android:onClick="toDatabase" />
     </LinearLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connection"
+        android:id="@+id/connectionCheck"
+        android:textSize="10dp"
+        android:checked="false"
+        android:layout_alignTop="@+id/barcodeText"
+        android:layout_toRightOf="@+id/expirationDateText"
+        android:layout_toEndOf="@+id/expirationDateText"
+        android:background="@drawable/blankb"
+        android:layout_above="@+id/codeView"
+        android:backgroundTint="@color/abc_background_cache_hint_selector_material_light"
+        android:backgroundTintMode="src_in" />
 
 </RelativeLayout>
