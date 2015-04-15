@@ -1,9 +1,14 @@
 package com.example.martin.foodforme;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,8 +18,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class AddProductActivity extends ActionBarActivity {
@@ -23,31 +35,59 @@ public class AddProductActivity extends ActionBarActivity {
     SharedPreferences localBarcodes;
     TextView codeView;
     EditText productName;
+    String barcode;
+    String databaseName;
+    Context context;
+
+    // Progress Dialog
+    private ProgressDialog pDialog;
+
+    JSONParser jsonParser = new JSONParser();
+    // single product url
+    private static final String url_product_details = "http://212.25.149.10/get_product_details.php";
+
+    // url to update product
+    private static final String url_update_product = "http://212.25.149.10/update_product.php";
+
+    // JSON Node names
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_PRODUCT_NAME = "product_name";
+    private static final String TAG_PRODUCT = "product"; // tag for the db schema
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_add_product);
         setTitle("Add Product");
+        context = this;
 
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
         productName = (EditText)findViewById(R.id.productBox);
 
         Intent callingIntent = getIntent();
-        String str = callingIntent.getExtras().getString("result");
+        barcode = callingIntent.getExtras().getString("result");
         codeView = (TextView)findViewById(R.id.codeView);
-        codeView.setText(str);
+        codeView.setText(barcode);
 
-        if(localBarcodes.contains(str))                 //Local database has the code.
+        if(localBarcodes.contains(barcode))                 //Local database has the code.
         {
-            String foundName = localBarcodes.getString(str, "Not found");
+            String foundName = localBarcodes.getString(barcode, "Not found");
             productName.setText(foundName);
         }
         else
         {
-            //TODO: if(database contains str) productName.setText(foundName); and localBarcodes.putString(str,foundName); else next line
-            Toast.makeText(this, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
+            new GetProductDetails().execute();
+            if(databaseName != null)
+            {
+                String foundName = databaseName;
+                productName.setText(foundName);
+            }
+            else {
+                //Nothing found at all!
+            }
         }
 
         // Fills the spinner with years
@@ -59,8 +99,81 @@ public class AddProductActivity extends ActionBarActivity {
         // Fills the spinner with days
         fillSpinnerDay();
     }
+    class GetProductDetails extends AsyncTask<String, String, String>
+    {
+        /**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(AddProductActivity.this);
+            pDialog.setMessage("Loading product details. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+        /**
+         * Getting product details in background thread
+         * */
+        protected String doInBackground(String... params)
+        {
+
+            // updating UI from Background Thread
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    // Check for success tag
+                    int success;
+                    try {
+                        // Building Parameters
+                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+                        params.add(new BasicNameValuePair("barcode", barcode));
+
+                        // getting product details by making HTTP request
+                        // Note that product details url will use GET request
+                        JSONObject json = jsonParser.makeHttpRequest(
+                                url_product_details, "GET", params);
+
+                        // check your log for json response
+                        Log.d("Single Product Details", json.toString());
 
 
+                        // json success tag
+                        success = json.getInt(TAG_SUCCESS);
+                        if (success == 1) {
+                            // successfully received product details
+                            JSONArray productObj = json
+                                    .getJSONArray(TAG_PRODUCT); // JSON Array
+
+                            // get first product object from JSON Array
+                            JSONObject product = productObj.getJSONObject(0);
+
+                            // product with this pid found
+
+                            // display product data in EditText
+                            productName.setText(product.getString(TAG_PRODUCT_NAME));
+
+                        }else{
+                            // product with pid not found
+                            Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            return null;
+        }
+        /**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once got all details
+            pDialog.dismiss();
+        }
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
