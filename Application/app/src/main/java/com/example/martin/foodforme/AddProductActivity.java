@@ -187,7 +187,7 @@ public class AddProductActivity extends ActionBarActivity {
         {
 
             // updating UI from Background Thread
-            runOnUiThread(new Runnable() {
+            new Runnable() {
                 public void run() {
                     // Check for success tag
                     int success;
@@ -234,7 +234,7 @@ public class AddProductActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                 }
-            });
+            };
 
             return null;
         }
