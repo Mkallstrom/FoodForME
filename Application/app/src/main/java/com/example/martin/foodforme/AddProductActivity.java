@@ -31,28 +31,40 @@ import java.util.List;
 
 public class AddProductActivity extends ActionBarActivity {
 
-    String productString;
+
     SharedPreferences localBarcodes;
+
     TextView codeView;
     EditText productName;
+
+    String productString;
     String barcode;
     String databaseName;
+
     Context context;
+
+    Boolean databaseHasProduct = false;
+
+    JSONObject json;
 
     // Progress Dialog
     private ProgressDialog pDialog;
 
     JSONParser jsonParser = new JSONParser();
     // single product url
-    private static final String url_product_details = "http://212.25.149.10/get_product_details.php";
+    private static final String url_product_details = "http://130.238.15.131/get_product_details.php";
 
     // url to update product
-    private static final String url_update_product = "http://212.25.149.10/update_product.php";
+    private static final String url_update_product = "http://130.238.15.131/update_product.php";
+
+    // url to create new product
+    private static String url_create_product = "http://130.238.15.131/create_product.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_PRODUCT_NAME = "product_name";
-    private static final String TAG_PRODUCT = "product"; // tag for the db schema
+    private static final String TAG_PRODUCT = "product";
+    private static final String TAG_BARCODE = "barcode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +84,9 @@ public class AddProductActivity extends ActionBarActivity {
         codeView = (TextView)findViewById(R.id.codeView);
         codeView.setText(barcode);
 
+        new GetProductDetails().execute();
+        if(databaseName != null) { databaseHasProduct = true; }
+
         if(localBarcodes.contains(barcode))                 //Local database has the code.
         {
             String foundName = localBarcodes.getString(barcode, "Not found");
@@ -79,8 +94,7 @@ public class AddProductActivity extends ActionBarActivity {
         }
         else
         {
-            new GetProductDetails().execute();
-            if(databaseName != null)
+            if(databaseHasProduct)
             {
                 String foundName = databaseName;
                 productName.setText(foundName);
@@ -99,6 +113,63 @@ public class AddProductActivity extends ActionBarActivity {
         // Fills the spinner with days
         fillSpinnerDay();
     }
+
+    class CreateNewProduct extends AsyncTask<String, String, String> {
+
+        /**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        /**
+         * Creating product
+         * */
+        protected String doInBackground(String... args) {
+
+            // Building Parameters
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("product_name", productString));
+            params.add(new BasicNameValuePair("barcode", barcode));
+
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jsonParser.makeHttpRequest(url_create_product,
+                    "POST", params);
+
+            // check log cat fro response
+            Log.d("Create Response", json.toString());
+
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    // successfully created product
+
+                    // closing this screen
+                    finish();
+                } else {
+                    // failed to create product
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        /**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once done
+    }
+
+    }
+
     class GetProductDetails extends AsyncTask<String, String, String>
     {
         /**
@@ -106,12 +177,7 @@ public class AddProductActivity extends ActionBarActivity {
          * */
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
-            pDialog = new ProgressDialog(AddProductActivity.this);
-            pDialog.setMessage("Loading product details. Please wait...");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
+
         }
         /**
          * Getting product details in background thread
@@ -131,16 +197,20 @@ public class AddProductActivity extends ActionBarActivity {
 
                         // getting product details by making HTTP request
                         // Note that product details url will use GET request
-                        JSONObject json = jsonParser.makeHttpRequest(
+                        json = jsonParser.makeHttpRequest(
                                 url_product_details, "GET", params);
 
-                        // check your log for json response
-                        Log.d("Single Product Details", json.toString());
+                        if(json == null)
+                        {
+                            return;
+                        }
 
 
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
                         if (success == 1) {
+                            // check your log for json response
+                            Log.d("Single Product Details", json.toString());
                             // successfully received product details
                             JSONArray productObj = json
                                     .getJSONArray(TAG_PRODUCT); // JSON Array
@@ -170,10 +240,66 @@ public class AddProductActivity extends ActionBarActivity {
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once got all details
-            pDialog.dismiss();
+
         }
 
     }
+
+    /**
+     * Background Async Task to  Save product Details
+     * */
+    class SaveProductDetails extends AsyncTask<String, String, String> {
+
+        /**
+         * Before starting background thread Show Progress Dialog
+         * */
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        /**
+         * Saving product
+         * */
+        protected String doInBackground(String... args) {
+
+            // Building Parameters
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair(TAG_PRODUCT_NAME, productString));
+            params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
+
+
+            // sending modified data through http request
+            // Notice that update product url accepts POST method
+            JSONObject json = jsonParser.makeHttpRequest(url_update_product,
+                    "POST", params);
+
+            // check json success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    // successfully updated
+                    finish();
+                } else {
+                    // failed to update product
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        /**
+         * After completing background task Dismiss the progress dialog
+         * **/
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once product uupdated
+
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -214,8 +340,16 @@ public class AddProductActivity extends ActionBarActivity {
                     editor.putString(barcode,productString);
                     editor.commit();
                 }
-        //TODO: if(global database contains barcode && global database response to barcode != productString) global database update for barcode with productString;
-        //TODO: if(global database does not contain barcode) insert barcode, productString;
+        if(json != null)
+        {
+            if (databaseHasProduct && databaseName != productString) {
+                new SaveProductDetails().execute();
+            }
+            if (!databaseHasProduct) {
+                new CreateNewProduct().execute();
+            }
+        }
+
         Intent intent = new Intent();
         intent.putExtra("product",productString);
         intent.putExtra("expDate",expDateString());
