@@ -8,5 +8,8 @@
     <string name="title_activity_list">ListActivity</string>
     <string name="title_activity_shopping_list_addition">ShoppingListAdditionActivity</string>
     <string name="title_activity_required_list">RequiredList</string>
+    <string name="title_activity_database">DatabaseActivity</string>
+    <string name="title_activity_all_products">AllProductsActivity</string>
+    <string name="title_activity_search_products">SearchProductsActivity</string>
 
 </resources>

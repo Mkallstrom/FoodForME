@@ -132,6 +132,14 @@
             android:layout_toEndOf="@+id/productText"
             android:layout_toRightOf="@+id/productText"
             android:layout_weight="0.5" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Database"
+            android:id="@+id/databaseButton"
+            android:layout_weight="0.50"
+            android:onClick="toDatabase" />
     </LinearLayout>
 
 </RelativeLayout>

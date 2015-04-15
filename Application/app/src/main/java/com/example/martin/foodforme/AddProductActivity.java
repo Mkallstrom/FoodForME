@@ -115,6 +115,15 @@ public class AddProductActivity extends ActionBarActivity {
         finish();
     }
 
+    /**
+     * This is a temporary method to open an Activity that displays all products in the database
+     * @param view
+     */
+    public void toDatabase(View view) {
+        Intent intent = new Intent(this, AllProductsActivity.class);
+        startActivity(intent);
+    }
+
     // Extracts the expiration date set by the user
     private String expDateString(){
         Spinner spinner = (Spinner)findViewById(R.id.spinnerYear);
