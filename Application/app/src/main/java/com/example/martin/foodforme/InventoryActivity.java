@@ -17,7 +17,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -59,8 +62,8 @@ public class InventoryActivity extends ActionBarActivity {
         requiredList = new ArrayList<>();
         productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
 
-        inventory = getSharedPreferences("inventory",0);
-        requiredSP = getSharedPreferences("requiredSP",0);
+        inventory = getSharedPreferences("inventory", 0);
+        requiredSP = getSharedPreferences("requiredSP", 0);
         shoppingSP = getSharedPreferences("shoppingSP",0);
         inventoryEditor = inventory.edit();
         requiredEditor = requiredSP.edit();
@@ -95,6 +98,9 @@ public class InventoryActivity extends ActionBarActivity {
                 products.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
+
+        setEmptyText();
+
         keys = shoppingSP.getAll();                    //Get the products into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
@@ -125,6 +131,23 @@ public class InventoryActivity extends ActionBarActivity {
             }
         });
 
+
+
+    }
+
+    /**
+     * Check if inventory is empty and show text for it
+     * or hide text if not empty.
+     */
+    private void setEmptyText() {
+        RelativeLayout layout = (RelativeLayout)findViewById(R.id.inventoryLayout);
+        TextView tv = (TextView)findViewById(R.id.emptyText);
+        if(products.isEmpty()){
+            tv.setVisibility(View.VISIBLE);
+        }
+        else{
+            tv.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
@@ -146,6 +169,7 @@ public class InventoryActivity extends ActionBarActivity {
             inventoryEditor.commit();
             products.remove(product);
             productsAdapter.notifyDataSetChanged();
+            setEmptyText();
 
         } else if(itemID == 2) {
             final EditText txtUrl = new EditText(this);
@@ -249,6 +273,7 @@ public class InventoryActivity extends ActionBarActivity {
     {
         Product product = new Product(name, date, Integer.toString(index), 1, code);
         // Namn, date, key, amount, code
+
         inventoryEditor.putString(Integer.toString(index), product.toString());
         inventoryEditor.commit();
         products.add(product);
@@ -276,6 +301,7 @@ public class InventoryActivity extends ActionBarActivity {
             }
             shoppingEditor.commit();
         }
+        setEmptyText();
     }
 
     @Override
