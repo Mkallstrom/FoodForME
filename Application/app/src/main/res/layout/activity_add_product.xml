@@ -106,8 +106,9 @@
         android:weightSum="1">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="158dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blankb"
             android:text="Add"
             android:id="@+id/addButton"
             android:onClick="addProduct"
@@ -116,11 +117,12 @@
             android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/expirationDateText"
             android:layout_toStartOf="@+id/expirationDateText"
-            android:layout_weight="0.50" />
+            android:layout_weight="0.5" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="158dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blankb"
             android:text="Cancel"
             android:id="@+id/cancelButton"
             android:layout_alignParentBottom="true"

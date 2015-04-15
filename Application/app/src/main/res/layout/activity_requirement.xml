@@ -27,11 +27,12 @@
 
         <Button
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:text="Add"
             android:id="@+id/addbutton"
             android:layout_gravity="center_horizontal"
-            android:onClick="addRequirement" />
+            android:onClick="addRequirement"
+            android:layout_height="50dp"
+            android:background="@drawable/blankb" />
 
     </LinearLayout>
 

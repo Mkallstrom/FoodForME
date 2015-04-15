@@ -34,7 +34,8 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/blankb"
                 android:text="Add"
                 android:id="@+id/addtoslbutton"
                 android:layout_gravity="center_horizontal"
@@ -43,7 +44,8 @@
 
             <Button
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/blankb"
                 android:text="Scan"
                 android:id="@+id/scanButton"
                 android:layout_weight="0.5"

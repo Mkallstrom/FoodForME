@@ -172,7 +172,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         if(v == findViewById(R.id.shoppinglistView))
         {
             menu.setHeaderTitle("Edit " + shoppingList.get(info.position).getName());
-            menu.add(0, 1, 0, "Edit");
+            menu.add(0, 1, 0, "Edit Amount");
             menu.add(0, 2, 0, "Delete");
         }
 
@@ -324,7 +324,6 @@ public class ShoppingListActivity extends ActionBarActivity {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
                 String newCode = data.getStringExtra("code");
-                // TODO: save expiration date somewhere
 
                 index+=1;
                 inventoryEditor.remove("index");

@@ -46,7 +46,7 @@ public class AddProductActivity extends ActionBarActivity {
         }
         else
         {
-            //CHECK GLOBAL DATABASE HERE
+            //TODO: if(database contains str) productName.setText(foundName); and localBarcodes.putString(str,foundName); else next line
             Toast.makeText(this, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
         }
 
@@ -101,7 +101,8 @@ public class AddProductActivity extends ActionBarActivity {
                     editor.putString(barcode,productString);
                     editor.commit();
                 }
-
+        //TODO: if(global database contains barcode && global database response to barcode != productString) global database update for barcode with productString;
+        //TODO: if(global database does not contain barcode) insert barcode, productString;
         Intent intent = new Intent();
         intent.putExtra("product",productString);
         intent.putExtra("expDate",expDateString());

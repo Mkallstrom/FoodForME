@@ -3,6 +3,7 @@ package com.example.martin.foodforme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -80,7 +81,7 @@ public class RequirementActivity extends ActionBarActivity {
         if(v == findViewById(R.id.requirementlistView))
         {
             menu.setHeaderTitle("Edit " + requiredList.get(info.position).getName());
-            menu.add(0, 1, 0, "Edit");
+            menu.add(0, 1, 0, "Edit Amount");
             menu.add(0, 2, 0, "Remove");
         }
 
@@ -148,6 +149,11 @@ public class RequirementActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    public void addRequirement(View view)
+    {
+        Intent intent = new Intent(this, InventoryActivity.class);
+        startActivity(intent);
     }
     public Product parseSharedPreferences(String string, String key)
     {  String[] strings = string.split("\\|");
