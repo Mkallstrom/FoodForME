@@ -21,7 +21,7 @@ if (isset($_POST['product_name']) && isset($_POST['barcode'])) {
     $db = new DB_CONNECT();
  
     // mysql update row with matched pid
-    $result = mysql_query("UPDATE products SET product_name = '$product_name', barcode = '$barcode' WHERE barcode = $barcode");
+    $result = mysql_query("UPDATE barcode_to_product SET product_name = '$product_name', barcode = '$barcode' WHERE barcode = $barcode");
  
     // check if row inserted or not
     if ($result) {

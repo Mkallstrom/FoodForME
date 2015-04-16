@@ -21,7 +21,7 @@ if (isset($_POST['product_name']) && isset($_POST['barcode'])) {
     $db = new DB_CONNECT();
  
     // mysql inserting a new row
-    $result = mysql_query("INSERT INTO products(product_name, barcode) VALUES('$product_name', '$barcode')");
+    $result = mysql_query("INSERT INTO barcode_to_product(product_name, barcode) VALUES('$product_name', '$barcode')");
  
     // check if row inserted or not
     if ($result) {
