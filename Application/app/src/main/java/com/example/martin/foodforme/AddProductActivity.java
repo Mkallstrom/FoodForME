@@ -159,7 +159,6 @@ public class AddProductActivity extends ActionBarActivity {
             // Note that create product url accepts POST method
             JSONObject json = jsonParser.makeHttpRequest(url_create_product,
                     "POST", params);
-
             // check log cat fro response
             Log.d("Create Response", json.toString());
 
@@ -226,6 +225,7 @@ public class AddProductActivity extends ActionBarActivity {
                             Log.d("Product not found :", barcode);
                             return;
                         }
+                        databaseHasProduct = true;
 
 
                         // json success tag
@@ -366,6 +366,7 @@ public class AddProductActivity extends ActionBarActivity {
         if(json != null)
         {
             if (databaseHasProduct && databaseName != productString) {
+                Log.d("Saving: ", productString);
                 new SaveProductDetails().execute();
             }
         }
