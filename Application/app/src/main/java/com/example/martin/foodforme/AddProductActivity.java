@@ -1,6 +1,5 @@
 package com.example.martin.foodforme;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -48,18 +49,18 @@ public class AddProductActivity extends ActionBarActivity {
 
     JSONObject json;
 
-    // Progress Dialog
-    private ProgressDialog pDialog;
-
     JSONParser jsonParser = new JSONParser();
+
+    private static final String ip = "http://212.25.146.241/";
+
     // single product url
-    private static final String url_product_details = "http://130.238.15.131/get_product_details.php";
+    private static final String url_product_details = ip + "get_product_details.php";
 
     // url to update product
-    private static final String url_update_product = "http://130.238.15.131/update_product.php";
+    private static final String url_update_product = ip + "update_product.php";
 
     // url to create new product
-    private static String url_create_product = "http://130.238.15.131/create_product.php";
+    private static String url_create_product = ip + "create_product.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -85,7 +86,24 @@ public class AddProductActivity extends ActionBarActivity {
         codeView = (TextView)findViewById(R.id.codeView);
         codeView.setText(barcode);
 
-        new GetProductDetails().execute();
+        try {
+            //make a URL to a known source
+            URL url = new URL(ip);
+
+            //open a connection to that source
+            HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+
+            //trying to retrieve data from the source. If there
+            //is no connection, this line will fail
+            Object objData = urlConnect.getContent();
+            new GetProductDetails().execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.d("Connection failed: ", ip);
+        }
+
         if(databaseName != null) { databaseHasProduct = true; }
 
         if(localBarcodes.contains(barcode))                 //Local database has the code.
@@ -187,7 +205,7 @@ public class AddProductActivity extends ActionBarActivity {
         {
 
             // updating UI from Background Thread
-            new Runnable() {
+            runOnUiThread(new Runnable() {
                 public void run() {
                     // Check for success tag
                     int success;
@@ -198,11 +216,12 @@ public class AddProductActivity extends ActionBarActivity {
 
                         // getting product details by making HTTP request
                         // Note that product details url will use GET request
-                        json = jsonParser.makeHttpRequest(
+
+                                json = jsonParser.makeHttpRequest(
                                 url_product_details, "GET", params);
 
-                        if(json == null)
-                        {
+                        if (json == null) {
+                            Log.d("Connection failed:", ip);
                             return;
                         }
 
@@ -226,7 +245,7 @@ public class AddProductActivity extends ActionBarActivity {
                             // display product data in EditText
                             productName.setText(product.getString(TAG_PRODUCT_NAME));
 
-                        }else{
+                        } else {
                             // product with pid not found
                             Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
                         }
@@ -234,7 +253,7 @@ public class AddProductActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                 }
-            };
+            });
 
             return null;
         }
