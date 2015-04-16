@@ -49,8 +49,7 @@
         android:id="@+id/productText"
         android:layout_below="@+id/codeView"
         android:layout_alignLeft="@+id/barcodeText"
-        android:layout_alignStart="@+id/barcodeText"
-        android:layout_marginTop="32dp" />
+        android:layout_alignStart="@+id/barcodeText" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -92,7 +91,6 @@
         android:text="Expiration date"
         android:id="@+id/expirationDateText"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_marginTop="32dp"
         android:layout_below="@+id/productBox"
         android:layout_centerHorizontal="true" />
 
