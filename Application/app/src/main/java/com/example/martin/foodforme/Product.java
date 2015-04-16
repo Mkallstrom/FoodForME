@@ -14,6 +14,8 @@ public class Product implements Comparable<Product>{
     private String amount;
     private String code;
 
+    private boolean expiring = true;
+
     private int expiryYear;
     private int expiryMonth;
     private int expiryDay;
@@ -27,6 +29,7 @@ public class Product implements Comparable<Product>{
     public Product(String productName, String key, int amount) {
         name = productName;
         setExpiryDate(getTodaysDate());
+        expiring = false;
         this.key = key;
         this.code = "0";
         this.amount = Integer.toString(amount);
@@ -40,9 +43,17 @@ public class Product implements Comparable<Product>{
      * @param amount        the amount of the same Product.
      * @param code          the barcode of the Product.
      */
-    public Product(String productName, String expiryDate, String key, int amount, String code) {
+    public Product(String productName, String expiryDate, String key, int amount, String code, boolean expires) {
         name = productName;
-        setExpiryDate(expiryDate);
+        if(expires)
+        {
+            setExpiryDate(expiryDate);
+        }
+        else
+        {
+            setExpiryDate("9999-99-99");
+            expiring = false;
+        }
         this.key = key;
         this.amount = Integer.toString(amount);
         this.code = code;
@@ -118,6 +129,8 @@ public class Product implements Comparable<Product>{
         return expiryDay;
     }
 
+    public boolean expires() { return expiring; }
+
     public String getCode() { return code; }
 
     /**
@@ -192,6 +205,6 @@ public class Product implements Comparable<Product>{
      */
     public String toString()
     {
-        return name + "|" + expiryDate + "|" + amount + "|" + code;
+        return name + "|" + expiryDate + "|" + amount + "|" + code + "|" + Boolean.toString(expiring);
     }
 }

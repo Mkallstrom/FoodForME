@@ -126,7 +126,7 @@ public class ShoppingListActivity extends ActionBarActivity {
             {
                 if(!shoppingCodes.contains(requiredCode))
                 {
-                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode());
+                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(), false);
                     shoppingList.add(newProduct);
                     Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
@@ -263,7 +263,7 @@ public class ShoppingListActivity extends ActionBarActivity {
     public Product parseSharedPreferences(String string, String key)
     {  String[] strings = string.split("\\|");
         // Namn, date, key, amount, code
-        return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3]);
+        return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3], Boolean.parseBoolean(strings[4]));
 
     }
 
@@ -274,9 +274,9 @@ public class ShoppingListActivity extends ActionBarActivity {
         scanner.scan();
     }
 
-    protected void addProduct(String name, String date, String code)
+    protected void addProduct(String name, String date, String code, boolean expires)
     {
-        Product product = new Product(name, date, Integer.toString(index), 1, code);
+        Product product = new Product(name, date, Integer.toString(index), 1, code, expires);
         // Namn, date, key, amount, code
         inventoryEditor.putString(Integer.toString(index), product.toString());
         inventoryEditor.commit();
@@ -316,12 +316,13 @@ public class ShoppingListActivity extends ActionBarActivity {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
                 String newCode = data.getStringExtra("code");
+                boolean expires = data.getBooleanExtra("expires",true);
 
                 index+=1;
                 inventoryEditor.remove("index");
                 inventoryEditor.putString("index",Integer.toString(index));
                 inventoryEditor.commit();
-                addProduct(newProduct, newProductExpDate, newCode);
+                addProduct(newProduct, newProductExpDate, newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();

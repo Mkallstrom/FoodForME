@@ -57,29 +57,40 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/expirationDateText">
+        android:layout_below="@+id/expirationDateText"
+        android:weightSum="1">
+
+        <CheckBox
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:text="Expires"
+            android:id="@+id/expiresCheck"
+            android:background="@color/background_floating_material_light"
+            android:layout_weight="0.25"
+            android:checked="true"
+            android:textSize="10dp"/>
 
         <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
             android:id="@+id/spinnerYear"
-            android:layout_weight="1"
             android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light" />
+            android:background="@color/background_floating_material_light"
+            android:layout_weight="0.25" />
 
         <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
             android:id="@+id/spinnerMonth"
-            android:layout_weight="1"
+            android:layout_weight="0.25"
             android:spinnerMode="dropdown"
             android:background="@color/background_floating_material_light" />
 
         <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
             android:id="@+id/spinnerDay"
-            android:layout_weight="1"
+            android:layout_weight="0.25"
             android:spinnerMode="dropdown"
             android:background="@color/background_floating_material_light" />
 
@@ -147,8 +158,9 @@
         android:layout_toRightOf="@+id/expirationDateText"
         android:layout_toEndOf="@+id/expirationDateText"
         android:background="@drawable/blankb"
+        android:onClick="clickedConnection"
         android:layout_above="@+id/codeView"
         android:backgroundTint="@color/abc_background_cache_hint_selector_material_light"
-        android:backgroundTintMode="src_in" />
+        android:backgroundTintMode="src_in"/>
 
 </RelativeLayout>

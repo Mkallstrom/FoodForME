@@ -44,6 +44,7 @@ public class AddProductActivity extends ActionBarActivity {
     Context context;
     Boolean databaseHasProduct = false;
     Boolean localHasProduct = false;
+    Boolean connection = false;
     JSONObject json;
     JSONParser jsonParser = new JSONParser();
 
@@ -89,6 +90,7 @@ public class AddProductActivity extends ActionBarActivity {
             Object objData = urlConnect.getContent();
             CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
             checkBox.setChecked(true);
+            connection = true;
             new GetProductDetails().execute();
         }
         catch (Exception e)
@@ -359,7 +361,7 @@ public class AddProductActivity extends ActionBarActivity {
         }
         else
         {
-            if (!databaseHasProduct) {
+            if (!databaseHasProduct && connection) {
                 new CreateNewProduct().execute();
             }
         }
@@ -368,6 +370,8 @@ public class AddProductActivity extends ActionBarActivity {
         intent.putExtra("product",productString);
         intent.putExtra("expDate",expDateString());
         intent.putExtra("code", barcode);
+        CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
+        intent.putExtra("expires", checkBox.isChecked());
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -420,5 +424,10 @@ public class AddProductActivity extends ActionBarActivity {
                 new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListDays);
         Spinner spinDay = (Spinner)findViewById(R.id.spinnerDay);
         spinDay.setAdapter(spinDayAdapter);
+    }
+    public void clickedConnection(View view)
+    {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
+        checkBox.toggle();
     }
 }
