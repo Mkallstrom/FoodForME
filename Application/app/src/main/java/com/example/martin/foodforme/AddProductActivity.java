@@ -49,7 +49,7 @@ public class AddProductActivity extends ActionBarActivity {
     private static final String ip = "http://212.25.146.241/"; // Ip address for database
     private static final String url_product_details = ip + "get_product_details.php"; // single product url
     private static final String url_update_product = ip + "update_product.php";  // url to update product
-    private static String url_create_product = ip + "create_product.php"; // url to create new product
+    private static final String url_create_product = ip + "create_product.php"; // url to create new product
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -345,17 +345,17 @@ public class AddProductActivity extends ActionBarActivity {
 
             editor.remove(codeView.getText().toString());
             editor.putString(barcode,productString);
-            editor.commit();
+            editor.apply();
         }
         else
             if(!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
                 {
                     editor.putString(barcode,productString);
-                    editor.commit();
+                    editor.apply();
                 }
         if(json != null)
         {
-            if (databaseHasProduct && databaseName != productString) {
+            if (databaseHasProduct && !databaseName.equals(productString)) {
                 Log.d("Saving: ", productString);
                 new SaveProductDetails().execute();
             }
