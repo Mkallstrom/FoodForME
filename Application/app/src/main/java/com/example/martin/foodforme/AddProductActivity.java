@@ -368,6 +368,9 @@ public class AddProductActivity extends ActionBarActivity {
             if (databaseHasProduct && databaseName != productString) {
                 new SaveProductDetails().execute();
             }
+        }
+        else
+        {
             if (!databaseHasProduct) {
                 new CreateNewProduct().execute();
             }
