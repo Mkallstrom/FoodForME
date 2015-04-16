@@ -17,9 +17,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,19 +28,13 @@ import java.util.Map;
 
 public class InventoryActivity extends ActionBarActivity {
 
-    ArrayList<Product> products;
-    ArrayAdapter productsAdapter;
     private Scanner scanner;
-    ArrayList<Product> shoppingList;
-    ArrayList<Product> requiredList;
 
+    ArrayAdapter inventoryAdapter;
+    ArrayList<Product> shoppingList, requiredList, inventoryList;
 
-    SharedPreferences inventory;
-    SharedPreferences requiredSP;
-    SharedPreferences shoppingSP;
-    SharedPreferences.Editor inventoryEditor;
-    SharedPreferences.Editor requiredEditor;
-    SharedPreferences.Editor shoppingEditor;
+    SharedPreferences inventorySP, requiredSP, shoppingSP;
+    SharedPreferences.Editor inventoryEditor, requiredEditor, shoppingEditor;
 
     int index = 0;
     int rindex = 0;
@@ -57,23 +49,23 @@ public class InventoryActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Inventory");
 
-        products = new ArrayList<>();
+        inventoryList = new ArrayList<>();
         shoppingList = new ArrayList<>();
         requiredList = new ArrayList<>();
-        productsAdapter = new ListArrayAdapter(context,R.layout.productlayout,products);
+        inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
 
-        inventory = getSharedPreferences("inventory", 0);
+        inventorySP = getSharedPreferences("inventorySP", 0);
         requiredSP = getSharedPreferences("requiredSP", 0);
-        shoppingSP = getSharedPreferences("shoppingSP",0);
-        inventoryEditor = inventory.edit();
+        shoppingSP = getSharedPreferences("shoppingSP", 0);
+        inventoryEditor = inventorySP.edit();
         requiredEditor = requiredSP.edit();
         shoppingEditor = shoppingSP.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
-        listView.setAdapter(productsAdapter);
+        listView.setAdapter(inventoryAdapter);
         registerForContextMenu(listView);
 
-        if(!inventory.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
             inventoryEditor.putString("index", "0");
             inventoryEditor.commit();
@@ -88,27 +80,27 @@ public class InventoryActivity extends ActionBarActivity {
             shoppingEditor.putString("index", "0");
             shoppingEditor.commit();
         }
-        index = Integer.parseInt(inventory.getString("index",""));  //Get and save the index.
+        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
         rindex = Integer.parseInt(requiredSP.getString("index",""));
 
-        Map<String,?> keys = inventory.getAll();                    //Get the products into the product listview.
+        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                products.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
 
         setEmptyText();
 
-        keys = shoppingSP.getAll();                    //Get the products into the product listview.
+        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
                 shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
             }
         }
-        keys = requiredSP.getAll();                    //Get the products into the product listview.
+        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
@@ -117,8 +109,8 @@ public class InventoryActivity extends ActionBarActivity {
         }
 
 
-        Collections.sort(products);
-        productsAdapter.notifyDataSetChanged();
+        Collections.sort(inventoryList);
+        inventoryAdapter.notifyDataSetChanged();
 
         listView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -136,13 +128,12 @@ public class InventoryActivity extends ActionBarActivity {
     }
 
     /**
-     * Check if inventory is empty and show text for it
+     * Check if inventorySP is empty and show text for it
      * or hide text if not empty.
      */
     private void setEmptyText() {
-        RelativeLayout layout = (RelativeLayout)findViewById(R.id.inventoryLayout);
         TextView tv = (TextView)findViewById(R.id.emptyText);
-        if(products.isEmpty()){
+        if(inventoryList.isEmpty()){
             tv.setVisibility(View.VISIBLE);
         }
         else{
@@ -153,7 +144,7 @@ public class InventoryActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
-        menu.setHeaderTitle("Edit " + products.get(info.position).getName());
+        menu.setHeaderTitle("Edit " + inventoryList.get(info.position).getName());
         menu.add(0, 1, 0, "Remove");
         menu.add(0, 2, 0, "Edit Amount");
         menu.add(0, 3, 0, "Add to requirements");
@@ -164,11 +155,11 @@ public class InventoryActivity extends ActionBarActivity {
         int itemID = item.getItemId();
 
         if(itemID == 1){
-            Product product = products.get(info.position);
+            Product product = inventoryList.get(info.position);
             inventoryEditor.remove(product.getKey());
             inventoryEditor.commit();
-            products.remove(product);
-            productsAdapter.notifyDataSetChanged();
+            inventoryList.remove(product);
+            inventoryAdapter.notifyDataSetChanged();
             setEmptyText();
 
         } else if(itemID == 2) {
@@ -176,16 +167,16 @@ public class InventoryActivity extends ActionBarActivity {
             txtUrl.setInputType(InputType.TYPE_CLASS_NUMBER);
 
             new AlertDialog.Builder(this)
-                    .setTitle(products.get(info.position).getName())
+                    .setTitle(inventoryList.get(info.position).getName())
                     .setView(txtUrl)
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
-                            Product item = products.get(info.position);
-                            products.remove(item);
+                            Product item = inventoryList.get(info.position);
+                            inventoryList.remove(item);
                             item.setAmount(Integer.toString(amount));
-                            products.add(info.position,item);
-                            productsAdapter.notifyDataSetChanged();
+                            inventoryList.add(info.position, item);
+                            inventoryAdapter.notifyDataSetChanged();
                             inventoryEditor.remove(item.getKey());
                             inventoryEditor.putString(item.getKey(), item.toString());
                             inventoryEditor.commit();
@@ -204,7 +195,7 @@ public class InventoryActivity extends ActionBarActivity {
             {
                 for (Product p : requiredList)
                 {
-                    if (products.get(info.position).getCode().equals(p.getCode()))
+                    if (inventoryList.get(info.position).getCode().equals(p.getCode()))
                     {
                         requiredItem = p;
                     }
@@ -223,9 +214,9 @@ public class InventoryActivity extends ActionBarActivity {
                 rindex++;
                 requiredEditor.remove("index");
                 requiredEditor.putString("index",Integer.toString(rindex));
-                Product reqProduct = products.get(info.position);
-                requiredList.add(new Product(reqProduct.getName(),reqProduct.getExpiryDate(),reqProduct.getKey(),1,reqProduct.getCode()));
-                requiredEditor.putString(Integer.toString(rindex), products.get(info.position).toString());
+                Product reqProduct = inventoryList.get(info.position);
+                requiredList.add(new Product(reqProduct.getName(), reqProduct.getExpiryDate(), reqProduct.getKey(), 1, reqProduct.getCode()));
+                requiredEditor.putString(Integer.toString(rindex), inventoryList.get(info.position).toString());
                 requiredEditor.commit();
             }
         }
@@ -276,9 +267,9 @@ public class InventoryActivity extends ActionBarActivity {
 
         inventoryEditor.putString(Integer.toString(index), product.toString());
         inventoryEditor.commit();
-        products.add(product);
-        Collections.sort(products);
-        productsAdapter.notifyDataSetChanged();
+        inventoryList.add(product);
+        Collections.sort(inventoryList);
+        inventoryAdapter.notifyDataSetChanged();
         Product boughtItem = null;
         if(!shoppingList.isEmpty())
         {

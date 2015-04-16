@@ -174,7 +174,7 @@ public class Product implements Comparable<Product>{
     }
 
     /**
-     * Compare the expiration dates between two products
+     * Compare the expiration dates between two inventoryList
      * @param product   The Product to compare this Product with
      * @return          Positive if the Product (this) expires after the Product it is compared with,
      *                  else the returned value is negative.

@@ -43,6 +43,7 @@ public class AddProductActivity extends ActionBarActivity {
 
     Context context;
     Boolean databaseHasProduct = false;
+    Boolean localHasProduct = false;
     JSONObject json;
     JSONParser jsonParser = new JSONParser();
 
@@ -96,19 +97,17 @@ public class AddProductActivity extends ActionBarActivity {
             Log.d("Connection failed: ", ip);
         }
 
-        if(databaseName != null) { databaseHasProduct = true; }
-
         if(localBarcodes.contains(barcode))                 //Local database has the code.
         {
             String foundName = localBarcodes.getString(barcode, "Not found");
             productName.setText(foundName);
+            localHasProduct = true;
         }
         else
         {
             if(databaseHasProduct)
             {
-                String foundName = databaseName;
-                productName.setText(foundName);
+                productName.setText(databaseName);
             }
             else {
                 //Nothing found at all!
@@ -128,7 +127,7 @@ public class AddProductActivity extends ActionBarActivity {
     class CreateNewProduct extends AsyncTask<String, String, String> {
 
         /**
-         * Before starting background thread Show Progress Dialog
+         * Before starting background thread
          * */
         @Override
         protected void onPreExecute() {
@@ -142,14 +141,14 @@ public class AddProductActivity extends ActionBarActivity {
 
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("product_name", productString));
-            params.add(new BasicNameValuePair("barcode", barcode));
+            params.add(new BasicNameValuePair(TAG_PRODUCT_NAME, productString));
+            params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
 
             // getting JSON Object
             // Note that create product url accepts POST method
             JSONObject json = jsonParser.makeHttpRequest(url_create_product,
                     "POST", params);
-            // check log cat fro response
+            // check log cat for response
             Log.d("Create Response", json.toString());
 
             // check for success tag
@@ -172,7 +171,7 @@ public class AddProductActivity extends ActionBarActivity {
         }
 
         /**
-         * After completing background task Dismiss the progress dialog
+         * After completing background task
          * **/
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once done
@@ -183,7 +182,7 @@ public class AddProductActivity extends ActionBarActivity {
     class GetProductDetails extends AsyncTask<String, String, String>
     {
         /**
-         * Before starting background thread Show Progress Dialog
+         * Before starting background thread
          * */
         @Override
         protected void onPreExecute() {
@@ -203,7 +202,7 @@ public class AddProductActivity extends ActionBarActivity {
                     try {
                         // Building Parameters
                         List<NameValuePair> params = new ArrayList<NameValuePair>();
-                        params.add(new BasicNameValuePair("barcode", barcode));
+                        params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
 
                         // getting product details by making HTTP request
                         // Note that product details url will use GET request
@@ -213,15 +212,17 @@ public class AddProductActivity extends ActionBarActivity {
 
                         if (json == null) {
                             Log.d("Product not found :", barcode);
+                            if(!localHasProduct)
+                            {
+                                Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
+                            }
                             return;
                         }
                         databaseHasProduct = true;
 
-
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
                         if (success == 1) {
-
                             // check your log for json response
                             Log.d("Single Product Details", json.toString());
                             // successfully received product details
@@ -232,13 +233,14 @@ public class AddProductActivity extends ActionBarActivity {
                             JSONObject product = productObj.getJSONObject(0);
 
                             // product with this pid found
-
-                            // display product data in EditText
-                            productName.setText(product.getString(TAG_PRODUCT_NAME));
+                            if(!localHasProduct)
+                            {
+                                productName.setText(product.getString(TAG_PRODUCT_NAME));
+                            }
 
                         } else {
-                            // product with pid not found
-                            Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
+                            // product with barcode not found
+
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -249,10 +251,9 @@ public class AddProductActivity extends ActionBarActivity {
             return null;
         }
         /**
-         * After completing background task Dismiss the progress dialog
+         * After completing background task
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once got all details
 
         }
 
@@ -264,11 +265,10 @@ public class AddProductActivity extends ActionBarActivity {
     class SaveProductDetails extends AsyncTask<String, String, String> {
 
         /**
-         * Before starting background thread Show Progress Dialog
+         * Before starting background thread
          * */
         @Override
         protected void onPreExecute() {
-
         }
 
         /**
@@ -305,11 +305,9 @@ public class AddProductActivity extends ActionBarActivity {
         }
 
         /**
-         * After completing background task Dismiss the progress dialog
+         * After completing background task
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once product uupdated
-
         }
     }
 
@@ -342,7 +340,6 @@ public class AddProductActivity extends ActionBarActivity {
 
         if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
         {                                                                                                    // -> replace with new name.
-
             editor.remove(codeView.getText().toString());
             editor.putString(barcode,productString);
             editor.apply();
@@ -378,15 +375,6 @@ public class AddProductActivity extends ActionBarActivity {
     public void cancelAddProduct (View view) {
         setResult(RESULT_CANCELED);
         finish();
-    }
-
-    /**
-     * This is a temporary method to open an Activity that displays all products in the database
-     * @param view
-     */
-    public void toDatabase(View view) {
-        Intent intent = new Intent(this, AllProductsActivity.class);
-        startActivity(intent);
     }
 
     // Extracts the expiration date set by the user

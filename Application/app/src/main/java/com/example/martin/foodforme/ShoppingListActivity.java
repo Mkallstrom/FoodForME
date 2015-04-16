@@ -25,21 +25,13 @@ import java.util.Map;
 public class ShoppingListActivity extends ActionBarActivity {
 
     private Scanner scanner;
-    ArrayList<Product> shoppingList;
-    ArrayList<Product> requiredList;
-    ArrayList<Product> inventoryList;
+    ArrayList<Product> shoppingList, requiredList, inventoryList;
     ArrayAdapter shoppingAdapter;
-    SharedPreferences shoppingSP;
-    SharedPreferences requiredSP;
-    SharedPreferences inventorySP;
-    SharedPreferences localBarcodes;
-    SharedPreferences.Editor shoppingEditor;
-    SharedPreferences.Editor inventoryEditor;
+    SharedPreferences shoppingSP, requiredSP, inventorySP, localBarcodes;
+    SharedPreferences.Editor shoppingEditor, inventoryEditor;
     ListView shoppingListView;
     int sindex = 0;
     int index = 0;
-
-    private static final String TAG = "MyActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +49,7 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         shoppingSP = getSharedPreferences("shoppingSP",0);
         requiredSP = getSharedPreferences("requiredSP",0);
-        inventorySP = getSharedPreferences("inventory",0);
+        inventorySP = getSharedPreferences("inventorySP",0);
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
 
@@ -83,7 +75,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         sindex = Integer.parseInt(shoppingSP.getString("index",""));
         index = Integer.parseInt(inventorySP.getString("index",""));
 
-        Map<String,?> keys = shoppingSP.getAll();                    //Get the products into the product listview.
+        Map<String,?> keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {

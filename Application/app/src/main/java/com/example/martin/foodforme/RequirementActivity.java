@@ -52,7 +52,7 @@ public class RequirementActivity extends ActionBarActivity {
 
         registerForContextMenu(requiredListView);
 
-        Map<String,?> keys = requiredSP.getAll();                    //Get the products into the product listview.
+        Map<String,?> keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {

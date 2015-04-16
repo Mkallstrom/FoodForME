@@ -33,7 +33,7 @@ public class AllProductsActivity extends ListActivity {
 
     ArrayList<HashMap<String, String>> productsList;
 
-    // url to get all products list
+    // url to get all inventoryList list
     // MAKE SURE TO MANUALLY CHANGE THIS TO THE CURRENT DATABASE URL
     // check by using the same url in your web browser (you should see some plain text as a result)
     private static String url_all_products = "http://212.25.149.10/get_all_products.php";
@@ -46,7 +46,7 @@ public class AllProductsActivity extends ListActivity {
     private static final String TAG_PID = "barcode"; // tag for the db column
     private static final String TAG_NAME = "product_name"; // tag for the db colum
 
-    // products JSONArray
+    // inventoryList JSONArray
     JSONArray products = null;
 
     @Override
@@ -57,7 +57,7 @@ public class AllProductsActivity extends ListActivity {
         // Hashmap for ListView
         productsList = new ArrayList<HashMap<String, String>>();
 
-        // Loading products in Background Thread
+        // Loading inventoryList in Background Thread
         new LoadAllProducts().execute();
 
         // Get listview
@@ -121,14 +121,14 @@ public class AllProductsActivity extends ListActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             pDialog = new ProgressDialog(AllProductsActivity.this);
-            pDialog.setMessage("Loading products. Please wait...");
+            pDialog.setMessage("Loading inventoryList. Please wait...");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
             pDialog.show();
         }
 
         /**
-         * getting All products from url
+         * getting All inventoryList from url
          * */
         protected String doInBackground(String... args) {
             // Building Parameters
@@ -145,7 +145,7 @@ public class AllProductsActivity extends ListActivity {
                 int success = json.getInt(TAG_SUCCESS);
 
                 if (success == 1) {
-                    // products found
+                    // inventoryList found
                     // Getting Array of Products
                     products = json.getJSONArray(TAG_PRODUCTS);
 
@@ -164,11 +164,11 @@ public class AllProductsActivity extends ListActivity {
                         map.put(TAG_PID, id);
                         map.put(TAG_NAME, name);
 
-                        // adding HashList to ArrayList with all products
+                        // adding HashList to ArrayList with all inventoryList
                         productsList.add(map);
                     }
                 } else {
-                    // no products found
+                    // no inventoryList found
                     // Launch Add New product Activity
 
                     // ----> THIS HAS BEEN REMOVED, but may be used later <-----
@@ -191,7 +191,7 @@ public class AllProductsActivity extends ListActivity {
          * After completing background task Dismiss the progress dialog
          * **/
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog after getting all products
+            // dismiss the dialog after getting all inventoryList
             pDialog.dismiss();
 
             // updating UI from Background Thread
