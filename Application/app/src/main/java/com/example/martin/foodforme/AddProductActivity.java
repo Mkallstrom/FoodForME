@@ -32,10 +32,8 @@ import java.util.List;
 
 
 public class AddProductActivity extends ActionBarActivity {
-
-
+    //Attributes
     SharedPreferences localBarcodes;
-
     TextView codeView;
     EditText productName;
 
@@ -44,23 +42,14 @@ public class AddProductActivity extends ActionBarActivity {
     String databaseName;
 
     Context context;
-
     Boolean databaseHasProduct = false;
-
     JSONObject json;
-
     JSONParser jsonParser = new JSONParser();
 
-    private static final String ip = "http://212.25.146.241/";
-
-    // single product url
-    private static final String url_product_details = ip + "get_product_details.php";
-
-    // url to update product
-    private static final String url_update_product = ip + "update_product.php";
-
-    // url to create new product
-    private static String url_create_product = ip + "create_product.php";
+    private static final String ip = "http://212.25.146.241/"; // Ip address for database
+    private static final String url_product_details = ip + "get_product_details.php"; // single product url
+    private static final String url_update_product = ip + "update_product.php";  // url to update product
+    private static String url_create_product = ip + "create_product.php"; // url to create new product
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
@@ -68,6 +57,7 @@ public class AddProductActivity extends ActionBarActivity {
     private static final String TAG_PRODUCT = "product";
     private static final String TAG_BARCODE = "barcode";
 
+    //Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
