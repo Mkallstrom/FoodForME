@@ -96,6 +96,8 @@ public class AddProductActivity extends ActionBarActivity {
             //trying to retrieve data from the source. If there
             //is no connection, this line will fail
             Object objData = urlConnect.getContent();
+            CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+            checkBox.setChecked(true);
             new GetProductDetails().execute();
         }
         catch (Exception e)
@@ -221,7 +223,7 @@ public class AddProductActivity extends ActionBarActivity {
                                 url_product_details, "GET", params);
 
                         if (json == null) {
-                            Log.d("Connection failed:", ip);
+                            Log.d("Product not found :", barcode);
                             return;
                         }
 
@@ -229,8 +231,7 @@ public class AddProductActivity extends ActionBarActivity {
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
                         if (success == 1) {
-                            CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
-                            checkBox.setChecked(true);
+
                             // check your log for json response
                             Log.d("Single Product Details", json.toString());
                             // successfully received product details
