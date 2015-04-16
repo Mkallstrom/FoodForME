@@ -11,8 +11,8 @@ $response = array();
 // check for required fields
 if (isset($_POST['product_name']) && isset($_POST['barcode'])) {
  
-    $name = $_POST['product_name'];
-    $price = $_POST['barcode'];
+    $product_name = $_POST['product_name'];
+    $barcode = $_POST['barcode'];
  
     // include db connect class
     require_once __DIR__ . '/db_connect.php';
