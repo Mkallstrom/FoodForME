@@ -48,7 +48,7 @@ public class AddProductActivity extends ActionBarActivity {
     JSONObject json;
     JSONParser jsonParser = new JSONParser();
 
-    private static final String ip = "http://212.25.146.241/"; // Ip address for database
+    private static final String ip = "http://213.113.213.25:8080/"; // Ip address for database
     private static final String url_product_details = ip + "get_product_details.php"; // single product url
     private static final String url_update_product = ip + "update_product.php";  // url to update product
     private static final String url_create_product = ip + "create_product.php"; // url to create new product
@@ -91,7 +91,7 @@ public class AddProductActivity extends ActionBarActivity {
             CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
             checkBox.setChecked(true);
             connection = true;
-            new GetProductDetails().execute();
+            new GetProductDetails().execute(); // AsyncTask created searching the database
         }
         catch (Exception e)
         {
@@ -107,7 +107,7 @@ public class AddProductActivity extends ActionBarActivity {
         }
         else
         {
-            if(databaseHasProduct)
+            if(databaseHasProduct) // NOTE: This one seems to be false every time (but product.setText is done in the GetProductDetails AsyncTask)
             {
                 productName.setText(databaseName);
             }
@@ -231,13 +231,12 @@ public class AddProductActivity extends ActionBarActivity {
                             JSONArray productObj = json
                                     .getJSONArray(TAG_PRODUCT); // JSON Array
 
-                            // get first product object from JSON Array
-                            JSONObject product = productObj.getJSONObject(0);
+                            JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                            databaseName = product.getString(TAG_PRODUCT_NAME); // sets databaseName to what was found in the database
 
-                            // product with this pid found
                             if(!localHasProduct)
                             {
-                                productName.setText(product.getString(TAG_PRODUCT_NAME));
+                                productName.setText(databaseName);
                             }
 
                         } else {
@@ -354,15 +353,15 @@ public class AddProductActivity extends ActionBarActivity {
                 }
         if(json != null)
         {
-            if (databaseHasProduct && !databaseName.equals(productString)) {
+            if (databaseHasProduct && !databaseName.equals(productString)) {                                // if the product is in the database and the name does not match the new String
                 Log.d("Saving: ", productString);
-                new SaveProductDetails().execute();
+                new SaveProductDetails().execute();                                                         // Saves the new String to the database
             }
         }
         else
         {
-            if (!databaseHasProduct && connection) {
-                new CreateNewProduct().execute();
+            if (!databaseHasProduct && connection) {                                                        // if the product is not in the database and there is a connection
+                new CreateNewProduct().execute();                                                           // Saves a new product to the database
             }
         }
 
@@ -395,7 +394,7 @@ public class AddProductActivity extends ActionBarActivity {
     private void fillSpinnerYear(){
         ArrayList<String> arrayListYears = new ArrayList<String>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int i = thisYear - 5; i <= thisYear + 5; i++) {
+        for (int i = thisYear; i <= thisYear + 10; i++) {
             arrayListYears.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinYearAdapter =

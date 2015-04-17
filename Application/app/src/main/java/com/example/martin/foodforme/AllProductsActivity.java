@@ -36,7 +36,7 @@ public class AllProductsActivity extends ListActivity {
     // url to get all inventoryList list
     // MAKE SURE TO MANUALLY CHANGE THIS TO THE CURRENT DATABASE URL
     // check by using the same url in your web browser (you should see some plain text as a result)
-    private static String url_all_products = "http://212.25.149.10/get_all_products.php";
+    private static String url_all_products = "http://212.25.146.241/get_all_products.php";
     //private static String url_all_products = "http://85.230.232.166/get_all_products.php";
 
     // JSON Node names - These are used to extract info from the JSON object (db response)
