@@ -58,7 +58,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/expirationDateText"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:id="@+id/linearLayout3">
 
         <CheckBox
             android:layout_width="25dp"
@@ -162,5 +163,14 @@
         android:layout_above="@+id/codeView"
         android:backgroundTint="@color/abc_background_cache_hint_selector_material_light"
         android:backgroundTintMode="src_in"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/button"
+        android:layout_below="@+id/linearLayout3"
+        android:layout_centerHorizontal="true"
+        android:onClick="startCameraActivity" />
 
 </RelativeLayout>
