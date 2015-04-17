@@ -47,9 +47,10 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Barcode"
         android:id="@+id/barcodeText"
+        android:textColor="#ffffffff"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ffffffff" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -123,9 +124,10 @@
         android:text="Expiration date"
         android:id="@+id/expirationDateText"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#ffffffff"
         android:layout_below="@+id/productBox"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ffffffff" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -141,32 +143,26 @@
             android:layout_width="158dp"
             android:layout_height="50dp"
             android:background="@drawable/blankb"
+            android:text="Cancel"
+            android:id="@+id/cancelButton"
+            android:onClick="cancelAddProduct"
+            android:nestedScrollingEnabled="false"
+            android:layout_weight="0.5"
+            android:layout_above="@+id/linearLayout2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:background="@drawable/blankb"
             android:text="Add"
             android:id="@+id/addButton"
             android:onClick="addProduct"
-            android:layout_alignTop="@+id/cancelButton"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_toLeftOf="@+id/expirationDateText"
-            android:layout_toStartOf="@+id/expirationDateText"
-            android:layout_weight="0.5" />
-
-        <Button
-            android:layout_width="158dp"
-            android:layout_height="50dp"
-            android:background="@drawable/blankb"
-            android:text="Cancel"
-            android:id="@+id/cancelButton"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="12dp"
-            android:onClick="cancelAddProduct"
-            android:nestedScrollingEnabled="false"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@+id/productText"
-            android:layout_toRightOf="@+id/productText"
-            android:layout_weight="0.5" />
-
+            android:layout_above="@+id/linearLayout2"
+            android:layout_toRightOf="@+id/cancelButton"
+            android:layout_toEndOf="@+id/cancelButton"
+            android:layout_weight="0.47" />
     </LinearLayout>
 
     <CheckBox
