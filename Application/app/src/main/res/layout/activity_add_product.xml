@@ -12,12 +12,15 @@
         android:layout_height="wrap_content"
         android:id="@+id/productBox"
         android:background="@color/background_floating_material_light"
-        android:textSize="16dp"
+        android:textSize="22dp"
         android:layout_below="@+id/productText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/codeView"
-        android:layout_alignEnd="@+id/codeView" />
+        android:layout_alignEnd="@+id/codeView"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +33,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:textSize="22dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -39,7 +46,8 @@
         android:text="Barcode"
         android:id="@+id/barcodeText"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffffff" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -49,7 +57,8 @@
         android:id="@+id/productText"
         android:layout_below="@+id/codeView"
         android:layout_alignLeft="@+id/barcodeText"
-        android:layout_alignStart="@+id/barcodeText" />
+        android:layout_alignStart="@+id/barcodeText"
+        android:textColor="#ffffffff" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -69,7 +78,9 @@
             android:background="@color/background_floating_material_light"
             android:layout_weight="0.25"
             android:checked="true"
-            android:textSize="10dp"/>
+            android:textSize="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
         <Spinner
             android:layout_width="25dp"
@@ -77,7 +88,9 @@
             android:id="@+id/spinnerYear"
             android:spinnerMode="dropdown"
             android:background="@color/background_floating_material_light"
-            android:layout_weight="0.25" />
+            android:layout_weight="0.25"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
         <Spinner
             android:layout_width="25dp"
@@ -85,7 +98,9 @@
             android:id="@+id/spinnerMonth"
             android:layout_weight="0.25"
             android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light" />
+            android:background="@color/background_floating_material_light"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
         <Spinner
             android:layout_width="25dp"
@@ -93,7 +108,9 @@
             android:id="@+id/spinnerDay"
             android:layout_weight="0.25"
             android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light" />
+            android:background="@color/background_floating_material_light"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
     </LinearLayout>
 
@@ -104,7 +121,8 @@
         android:id="@+id/expirationDateText"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_below="@+id/productBox"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffffff" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -155,14 +173,11 @@
         android:id="@+id/connectionCheck"
         android:textSize="10dp"
         android:checked="false"
-        android:layout_alignTop="@+id/barcodeText"
-        android:layout_toRightOf="@+id/expirationDateText"
-        android:layout_toEndOf="@+id/expirationDateText"
-        android:background="@drawable/blankb"
+        android:background="#ffffffff"
         android:onClick="clickedConnection"
-        android:layout_above="@+id/codeView"
-        android:backgroundTint="@color/abc_background_cache_hint_selector_material_light"
-        android:backgroundTintMode="src_in"/>
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/codeView"
+        android:layout_alignEnd="@+id/codeView" />
 
     <Button
         android:layout_width="wrap_content"
