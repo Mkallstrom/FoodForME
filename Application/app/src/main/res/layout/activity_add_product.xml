@@ -175,8 +175,41 @@
         android:layout_height="wrap_content"
         android:text="New Button"
         android:id="@+id/button"
+        android:onClick="startCameraActivity"
+        android:layout_above="@+id/linearLayout2"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout3"
-        android:layout_centerHorizontal="true"
-        android:onClick="startCameraActivity" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:id="@+id/textView"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#ffffffff"
+            android:layout_below="@+id/linearLayout3"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/amountText"
+            android:layout_weight="1"
+            android:background="@color/background_floating_material_light"
+            android:textSize="22sp"
+            android:layout_marginLeft="5sp"
+            android:layout_marginBottom="10sp"
+            android:text="1" />
+    </LinearLayout>
 
 </RelativeLayout>

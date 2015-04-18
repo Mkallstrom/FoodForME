@@ -260,9 +260,9 @@ public class InventoryActivity extends ActionBarActivity {
     * Results from other activities needs to be handled here (ex. scanner)
     */
 
-    protected void addProduct(String name, String date, String code, boolean expires)
+    protected void addProduct(String name, String date, int amount, String code, boolean expires)
     {
-        Product product = new Product(name, date, Integer.toString(index), 1, code, expires);
+        Product product = new Product(name, date, Integer.toString(index), amount, code, expires);
         // Namn, date, key, amount, code
 
         inventoryEditor.putString(Integer.toString(index), product.toString());
@@ -301,6 +301,7 @@ public class InventoryActivity extends ActionBarActivity {
             if(resultCode == RESULT_OK) {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
+                String newProductAmount = data.getStringExtra("amount");
                 String newCode = data.getStringExtra("code");
                 boolean expires = data.getBooleanExtra("expires", true);
 
@@ -308,7 +309,7 @@ public class InventoryActivity extends ActionBarActivity {
                 inventoryEditor.remove("index");
                 inventoryEditor.putString("index",Integer.toString(index));
                 inventoryEditor.commit();
-                addProduct(newProduct, newProductExpDate, newCode, expires);
+                addProduct(newProduct, newProductExpDate, Integer.parseInt(newProductAmount), newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();

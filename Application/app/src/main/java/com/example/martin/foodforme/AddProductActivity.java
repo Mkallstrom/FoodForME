@@ -52,6 +52,7 @@ public class AddProductActivity extends ActionBarActivity {
     SharedPreferences localBarcodes;
     TextView codeView;
     EditText productName;
+    EditText productAmount;
 
     String productString;
     String barcode;
@@ -137,6 +138,7 @@ public class AddProductActivity extends ActionBarActivity {
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
         productName = (EditText)findViewById(R.id.productBox);
+        productAmount = (EditText)findViewById(R.id.amountText);
 
         Intent callingIntent = getIntent();
         barcode = callingIntent.getExtras().getString("result");
@@ -524,6 +526,7 @@ public class AddProductActivity extends ActionBarActivity {
         productString = productName.getText().toString();
         String barcode = codeView.getText().toString();
         SharedPreferences.Editor editor = localBarcodes.edit();
+        String amount = productAmount.getText().toString();
 
         if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
         {                                                                                                    // -> replace with new name.
@@ -554,6 +557,7 @@ public class AddProductActivity extends ActionBarActivity {
         Intent intent = new Intent();
         intent.putExtra("product",productString);
         intent.putExtra("expDate",expDateString());
+        intent.putExtra("amount", amount);
         intent.putExtra("code", barcode);
         CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
         intent.putExtra("expires", checkBox.isChecked());
