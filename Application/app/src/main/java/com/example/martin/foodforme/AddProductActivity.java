@@ -1,5 +1,6 @@
 package com.example.martin.foodforme;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -298,7 +299,14 @@ public class AddProductActivity extends ActionBarActivity {
         recognizedText = recognizedText.trim();
 
         if ( recognizedText.length() != 0 ) {
-            Toast.makeText(context, recognizedText, Toast.LENGTH_LONG).show();
+
+            // Create a dialog to display the text
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(recognizedText)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", null);
+            AlertDialog alert = builder.create();
+            alert.show();
         }
 
         // Cycle done.
