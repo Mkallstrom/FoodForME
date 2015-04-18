@@ -584,7 +584,7 @@ public class AddProductActivity extends ActionBarActivity {
             arrayListYears.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinYearAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListYears);
+                new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListYears);
         Spinner spinYear = (Spinner)findViewById(R.id.spinnerYear);
         spinYear.setAdapter(spinYearAdapter);
     }
@@ -595,7 +595,7 @@ public class AddProductActivity extends ActionBarActivity {
             arrayListMonths.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinMonthAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListMonths);
+                new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListMonths);
         Spinner spinMonth = (Spinner)findViewById(R.id.spinnerMonth);
         spinMonth.setAdapter(spinMonthAdapter);
     }
@@ -606,7 +606,7 @@ public class AddProductActivity extends ActionBarActivity {
             arrayListDays.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinDayAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, arrayListDays);
+                new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListDays);
         Spinner spinDay = (Spinner)findViewById(R.id.spinnerDay);
         spinDay.setAdapter(spinDayAdapter);
     }

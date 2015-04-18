@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        style="?android:attr/spinnerDropDownItemStyle"
-        android:singleLine="true"
-        android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
-        android:ellipsize="marquee"
-        android:textSize="17sp">
-    </TextView>
-</LinearLayout>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/spinnerItemTextView"
+    style="?android:attr/spinnerItemStyle"
+    android:singleLine="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="marquee"
+    android:textColor="#000000"
+    android:textSize="25sp"
+    android:paddingBottom="10sp"
+    android:paddingTop="10sp"
+    android:gravity="center"
+    android:text="Sample text" >
+</TextView>

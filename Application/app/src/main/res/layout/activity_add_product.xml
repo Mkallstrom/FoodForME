@@ -82,9 +82,7 @@
             android:background="@color/background_floating_material_light"
             android:layout_weight="0.25"
             android:checked="true"
-            android:textSize="15dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" />
+            android:textSize="15dp" />
 
         <Spinner
             android:layout_width="25dp"
@@ -92,9 +90,7 @@
             android:id="@+id/spinnerYear"
             android:spinnerMode="dropdown"
             android:background="@color/background_floating_material_light"
-            android:layout_weight="0.25"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" />
+            android:layout_weight="0.25" />
 
         <Spinner
             android:layout_width="25dp"
@@ -102,9 +98,7 @@
             android:id="@+id/spinnerMonth"
             android:layout_weight="0.25"
             android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" />
+            android:background="@color/background_floating_material_light" />
 
         <Spinner
             android:layout_width="25dp"
@@ -112,9 +106,7 @@
             android:id="@+id/spinnerDay"
             android:layout_weight="0.25"
             android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp" />
+            android:background="@color/background_floating_material_light" />
 
     </LinearLayout>
 

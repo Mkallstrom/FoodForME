@@ -47,10 +47,6 @@
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
-            android:name=".AllProductsActivity"
-            android:label="@string/title_activity_all_products" >
-        </activity>
-        <activity
             android:name=".SearchProductsActivity"
             android:label="@string/title_activity_search_products" >
         </activity>
