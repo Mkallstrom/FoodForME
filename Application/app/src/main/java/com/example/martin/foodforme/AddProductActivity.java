@@ -612,7 +612,12 @@ public class AddProductActivity extends ActionBarActivity {
     }
     public void clickedConnection(View view)
     {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
+        CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+        if(checkBox.isChecked()) {
+            Toast.makeText(context,"You are connected to the database", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
+        }
         checkBox.toggle();
     }
 }
