@@ -1,36 +1,27 @@
 package com.example.martin.foodforme;
 
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * SOURCE: http://examples.javacodegeeks.com/android/core/hardware/camera-hardware/android-camera-example
@@ -115,9 +106,6 @@ public class CameraActivity extends Activity {
 
         capture = (Button) findViewById(R.id.button_capture);
         capture.setOnClickListener(captureListener);
-
-        switchCamera = (Button) findViewById(R.id.button_ChangeCamera);
-        switchCamera.setOnClickListener(switchCameraListener);
 
         /* TRYING TO DRAW A RECTANGLE */
         /*ImageView imgView = (ImageView) this.findViewById(R.id.imageViewDraw);

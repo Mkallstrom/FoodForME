@@ -36,11 +36,23 @@ public class MainActivity extends ActionBarActivity {
     private static final String USERNAME = "name";
     private static final String PASSWORD = "password";
 
+    AccountDB accountDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context=this;
+        accountDB = (AccountDB) getApplicationContext();
+
+        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        boolean usesAccount = account.getBoolean("active", false);
+        if(usesAccount)
+        {
+            String username = account.getString("user", "No user was found!");
+            String password = account.getString("password", "No password found!");
+            accountDB.setDetails(username,password);
+        }
     }
 
 
@@ -114,6 +126,7 @@ public class MainActivity extends ActionBarActivity {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
                             info.message();
+                            accountDB.setDetails(sa.getName(),sa.getPassword());
                         } else {
                             //if failed
                             InfoDialog info = new InfoDialog("Error, the database could not accept your request.", context);
@@ -131,6 +144,8 @@ public class MainActivity extends ActionBarActivity {
 
     class SaveAccount extends AsyncTask<String, String, String> {
         private int createdAcc = 0;
+        private String userName;
+        private String password;
         /**
          * Before starting background thread
          */
@@ -156,6 +171,8 @@ public class MainActivity extends ActionBarActivity {
         private void createAccountDB(String username, String password) {
             // Building Parameters
             List<NameValuePair> params = new ArrayList<>();
+            this.userName = username;
+            this.password = password;
             params.add(new BasicNameValuePair(USERNAME, username));
             params.add(new BasicNameValuePair(PASSWORD, password));
 
@@ -197,6 +214,7 @@ public class MainActivity extends ActionBarActivity {
         public void storeAccountOnPhone(String username, String password){
             SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
             SharedPreferences.Editor accountEditor = account.edit();
+            accountEditor.putBoolean("active", true);
             accountEditor.putString("user", username);
             accountEditor.putString("password", password);
             accountEditor.commit();
@@ -205,6 +223,8 @@ public class MainActivity extends ActionBarActivity {
         public int getCreatedAcc(){
             return createdAcc;
         }
+        public String getName() { return userName; }
+        public String getPassword() { return password; }
     }
 
 

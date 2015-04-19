@@ -15,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -187,16 +186,16 @@ public class AddProductActivity extends ActionBarActivity {
         File file = new File(_path);
         Uri outputFileUri = Uri.fromFile(file);
 
-        final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+        //final Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        //intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
-        startActivityForResult(intent, 0);
+        //startActivityForResult(intent, 0);
 
-        /* This code can be used to call the custom Camera activity (not completed, but working)
+         //This code can be used to call the custom Camera activity (not completed, but working)
 
         Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, 45);                     // The code can be changed, as long as it is handled in onActivityResult
-        */
+
     }
 
     @Override

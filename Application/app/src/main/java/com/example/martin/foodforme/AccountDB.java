@@ -1,8 +1,8 @@
 package com.example.martin.foodforme;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
+import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by Andreas on 2015-04-24.
  */
-public class AccountDB extends Activity {
+public class AccountDB extends Application {
     //Attributes
     private String username;
     private String password;
@@ -27,11 +27,11 @@ public class AccountDB extends Activity {
     private static final String url_get_inventory = ip + "get_inventory.php"; //Get all inventory from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
 
-    //Constructs
-    public AccountDB(){
-        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
-        this.username = account.getString("user", "No user was found!");
-        this.password = account.getString("password", "No password found!");
+
+    public void setDetails(String username, String password) {
+        this.username = username;
+        this.password = password;
+        Log.d("AccountDB", "set details");
     }
 
 
@@ -110,6 +110,7 @@ public class AccountDB extends Activity {
          */
         public void loadInventory(){
             // Building Parameters
+            Log.d("AccountDB", "load Inventory initiated");
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(USERNAME, username));
             params.add(new BasicNameValuePair(PASSWORD, password));
@@ -122,8 +123,10 @@ public class AccountDB extends Activity {
             try {
                 int success = json.getInt(TAG_SUCCESS);
 
+
                 if (success == 1) {
                     //successfully
+                    Log.d("AccountDB", "success for get inventory");
                     //TODO fill and create the inventory array with all items
                     JSONArray productObj = json
                             .getJSONArray("inventory"); // JSON Array
@@ -134,6 +137,7 @@ public class AccountDB extends Activity {
                     loadInventory = 1; //Loading inventory success.
 
                 } else {
+                    Log.d("AccountDB", "no success for get inventory");
                     //failed
                     loadInventory = -1; //Loading inventory failed.
                 }
