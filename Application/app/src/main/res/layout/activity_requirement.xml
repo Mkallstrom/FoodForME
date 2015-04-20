@@ -25,15 +25,6 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1" />
 
-        <Button
-            android:layout_width="fill_parent"
-            android:text="Add"
-            android:id="@+id/addbutton"
-            android:layout_gravity="center_horizontal"
-            android:onClick="addRequirement"
-            android:layout_height="50dp"
-            android:background="@drawable/blankb" />
-
     </LinearLayout>
 
 </RelativeLayout>
