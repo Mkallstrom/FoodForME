@@ -34,7 +34,8 @@
         <activity
             android:name=".AddProductActivity"
             android:label="@string/title_activity_add_product"
-            android:parentActivityName=".InventoryActivity" >
+            android:parentActivityName=".InventoryActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ShoppingListActivity"
@@ -46,10 +47,7 @@
             android:label="@string/title_activity_required_list"
             android:parentActivityName=".MainActivity" >
         </activity>
-        <activity
-            android:name=".SearchProductsActivity"
-            android:label="@string/title_activity_search_products" >
-        </activity>
+
         <activity
             android:name=".Item_not_found"
             android:label="@string/title_activity_item_not_found" >
