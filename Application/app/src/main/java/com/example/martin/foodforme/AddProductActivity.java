@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,6 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class AddProductActivity extends ActionBarActivity {
@@ -170,11 +172,6 @@ public class AddProductActivity extends ActionBarActivity {
             String foundName = localBarcodes.getString(barcode, "Not found");
             productName.setText(foundName);
             localHasProduct = true;
-        }
-
-        if (!databaseHasProduct && !localHasProduct) {
-            Intent intent = new Intent(this, Item_not_found.class);
-            startActivityForResult(intent, 80);
         }
 
         // Fills the spinner with years
@@ -375,12 +372,20 @@ public class AddProductActivity extends ActionBarActivity {
     }
 
     class GetProductDetails extends AsyncTask<String, String, String> {
+        private ProgressDialog pDialog;
         /**
          * Before starting background thread
          */
         @Override
         protected void onPreExecute() {
+            super.onPreExecute();
 
+            // Creates a ProgressDialog that will be visible until the task is completed
+            pDialog = new ProgressDialog(context);
+            pDialog.setMessage("Searching the product database. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
         }
 
         /**
@@ -449,7 +454,12 @@ public class AddProductActivity extends ActionBarActivity {
          * *
          */
         protected void onPostExecute(String file_url) {
+            pDialog.dismiss(); // the progress dialog can be dismissed
 
+            if (!databaseHasProduct && !localHasProduct) { // product was not in the local nor global database
+                Intent intent = new Intent(context, Item_not_found.class);
+                startActivityForResult(intent, 80);
+            }
         }
 
     }
