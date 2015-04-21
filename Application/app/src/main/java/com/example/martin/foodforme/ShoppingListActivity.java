@@ -250,7 +250,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                         shoppingAdapter.notifyDataSetChanged();
                         shoppingEditor.remove("index");
                         shoppingEditor.putString("index", Integer.toString(sindex));
-                        shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode());
+                        shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode() + "|" + newProduct.expires());
                         shoppingEditor.commit();
                     }
                 })
@@ -262,7 +262,7 @@ public class ShoppingListActivity extends ActionBarActivity {
     }
     public Product parseSharedPreferences(String string, String key)
     {  String[] strings = string.split("\\|");
-        // Namn, date, key, amount, code
+        // Namn, date, key, amount, code, expires
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3], Boolean.parseBoolean(strings[4]));
 
     }

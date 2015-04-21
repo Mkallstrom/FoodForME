@@ -20,6 +20,8 @@ public class Product implements Comparable<Product>{
     private int expiryMonth;
     private int expiryDay;
 
+    private String DUMMY_DATE = "9999-99-99"; // sets a dummy date for products without expiration
+
     /**
      * Public constructor for a Product object
      * @param productName   the name of the Product.
@@ -27,9 +29,9 @@ public class Product implements Comparable<Product>{
      * @param amount        the amount of the same Product.
      */
     public Product(String productName, String key, int amount) {
-        name = productName;
-        setExpiryDate(getTodaysDate());
-        expiring = false;
+        this.name = productName;
+        setExpiryDate(DUMMY_DATE);
+        this.expiring = false;
         this.key = key;
         this.code = "0";
         this.amount = Integer.toString(amount);
@@ -44,14 +46,14 @@ public class Product implements Comparable<Product>{
      * @param code          the barcode of the Product.
      */
     public Product(String productName, String expiryDate, String key, int amount, String code, boolean expires) {
-        name = productName;
+        this.name = productName;
         if(expires)
         {
             setExpiryDate(expiryDate);
         }
         else
         {
-            setExpiryDate("9999-99-99");
+            setExpiryDate(DUMMY_DATE);
             expiring = false;
         }
         this.key = key;
