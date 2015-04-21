@@ -73,7 +73,7 @@ public class AddProductActivity extends ActionBarActivity {
     protected static final String PHOTO_TAKEN = "photo_taken";
     private static final String TAG = "Tesseract: ";
 
-    private static final String ip = "http://212.25.153.193:8080/"; // Ip address for database
+    private static final String ip = "http://ffm.student.it.uu.se/"; // Ip address for database
     private static final String url_product_details = ip + "get_product_details.php"; // single product url
     private static final String url_update_product = ip + "update_product.php";  // url to update product
     private static final String url_create_product = ip + "create_product.php"; // url to create new product
@@ -542,9 +542,12 @@ public class AddProductActivity extends ActionBarActivity {
                 }
         if(json != null)
         {
-            if (databaseHasProduct && !databaseName.equals(productString)) {                                // if the product is in the database and the name does not match the new String
-                Log.d("Saving: ", productString);
-                new SaveProductDetails().execute();                                                         // Saves the new String to the database
+            if (databaseHasProduct) {
+                if(!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
+                {
+                    Log.d("Saving: ", productString);
+                    new SaveProductDetails().execute();
+                }                                                                        // Saves the new String to the database
             }
         }
         else
@@ -617,11 +620,12 @@ public class AddProductActivity extends ActionBarActivity {
     public void clickedConnection(View view)
     {
         CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+        checkBox.toggle();
         if(checkBox.isChecked()) {
             Toast.makeText(context,"You are connected to the database", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
         }
-        checkBox.toggle();
     }
+
 }
