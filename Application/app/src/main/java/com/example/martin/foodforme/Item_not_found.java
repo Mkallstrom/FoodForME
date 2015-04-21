@@ -15,7 +15,7 @@ public class Item_not_found extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_not_found);
-        setTitle("Activity Not Found");
+        setTitle("Product Not Found");
     }
 
 
