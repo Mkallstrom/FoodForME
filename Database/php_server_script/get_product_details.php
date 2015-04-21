@@ -25,12 +25,8 @@ if(isset($_GET["barcode"])) {
 			
 			// success
 			$response["success"] = 1;
-
 			$response["product"] = array();
-			
 			array_push($response["product"], $product);
-
-			echo json_encode($response);
 		} else {
 		       // no product found
 		       $response["success"] = 0;
@@ -45,8 +41,7 @@ if(isset($_GET["barcode"])) {
        // required field is missing
        $response["success"] = 0;
        $response["message"] = "Required field(s) is missing";
-
-       // echoing JSON response
-       echo json_encode($response);
 }
+
+echo json_encode($response);
 ?>
