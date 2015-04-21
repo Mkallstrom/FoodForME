@@ -402,13 +402,10 @@ public class AddProductActivity extends ActionBarActivity {
 
                         if (json == null) {
                             Log.d("Product not found :", barcode);
-                            if(!localHasProduct)
-                            {
-                                Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
-                            }
+
                             return;
                         }
-                        databaseHasProduct = true;
+
 
                         // json success tag
                         success = json.getInt(TAG_SUCCESS);
@@ -420,6 +417,7 @@ public class AddProductActivity extends ActionBarActivity {
                                     .getJSONArray(TAG_PRODUCT); // JSON Array
 
                             JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                            databaseHasProduct = true;
                             databaseName = product.getString(TAG_PRODUCT_NAME); // sets databaseName to what was found in the database
 
                             if(!localHasProduct)
@@ -429,6 +427,10 @@ public class AddProductActivity extends ActionBarActivity {
 
                         } else {
                             // product with barcode not found
+                            if(!localHasProduct)
+                            {
+                                Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
                     } catch (JSONException e) {
