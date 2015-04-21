@@ -172,7 +172,10 @@ public class AddProductActivity extends ActionBarActivity {
             localHasProduct = true;
         }
 
-        itemNotFound();
+        if (!databaseHasProduct && !localHasProduct) {
+            Intent intent = new Intent(this, Item_not_found.class);
+            startActivityForResult(intent, 80);
+        }
 
         // Fills the spinner with years
         fillSpinnerYear();
@@ -201,7 +204,6 @@ public class AddProductActivity extends ActionBarActivity {
         if (resultCode == -1) {
             if (requestCode == 80) {
                 this.productName.setText(data.getStringExtra("productName"));
-                return;
             } else {
                 onPhotoTaken();
             }
@@ -296,13 +298,13 @@ public class AddProductActivity extends ActionBarActivity {
 
         Log.v(TAG, "OCRED TEXT: " + recognizedText);
 
-        if ( lang.equalsIgnoreCase("swe") ) {
+        if (lang.equalsIgnoreCase("swe")) {
             recognizedText = recognizedText.replaceAll("[^a-zA-Z0-9]+", " ");
         }
 
         recognizedText = recognizedText.trim();
 
-        if ( recognizedText.length() != 0 ) {
+        if (recognizedText.length() != 0) {
 
             // Create a dialog to display the text
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -320,7 +322,7 @@ public class AddProductActivity extends ActionBarActivity {
 
         /**
          * Before starting background thread
-         * */
+         */
         @Override
         protected void onPreExecute() {
 
@@ -328,7 +330,7 @@ public class AddProductActivity extends ActionBarActivity {
 
         /**
          * Creating product
-         * */
+         */
         protected String doInBackground(String... args) {
 
             // Building Parameters
@@ -364,27 +366,27 @@ public class AddProductActivity extends ActionBarActivity {
 
         /**
          * After completing background task
-         * **/
+         * *
+         */
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once done
-    }
+        }
 
     }
 
-    class GetProductDetails extends AsyncTask<String, String, String>
-    {
+    class GetProductDetails extends AsyncTask<String, String, String> {
         /**
          * Before starting background thread
-         * */
+         */
         @Override
         protected void onPreExecute() {
 
         }
+
         /**
          * Getting product details in background thread
-         * */
-        protected String doInBackground(String... params)
-        {
+         */
+        protected String doInBackground(String... params) {
 
             // updating UI from Background Thread
             runOnUiThread(new Runnable() {
@@ -399,7 +401,7 @@ public class AddProductActivity extends ActionBarActivity {
                         // getting product details by making HTTP request
                         // Note that product details url will use GET request
 
-                                json = jsonParser.makeHttpRequest(
+                        json = jsonParser.makeHttpRequest(
                                 url_product_details, "GET", params);
 
                         if (json == null) {
@@ -422,15 +424,13 @@ public class AddProductActivity extends ActionBarActivity {
                             databaseHasProduct = true;
                             databaseName = product.getString(TAG_PRODUCT_NAME); // sets databaseName to what was found in the database
 
-                            if(!localHasProduct)
-                            {
+                            if (!localHasProduct) {
                                 productName.setText(databaseName);
                             }
 
                         } else {
                             // product with barcode not found
-                            if(!localHasProduct)
-                            {
+                            if (!localHasProduct) {
                                 Toast.makeText(context, "Product not found. Please enter name.", Toast.LENGTH_SHORT).show();
                             }
 
@@ -443,9 +443,11 @@ public class AddProductActivity extends ActionBarActivity {
 
             return null;
         }
+
         /**
          * After completing background task
-         * **/
+         * *
+         */
         protected void onPostExecute(String file_url) {
 
         }
@@ -454,19 +456,19 @@ public class AddProductActivity extends ActionBarActivity {
 
     /**
      * Background Async Task to  Save product Details
-     * */
+     */
     class SaveProductDetails extends AsyncTask<String, String, String> {
 
         /**
          * Before starting background thread
-         * */
+         */
         @Override
         protected void onPreExecute() {
         }
 
         /**
          * Saving product
-         * */
+         */
         protected String doInBackground(String... args) {
 
             // Building Parameters
@@ -499,7 +501,8 @@ public class AddProductActivity extends ActionBarActivity {
 
         /**
          * After completing background task
-         * **/
+         * *
+         */
         protected void onPostExecute(String file_url) {
         }
     }
@@ -535,35 +538,30 @@ public class AddProductActivity extends ActionBarActivity {
         if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
         {                                                                                                    // -> replace with new name.
             editor.remove(codeView.getText().toString());
-            editor.putString(barcode,productString);
+            editor.putString(barcode, productString);
+            editor.apply();
+        } else if (!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
+        {
+            editor.putString(barcode, productString);
             editor.apply();
         }
-        else
-            if(!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
-                {
-                    editor.putString(barcode,productString);
-                    editor.apply();
-                }
-        if(json != null)
-        {
+        if (json != null) {
             if (databaseHasProduct) {
-                if(!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
+                if (!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
                 {
                     Log.d("Saving: ", productString);
                     new SaveProductDetails().execute();
                 }                                                                        // Saves the new String to the database
             }
-        }
-        else
-        {
+        } else {
             if (!databaseHasProduct && connection) {                                                        // if the product is not in the database and there is a connection
                 new CreateNewProduct().execute();                                                           // Saves a new product to the database
             }
         }
 
         Intent intent = new Intent();
-        intent.putExtra("product",productString);
-        intent.putExtra("expDate",expDateString());
+        intent.putExtra("product", productString);
+        intent.putExtra("expDate", expDateString());
         intent.putExtra("amount", amount);
         intent.putExtra("code", barcode);
         CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
@@ -572,23 +570,23 @@ public class AddProductActivity extends ActionBarActivity {
         finish();
     }
 
-    public void cancelAddProduct (View view) {
+    public void cancelAddProduct(View view) {
         setResult(RESULT_CANCELED);
         finish();
     }
 
     // Extracts the expiration date set by the user
-    private String expDateString(){
-        Spinner spinner = (Spinner)findViewById(R.id.spinnerYear);
+    private String expDateString() {
+        Spinner spinner = (Spinner) findViewById(R.id.spinnerYear);
         String selectedYear = spinner.getSelectedItem().toString();
-        spinner = (Spinner)findViewById(R.id.spinnerMonth);
+        spinner = (Spinner) findViewById(R.id.spinnerMonth);
         String selectedMonth = spinner.getSelectedItem().toString();
-        spinner = (Spinner)findViewById(R.id.spinnerDay);
+        spinner = (Spinner) findViewById(R.id.spinnerDay);
         String selectedDay = spinner.getSelectedItem().toString();
         return selectedYear + "-" + selectedMonth + "-" + selectedDay;
     }
 
-    private void fillSpinnerYear(){
+    private void fillSpinnerYear() {
         ArrayList<String> arrayListYears = new ArrayList<String>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = thisYear; i <= thisYear + 10; i++) {
@@ -596,53 +594,41 @@ public class AddProductActivity extends ActionBarActivity {
         }
         ArrayAdapter<String> spinYearAdapter =
                 new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListYears);
-        Spinner spinYear = (Spinner)findViewById(R.id.spinnerYear);
+        Spinner spinYear = (Spinner) findViewById(R.id.spinnerYear);
         spinYear.setAdapter(spinYearAdapter);
     }
 
-    private void fillSpinnerMonth(){
+    private void fillSpinnerMonth() {
         ArrayList<String> arrayListMonths = new ArrayList<>();
-        for(int i = 1; i <= 12; i++) {
+        for (int i = 1; i <= 12; i++) {
             arrayListMonths.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinMonthAdapter =
                 new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListMonths);
-        Spinner spinMonth = (Spinner)findViewById(R.id.spinnerMonth);
+        Spinner spinMonth = (Spinner) findViewById(R.id.spinnerMonth);
         spinMonth.setAdapter(spinMonthAdapter);
     }
 
-    private void fillSpinnerDay(){
+    private void fillSpinnerDay() {
         ArrayList<String> arrayListDays = new ArrayList<>();
-        for(int i = 1; i <= 31; i++) {
+        for (int i = 1; i <= 31; i++) {
             arrayListDays.add(Integer.toString(i));
         }
         ArrayAdapter<String> spinDayAdapter =
                 new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListDays);
-        Spinner spinDay = (Spinner)findViewById(R.id.spinnerDay);
+        Spinner spinDay = (Spinner) findViewById(R.id.spinnerDay);
         spinDay.setAdapter(spinDayAdapter);
     }
-    public void clickedConnection(View view)
-    {
+
+    public void clickedConnection(View view) {
         CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
         checkBox.toggle();
-        if(checkBox.isChecked()) {
-            Toast.makeText(context,"You are connected to the database", Toast.LENGTH_SHORT).show();
+        if (checkBox.isChecked()) {
+            Toast.makeText(context, "You are connected to the database", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
         }
         checkBox.toggle();
-    }
-
-    /**
-     * If product doesn't exist in local or in database then
-     * ask for input name that are used to fill in for add
-     * product
-     */
-    public void itemNotFound(){
-        if(!databaseHasProduct && !localHasProduct){
-            Intent intent = new Intent(this, Item_not_found.class);
-            startActivityForResult(intent,80);
-        }
     }
 
 }
