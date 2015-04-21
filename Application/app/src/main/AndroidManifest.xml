@@ -4,7 +4,7 @@
 
     <!-- Internet Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -49,6 +49,10 @@
         <activity
             android:name=".SearchProductsActivity"
             android:label="@string/title_activity_search_products" >
+        </activity>
+        <activity
+            android:name=".Item_not_found"
+            android:label="@string/title_activity_item_not_found" >
         </activity>
     </application>
 

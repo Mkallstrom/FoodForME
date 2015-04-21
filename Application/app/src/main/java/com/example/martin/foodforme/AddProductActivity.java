@@ -173,10 +173,8 @@ public class AddProductActivity extends ActionBarActivity {
             productName.setText(foundName);
             localHasProduct = true;
         }
-        else
-        {
 
-        }
+        itemNotFound();
 
         // Fills the spinner with years
         fillSpinnerYear();
@@ -201,11 +199,16 @@ public class AddProductActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         Log.i(TAG, "resultCode: " + resultCode);
+        if(requestCode == 80){
 
-        if (resultCode == -1) {
-            onPhotoTaken();
-        } else {
-            Log.v(TAG, "User cancelled");
+            this.productName.setText(data.getStringExtra("productName"));
+        }
+        else {
+            if (resultCode == -1) {
+                onPhotoTaken();
+            } else {
+                Log.v(TAG, "User cancelled");
+            }
         }
     }
 
@@ -627,6 +630,19 @@ public class AddProductActivity extends ActionBarActivity {
             Toast.makeText(context,"You are connected to the database", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
+        }
+        checkBox.toggle();
+    }
+
+    /**
+     * If product doesn't exist in local or in database then
+     * ask for input name that are used to fill in for add
+     * product
+     */
+    public void itemNotFound(){
+        if(!databaseHasProduct && !localHasProduct){
+            Intent intent = new Intent(this, Item_not_found.class);
+            startActivityForResult(intent,80);
         }
     }
 
