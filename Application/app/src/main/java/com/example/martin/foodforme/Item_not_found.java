@@ -1,14 +1,12 @@
 package com.example.martin.foodforme;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 
 public class Item_not_found extends ActionBarActivity {
@@ -17,6 +15,7 @@ public class Item_not_found extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_not_found);
+        setTitle("Activity Not Found");
     }
 
 

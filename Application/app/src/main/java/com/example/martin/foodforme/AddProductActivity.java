@@ -94,7 +94,7 @@ public class AddProductActivity extends ActionBarActivity {
         setTitle("Add Product");
         context = this;
 
-        String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
+        String[] paths = new String[]{DATA_PATH, DATA_PATH + "tessdata/"};
         for (String path : paths) {
             File dir = new File(path);
             if (!dir.exists()) {
@@ -137,12 +137,12 @@ public class AddProductActivity extends ActionBarActivity {
 
         localBarcodes = getSharedPreferences("localBarcodes", 0);
 
-        productName = (EditText)findViewById(R.id.productBox);
-        productAmount = (EditText)findViewById(R.id.amountText);
+        productName = (EditText) findViewById(R.id.productBox);
+        productAmount = (EditText) findViewById(R.id.amountText);
 
         Intent callingIntent = getIntent();
         barcode = callingIntent.getExtras().getString("result");
-        codeView = (TextView)findViewById(R.id.codeView);
+        codeView = (TextView) findViewById(R.id.codeView);
         codeView.setText(barcode);
 
         try {
@@ -150,7 +150,7 @@ public class AddProductActivity extends ActionBarActivity {
             URL url = new URL(ip);
 
             //open a connection to that source
-            HttpURLConnection urlConnect = (HttpURLConnection)url.openConnection();
+            HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
             urlConnect.setConnectTimeout(1000);
 
             //trying to retrieve data from the source. If there
@@ -160,14 +160,12 @@ public class AddProductActivity extends ActionBarActivity {
             checkBox.setChecked(true);
             connection = true;
             new GetProductDetails().execute(); // AsyncTask created searching the database
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             Log.d("Connection failed: ", ip);
         }
 
-        if(localBarcodes.contains(barcode))                 //Local database has the code.
+        if (localBarcodes.contains(barcode))                 //Local database has the code.
         {
             String foundName = localBarcodes.getString(barcode, "Not found");
             productName.setText(foundName);
@@ -195,22 +193,23 @@ public class AddProductActivity extends ActionBarActivity {
 
         startActivityForResult(intent, 0);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         Log.i(TAG, "resultCode: " + resultCode);
-        if(requestCode == 80){
-
-            this.productName.setText(data.getStringExtra("productName"));
-        }
-        else {
-            if (resultCode == -1) {
-                onPhotoTaken();
+        if (resultCode == -1) {
+            if (requestCode == 80) {
+                this.productName.setText(data.getStringExtra("productName"));
+                return;
             } else {
-                Log.v(TAG, "User cancelled");
+                onPhotoTaken();
             }
+        } else {
+            Log.v(TAG, "User cancelled");
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
