@@ -630,6 +630,7 @@ public class AddProductActivity extends ActionBarActivity {
         } else {
             Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
         }
+        checkBox.toggle();
     }
 
     /**
