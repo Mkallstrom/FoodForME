@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/camera_preview"
+        android:layout_above="@+id/linearLayout4">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom">
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageViewDraw"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/expiration_date_rectangle_128" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout4">
+
+        <Button
+            android:id="@+id/button_ChangeCamera"
+            android:layout_width="72dp"
+            android:layout_height="match_parent"
+            android:text="Switch Camera"
+            android:layout_marginLeft="30sp"
+            android:layout_weight="0.30" />
+
+        <Button
+            android:id="@+id/button_capture"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Capture"
+            android:layout_weight="1"
+            android:layout_marginRight="30sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>
