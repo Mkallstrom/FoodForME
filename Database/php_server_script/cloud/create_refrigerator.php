@@ -21,7 +21,7 @@ if (isset($_POST['refrigerator_name']) && isset($_POST['refrigerator_password'])
     $db = new DB_CONNECT();
  
     // mysql inserting a new row
-    $result = mysql_query("INSERT INTO refrigerator(refrigerator_name, refrigerator_password) VALUES('$refrigerator_name', '$refrigerator_password')");
+    $result = mysql_query("INSERT INTO refrigerator(name, password) VALUES('$refrigerator_name', '$refrigerator_password')");
  
     // check if row inserted or not
     if ($result) {
