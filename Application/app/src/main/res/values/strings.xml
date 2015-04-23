@@ -3,6 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="refrigerator_connect">Connect to refrigerator</string>
+    <string name="create_refrigerator">Create new refrigerator</string>
     <string name="title_activity_inventory">InventoryActivity</string>
     <string name="title_activity_add_product">AddProductActivity</string>
     <string name="title_activity_list">ListActivity</string>
