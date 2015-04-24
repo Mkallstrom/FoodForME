@@ -195,12 +195,11 @@ public class MainActivity extends ActionBarActivity {
          * @param password - password for username to login with
          */
         public void storeAccountOnPhone(String username, String password){
-            SharedPreferences account = getSharedPreferences("account",0);
+            SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
             SharedPreferences.Editor accountEditor = account.edit();
             accountEditor.putString("user", username);
             accountEditor.putString("password", password);
             accountEditor.commit();
-
         }
 
         public int getCreatedAcc(){
