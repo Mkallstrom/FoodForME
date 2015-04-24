@@ -37,11 +37,12 @@ public class NotifyService extends Service {
 
         Log.v(TAG, "Service started");
 
-        if(!expiringProducts.isEmpty()) sendNotification();
+
         // Set an alarm for the next time this service should run:
-        buildList();
-        buildText();
-        setAlarm();
+        buildList();    // Make list of expiring products.
+        buildText();    // Make title and detail strings for the notification.
+        if(!expiringProducts.isEmpty()) sendNotification(); // Send notification.
+        setAlarm();     // Set alarm for next day.
 
         Log.v(TAG, "Service stopped");
         stopSelf();
