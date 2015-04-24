@@ -191,6 +191,12 @@ public class AddProductActivity extends ActionBarActivity {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
         startActivityForResult(intent, 0);
+
+        /* This code can be used to call the custom Camera activity (not completed, but working)
+
+        Intent intent = new Intent(this, CameraActivity.class);
+        startActivityForResult(intent, 45);                     // The code can be changed, as long as it is handled in onActivityResult
+        */
     }
 
     @Override

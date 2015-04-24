@@ -10,6 +10,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,7 +19,11 @@ import android.graphics.Paint;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -205,20 +210,25 @@ public class CameraActivity extends Activity {
                 if (pictureFile == null) {
                     return;
                 }
+
                 try {
                     //write the file
                     FileOutputStream fos = new FileOutputStream(pictureFile);
                     fos.write(data);
                     fos.close();
-                    Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
-                    toast.show();
+                    //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
+                    //toast.show();
+
 
                 } catch (FileNotFoundException e) {
                 } catch (IOException e) {
                 }
 
                 //refresh camera to continue preview
-                mPreview.refreshCamera(mCamera);
+                //mPreview.refreshCamera(mCamera);
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
             }
         };
         return picture;
@@ -233,13 +243,16 @@ public class CameraActivity extends Activity {
 
     //make picture and save to a folder
     private static File getOutputMediaFile() {
-        //make a new file directory inside the "sdcard" folder
-        File mediaStorageDir = new File("/sdcard/", "JCG Camera");
 
+        File fileToOCR = new File(AddProductActivity.DATA_PATH + "/ocr.jpg"); // The image should be saved in this directory for Tesseract
+        Log.d("CameraActivity: ", "The image will be saved to " + Uri.fromFile(fileToOCR));
+        return fileToOCR;
+
+        /* OLD CODE
         //if this "JCGCamera folder does not exist
-        if (!mediaStorageDir.exists()) {
+        if (!fileToOCR.exists()) {
             //if you cannot make this folder return
-            if (!mediaStorageDir.mkdirs()) {
+            if (!fileToOCR.mkdirs()) {
                 return null;
             }
         }
@@ -248,9 +261,8 @@ public class CameraActivity extends Activity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         //and make a media file:
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-
-        return mediaFile;
+        mediaFile = new File(fileToOCR.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        */
     }
 
     private void releaseCamera() {

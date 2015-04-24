@@ -3,6 +3,7 @@ package com.example.martin.foodforme;
 import java.io.IOException;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -74,7 +75,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera = camera;
         Camera.Parameters parameters = mCamera.getParameters(); // Gets the current camera parameters
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE); // adds continuous auto focus to parameters
-        mCamera.setParameters(parameters); // sets the parameters to mCamera
+        parameters.setRotation(90);                             // Sets the camera parameter in portrait rotation
+        mCamera.setParameters(parameters);                      // sets the parameters to mCamera
+
     }
 
     @Override
