@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -108,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
                         SaveAccount sa = new SaveAccount();
                         sa.execute(new String[]{loginName, loginPassword});
                         while (sa.getCreatedAcc() == 0) {
-                        }
+                        };
                         if (sa.getCreatedAcc() == 1) {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
@@ -173,7 +174,7 @@ public class MainActivity extends ActionBarActivity {
                     // successfully created product
                     createdAcc = 1; //Account been created
 
-                    //TODO HERE BOX
+                    storeAccountOnPhone(username,password);
 
                     // closing this screen
                     //finish();
@@ -185,6 +186,20 @@ public class MainActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
 
+
+        }
+
+        /**
+         * Store the account info on phone
+         * @param username - the username for the database
+         * @param password - password for username to login with
+         */
+        public void storeAccountOnPhone(String username, String password){
+            SharedPreferences account = getSharedPreferences("account",0);
+            SharedPreferences.Editor accountEditor = account.edit();
+            accountEditor.putString("user", username);
+            accountEditor.putString("password", password);
+            accountEditor.commit();
 
         }
 
