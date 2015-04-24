@@ -1,6 +1,8 @@
 package com.example.martin.foodforme;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Map;
 
@@ -74,15 +78,16 @@ public class InventoryActivity extends ActionBarActivity {
         });
 
         setIndices();
+
         index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
         rindex = Integer.parseInt(requiredSP.getString("index",""));
+
         fillLists();
         Collections.sort(inventoryList);
         inventoryAdapter.notifyDataSetChanged();
 
         setEmptyText();
-
-        startService(new Intent(this, NotifyService.class)); // Start notification service
+        setAlarm();
 
     }
 
@@ -330,6 +335,23 @@ public class InventoryActivity extends ActionBarActivity {
                 requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
+    }
+    private void setAlarm()
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 16);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND,0);
+        calendar.add(Calendar.DATE, 1);
+
+        Intent serviceIntent = new Intent(this, NotifyService.class);
+        PendingIntent pi = PendingIntent.getService(this, 131313, serviceIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Long nextAlarm = calendar.getTimeInMillis()-System.currentTimeMillis();
+        am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000*60*60*24, pi);
+        Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm) / (1000 * 60)) + " minutes.");
     }
 
 
