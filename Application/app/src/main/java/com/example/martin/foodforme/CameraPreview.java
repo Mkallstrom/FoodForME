@@ -20,7 +20,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
-        mCamera = camera;
+        mCamera = camera;               // camera seems to be null at initialization
         mHolder = getHolder();
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
@@ -55,7 +55,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // start preview with new settings
         setCamera(camera);
         try {
-            //mCamera.autoFocus();
             mCamera.setPreviewDisplay(mHolder);
             mCamera.setDisplayOrientation(PORTRAIT_ANGLE); // Sets camera in portrait mode (90deg)
             mCamera.startPreview();
@@ -73,6 +72,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void setCamera(Camera camera) {
         //method to set a camera instance
         mCamera = camera;
+        Camera.Parameters parameters = mCamera.getParameters(); // Gets the current camera parameters
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE); // adds continuous auto focus to parameters
+        mCamera.setParameters(parameters); // sets the parameters to mCamera
     }
 
     @Override
