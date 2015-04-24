@@ -31,12 +31,12 @@ public class InventoryActivity extends ActionBarActivity {
     private Scanner scanner;
 
     ArrayAdapter inventoryAdapter;
-    ArrayList<Product> shoppingList, requiredList, inventoryList;
+    ArrayList<Product> shoppingList = new ArrayList<>(), requiredList = new ArrayList<>(), inventoryList = new ArrayList<>();
 
     SharedPreferences inventorySP, requiredSP, shoppingSP;
     SharedPreferences.Editor inventoryEditor, requiredEditor, shoppingEditor;
 
-    int index = 0, rindex = 0;
+    int index = 0, rindex = 0, REMOVE = 1, EDIT = 2, REQUIREMENT = 3;
 
     ListView listView;
 
@@ -48,9 +48,6 @@ public class InventoryActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Inventory");
 
-        inventoryList = new ArrayList<>();
-        shoppingList = new ArrayList<>();
-        requiredList = new ArrayList<>();
         inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
 
         inventorySP = getSharedPreferences("inventorySP", 0);
@@ -63,54 +60,6 @@ public class InventoryActivity extends ActionBarActivity {
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(inventoryAdapter);
         registerForContextMenu(listView);
-
-        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            inventoryEditor.putString("index", "0");
-            inventoryEditor.commit();
-        }
-        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            requiredEditor.putString("index", "0");
-            requiredEditor.commit();
-        }
-        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            shoppingEditor.putString("index", "0");
-            shoppingEditor.commit();
-        }
-        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
-        rindex = Integer.parseInt(requiredSP.getString("index",""));
-
-        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-
-        setEmptyText();
-
-        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-
-
-        Collections.sort(inventoryList);
-        inventoryAdapter.notifyDataSetChanged();
-
         listView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -122,7 +71,16 @@ public class InventoryActivity extends ActionBarActivity {
             }
         });
 
-        startService(new Intent(this, NotifyService.class));
+        setIndices();
+        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
+        rindex = Integer.parseInt(requiredSP.getString("index",""));
+        fillLists();
+        Collections.sort(inventoryList);
+        inventoryAdapter.notifyDataSetChanged();
+
+        setEmptyText();
+
+        startService(new Intent(this, NotifyService.class)); // Start notification service
 
     }
 
@@ -154,7 +112,8 @@ public class InventoryActivity extends ActionBarActivity {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int itemID = item.getItemId();
 
-        if(itemID == 1){
+        if(itemID == REMOVE)
+        {
             Product product = inventoryList.get(info.position);
             inventoryEditor.remove(product.getKey());
             inventoryEditor.commit();
@@ -162,7 +121,9 @@ public class InventoryActivity extends ActionBarActivity {
             inventoryAdapter.notifyDataSetChanged();
             setEmptyText();
 
-        } else if(itemID == 2) {
+        }
+        else if(itemID == EDIT)
+        {
             final EditText txtUrl = new EditText(this);
             txtUrl.setInputType(InputType.TYPE_CLASS_NUMBER);
 
@@ -188,7 +149,8 @@ public class InventoryActivity extends ActionBarActivity {
                     })
                     .show();
         }
-        else if(itemID == 3) {
+        else if(itemID == REQUIREMENT)
+        {
 
             Product requiredItem = null;
             if(!requiredList.isEmpty())
@@ -252,7 +214,8 @@ public class InventoryActivity extends ActionBarActivity {
     /*
     * Initiates the barcode scanner via intent
      */
-    public void scanBarcode(View view) {
+    public void scanBarcode(View view)
+    {
         scanner.scan();
     }
 
@@ -260,7 +223,7 @@ public class InventoryActivity extends ActionBarActivity {
     * Results from other activities needs to be handled here (ex. scanner)
     */
 
-    protected void addProduct(String name, String date, int amount, String code, boolean expires)
+    private void addProduct(String name, String date, int amount, String code, boolean expires)
     {
         Product product = new Product(name, date, Integer.toString(index), amount, code, expires);
         // Namn, date, key, amount, code
@@ -319,10 +282,52 @@ public class InventoryActivity extends ActionBarActivity {
             }
 
     }
-    public Product parseSharedPreferences(String string, String key) {
+    private Product parseSharedPreferences(String string, String key) {
         String[] strings = string.split("\\|"); // The double backslash is needed for some characters
         // Namn, date, key, amount, code, expires
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
+    }
+    private void setIndices()
+    {
+        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            inventoryEditor.putString("index", "0");
+            inventoryEditor.commit();
+        }
+        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            requiredEditor.putString("index", "0");
+            requiredEditor.commit();
+        }
+        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            shoppingEditor.putString("index", "0");
+            shoppingEditor.commit();
+        }
+    }
+    private void fillLists()
+    {
+        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
     }
 
 }

@@ -17,14 +17,14 @@
             android:layout_height="wrap_content"
             android:id="@+id/inventoryButton"
             android:onClick="toInventory"
-            android:src="@drawable/ib"
             android:background="#00ffffff"
             android:layout_gravity="center_horizontal"
             android:scaleType="fitCenter"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:layout_weight="0.5" />
+            android:layout_weight="0.5"
+            android:src="@drawable/ib" />
 
         <ImageButton
             android:layout_width="wrap_content"

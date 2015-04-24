@@ -25,7 +25,7 @@ import java.util.Map;
 public class ShoppingListActivity extends ActionBarActivity {
 
     private Scanner scanner;
-    ArrayList<Product> shoppingList, requiredList, inventoryList;
+    ArrayList<Product> shoppingList = new ArrayList<>(), requiredList = new ArrayList<>(), inventoryList = new ArrayList<>();
     ArrayAdapter shoppingAdapter;
     SharedPreferences shoppingSP, requiredSP, inventorySP, localBarcodes;
     SharedPreferences.Editor shoppingEditor, inventoryEditor;
@@ -40,10 +40,6 @@ public class ShoppingListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_shopping_list);
         Context context = this;
         setTitle("Shopping List");
-
-        shoppingList = new ArrayList<>();
-        requiredList = new ArrayList<>();
-        inventoryList = new ArrayList<>();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
 
@@ -62,87 +58,13 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         registerForContextMenu(shoppingListView);
 
-        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            shoppingEditor.putString("index", "0");
-            shoppingEditor.commit();
-        }
-        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            inventoryEditor.putString("index", "0");
-            inventoryEditor.commit();
-        }
+        setIndices();
         sindex = Integer.parseInt(shoppingSP.getString("index",""));
         index = Integer.parseInt(inventorySP.getString("index",""));
 
-        Map<String,?> keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = requiredSP.getAll();
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
+        fillLists();
 
-        keys = inventorySP.getAll();
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-
-        ArrayList shoppingCodes = new ArrayList();
-        for(Product p : shoppingList) { shoppingCodes.add(p.getCode()); }
-        for(Product requiredProduct : requiredList)
-        {
-            String requiredCode = requiredProduct.getCode();
-            Product changedItem = null;
-            int inventoryAmount = 0, shoppinglistAmount = 0;
-
-            for(Product inventoryProduct : inventoryList)
-            {
-                if(inventoryProduct.getCode().equals(requiredCode))
-                {
-                    inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
-                }
-            }
-            for(Product shoppinglistProduct : shoppingList)
-            {
-                if(shoppinglistProduct.getCode().equals(requiredCode))
-                {
-                    shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
-                    changedItem = shoppinglistProduct;
-                }
-            }
-
-            if(Integer.parseInt(requiredProduct.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
-            {
-                if(!shoppingCodes.contains(requiredCode))
-                {
-                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(), false);
-                    shoppingList.add(newProduct);
-                    Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
-                    shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
-                }
-                else if (changedItem != null)
-                {
-                    Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
-                    changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
-                    shoppingEditor.remove(changedItem.getKey());
-                    shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
-                }
-            }
-
-        }
-        shoppingEditor.commit();
-        shoppingAdapter.notifyDataSetChanged();
+        checkRequirements();
 
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -331,5 +253,90 @@ public class ShoppingListActivity extends ActionBarActivity {
             scanner.scannerResult(requestCode, resultCode, data);
         }
 
+    }
+    private void setIndices()
+    {
+        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            inventoryEditor.putString("index", "0");
+            inventoryEditor.commit();
+        }
+        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            shoppingEditor.putString("index", "0");
+            shoppingEditor.commit();
+        }
+    }
+    private void fillLists()
+    {
+        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+    }
+    private void checkRequirements()
+    {
+        ArrayList shoppingCodes = new ArrayList();
+        for(Product p : shoppingList) { shoppingCodes.add(p.getCode()); }
+        for(Product requiredProduct : requiredList)
+        {
+            String requiredCode = requiredProduct.getCode();
+            Product changedItem = null;
+            int inventoryAmount = 0, shoppinglistAmount = 0;
+
+            for(Product inventoryProduct : inventoryList)
+            {
+                if(inventoryProduct.getCode().equals(requiredCode))
+                {
+                    inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
+                }
+            }
+            for(Product shoppinglistProduct : shoppingList)
+            {
+                if(shoppinglistProduct.getCode().equals(requiredCode))
+                {
+                    shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
+                    changedItem = shoppinglistProduct;
+                }
+            }
+
+            if(Integer.parseInt(requiredProduct.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
+            {
+                if(!shoppingCodes.contains(requiredCode))
+                {
+                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(), false);
+                    shoppingList.add(newProduct);
+                    Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
+                    shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
+                }
+                else if (changedItem != null)
+                {
+                    Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
+                    changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
+                    shoppingEditor.remove(changedItem.getKey());
+                    shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
+                }
+            }
+
+        }
+        shoppingEditor.commit();
+        shoppingAdapter.notifyDataSetChanged();
     }
 }
