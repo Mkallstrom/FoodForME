@@ -37,12 +37,10 @@ public class NotifyService extends Service {
 
         Log.v(TAG, "Service started");
 
-
-        // Set an alarm for the next time this service should run:
-        buildList();    // Make list of expiring products.
-        buildText();    // Make title and detail strings for the notification.
+        buildList();                                        // Make list of expiring products.
+        buildText();                                        // Make title and detail strings for the notification.
         if(!expiringProducts.isEmpty()) sendNotification(); // Send notification.
-        setAlarm();     // Set alarm for next day.
+        setAlarm();                                         // Set alarm for next day.
 
         Log.v(TAG, "Service stopped");
         stopSelf();
@@ -117,8 +115,8 @@ public class NotifyService extends Service {
             title = "FFM: " + (today+tomorrow+dayAfterTomorrow) + " products expiring soon.";
         }
         String[] detailArray = new String[3];
-        detailArray[0] = today + " today, ";
-        detailArray[1] = tomorrow + " tomorrow, ";
+        detailArray[0] = today + " today. ";
+        detailArray[1] = tomorrow + " tomorrow. ";
         detailArray[2] = dayAfterTomorrow + " in two days.";
         if(today>0) details = details+detailArray[0];
         if(tomorrow>0) details = details+detailArray[1];
@@ -128,11 +126,11 @@ public class NotifyService extends Service {
     public void buildList()
     {
         SharedPreferences inventorySP = getSharedPreferences("inventorySP",0);
-        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
+        Map<String,?> keys = inventorySP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
     }

@@ -46,7 +46,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 public class AddProductActivity extends ActionBarActivity {
@@ -82,7 +81,6 @@ public class AddProductActivity extends ActionBarActivity {
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_MESSAGE = "message";
     private static final String TAG_PRODUCT_NAME = "product_name";
     private static final String TAG_PRODUCT = "product";
     private static final String TAG_BARCODE = "barcode";
@@ -332,7 +330,7 @@ public class AddProductActivity extends ActionBarActivity {
         protected String doInBackground(String... args) {
 
             // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(TAG_PRODUCT_NAME, productString));
             params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
 
@@ -349,11 +347,8 @@ public class AddProductActivity extends ActionBarActivity {
 
                 if (success == 1) {
                     // successfully created product
-
                     // closing this screen
                     finish();
-                } else {
-                    // failed to create product
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -401,7 +396,7 @@ public class AddProductActivity extends ActionBarActivity {
                     int success;
                     try {
                         // Building Parameters
-                        List<NameValuePair> params = new ArrayList<NameValuePair>();
+                        List<NameValuePair> params = new ArrayList<>();
                         params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
 
                         // getting product details by making HTTP request
@@ -483,7 +478,7 @@ public class AddProductActivity extends ActionBarActivity {
         protected String doInBackground(String... args) {
 
             // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(TAG_PRODUCT_NAME, productString));
             params.add(new BasicNameValuePair(TAG_BARCODE, barcode));
 
@@ -500,8 +495,6 @@ public class AddProductActivity extends ActionBarActivity {
                 if (success == 1) {
                     // successfully updated
                     finish();
-                } else {
-                    // failed to update product
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -601,7 +594,7 @@ public class AddProductActivity extends ActionBarActivity {
     }
 
     private void fillSpinnerYear() {
-        ArrayList<String> arrayListYears = new ArrayList<String>();
+        ArrayList<String> arrayListYears = new ArrayList<>();
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = thisYear; i <= thisYear + 10; i++) {
             arrayListYears.add(Integer.toString(i));

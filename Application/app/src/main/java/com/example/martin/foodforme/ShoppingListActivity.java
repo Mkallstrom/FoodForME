@@ -41,9 +41,9 @@ public class ShoppingListActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Shopping List");
 
-        shoppingList = new ArrayList();
-        requiredList = new ArrayList();
-        inventoryList = new ArrayList();
+        shoppingList = new ArrayList<>();
+        requiredList = new ArrayList<>();
+        inventoryList = new ArrayList<>();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
 
@@ -79,14 +79,14 @@ public class ShoppingListActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
         keys = requiredSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
 
@@ -94,7 +94,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
 

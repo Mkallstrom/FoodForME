@@ -36,12 +36,9 @@ public class InventoryActivity extends ActionBarActivity {
     SharedPreferences inventorySP, requiredSP, shoppingSP;
     SharedPreferences.Editor inventoryEditor, requiredEditor, shoppingEditor;
 
-    int index = 0;
-    int rindex = 0;
+    int index = 0, rindex = 0;
 
     ListView listView;
-
-    final static int RQS_1 = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +86,7 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
 
@@ -99,14 +96,14 @@ public class InventoryActivity extends ActionBarActivity {
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
         keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
 

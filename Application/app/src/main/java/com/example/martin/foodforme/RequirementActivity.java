@@ -3,7 +3,6 @@ package com.example.martin.foodforme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -38,25 +37,21 @@ public class RequirementActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Requirements");
 
-        requiredList = new ArrayList();
+        requiredList = new ArrayList<>();
 
         requiredAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,requiredList);
 
         requiredSP = getSharedPreferences("requiredSP",0);
 
-        requiredEditor = requiredSP.edit();
-
         requiredListView = (ListView) findViewById(R.id.requirementlistView);
-
         requiredListView.setAdapter(requiredAdapter);
-
         registerForContextMenu(requiredListView);
 
         Map<String,?> keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey().toString()));
+                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
             }
         }
 
@@ -149,11 +144,6 @@ public class RequirementActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    public void addRequirement(View view)
-    {
-        Intent intent = new Intent(this, InventoryActivity.class);
-        startActivity(intent);
     }
     public Product parseSharedPreferences(String string, String key)
     {  String[] strings = string.split("\\|");

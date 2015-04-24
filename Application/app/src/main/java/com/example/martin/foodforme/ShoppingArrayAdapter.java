@@ -18,7 +18,6 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
     private Context context;
     private int resource;
     private ArrayList<Product> products;
-    private int amount = 1;
     LayoutInflater inflater;
 
     public ShoppingArrayAdapter (Context context, int resource, ArrayList products)

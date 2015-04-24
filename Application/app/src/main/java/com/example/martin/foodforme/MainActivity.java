@@ -109,7 +109,6 @@ public class MainActivity extends ActionBarActivity {
                         sa.execute(new String[]{loginName, loginPassword});
                         while (sa.getCreatedAcc() == 0) {
                         }
-                        ;
                         if (sa.getCreatedAcc() == 1) {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
@@ -155,7 +154,7 @@ public class MainActivity extends ActionBarActivity {
          */
         private void createAccountDB(String username, String password) {
             // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(USERNAME, username));
             params.add(new BasicNameValuePair(PASSWORD, password));
 

@@ -21,9 +21,9 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
     private ArrayList<Product> products;
     LayoutInflater inflater;
     int expiredColor = Color.rgb(255, 178, 178);
-    int expiringColor = Color.rgb(255, 255, 178);
-    int notexpiringColor = Color.rgb(178, 255, 178);
-    int cantexpireColor = Color.rgb(178, 178, 255);
+    int expiringShortColor = Color.rgb(255, 255, 178);
+    int expiringLongColor = Color.rgb(178, 255, 178);
+    int nonExpiringColor = Color.rgb(178, 178, 255);
 
     public ListArrayAdapter (Context context, int resource, ArrayList products)
     {
@@ -53,12 +53,12 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         {
             if (expiringIn == 0) {
                 remaining.setText("Expires today.");
-                row.setBackgroundColor(expiringColor);
+                row.setBackgroundColor(expiringShortColor);
             } else {
                 if (expiringIn > 0) {
                     remaining.setText("Expires in " + Integer.toString(expiringIn) + " days.");
-                    if (expiringIn < 8) row.setBackgroundColor(expiringColor);
-                    else row.setBackgroundColor(notexpiringColor);
+                    if (expiringIn < 8) row.setBackgroundColor(expiringShortColor);
+                    else row.setBackgroundColor(expiringLongColor);
                 } else {
                     remaining.setText("Expired " + Integer.toString(-expiringIn) + " days ago.");
                     row.setBackgroundColor(expiredColor);
@@ -69,7 +69,7 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         {
             remaining.setText("");
             number.setText("");
-            row.setBackgroundColor(cantexpireColor);
+            row.setBackgroundColor(nonExpiringColor);
         }
         return row;
     }
