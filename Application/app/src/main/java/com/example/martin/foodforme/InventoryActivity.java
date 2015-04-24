@@ -31,7 +31,9 @@ public class InventoryActivity extends ActionBarActivity {
     private Scanner scanner;
 
     ArrayAdapter inventoryAdapter;
-    ArrayList<Product> shoppingList = new ArrayList<>(), requiredList = new ArrayList<>(), inventoryList = new ArrayList<>();
+    ArrayList<Product> shoppingList = new ArrayList<>(),
+            requiredList = new ArrayList<>(),
+            inventoryList = new ArrayList<>();
 
     SharedPreferences inventorySP, requiredSP, shoppingSP;
     SharedPreferences.Editor inventoryEditor, requiredEditor, shoppingEditor;
@@ -329,5 +331,9 @@ public class InventoryActivity extends ActionBarActivity {
             }
         }
     }
+
+
+
+
 
 }
