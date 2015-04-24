@@ -321,6 +321,9 @@ public class ShoppingListActivity extends ActionBarActivity {
             {
                 if(!shoppingCodes.contains(requiredCode))
                 {
+                    sindex++;
+                    shoppingEditor.remove("index");
+                    shoppingEditor.putString("index", Integer.toString(sindex));
                     Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(), false);
                     shoppingList.add(newProduct);
                     Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
