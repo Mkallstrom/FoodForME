@@ -349,9 +349,9 @@ public class InventoryActivity extends ActionBarActivity {
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Long nextAlarm = calendar.getTimeInMillis()-System.currentTimeMillis();
+        Long nextAlarm = calendar.getTimeInMillis();
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000*60*60*24, pi);
-        Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm) / (1000 * 60)) + " minutes.");
+        Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
     }
 
 
