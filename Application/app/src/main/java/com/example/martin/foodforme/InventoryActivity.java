@@ -39,10 +39,20 @@ public class InventoryActivity extends ActionBarActivity {
             requiredList = new ArrayList<>(),
             inventoryList = new ArrayList<>();
 
-    SharedPreferences inventorySP, requiredSP, shoppingSP;
-    SharedPreferences.Editor inventoryEditor, requiredEditor, shoppingEditor;
+    SharedPreferences inventorySP,
+            requiredSP,
+            shoppingSP;
+    SharedPreferences.Editor inventoryEditor,
+            requiredEditor,
+            shoppingEditor;
 
-    int index = 0, rindex = 0, REMOVE = 1, EDIT = 2, REQUIREMENT = 3;
+    int index = 0,
+            rindex = 0,
+            REMOVE = 1,
+            EDIT = 2,
+            REQUIREMENT = 3,
+            Inventory = 1,
+            Requirements = 3;
 
     ListView listView;
 
@@ -78,14 +88,9 @@ public class InventoryActivity extends ActionBarActivity {
         });
 
         setIndices();
-
-        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
-        rindex = Integer.parseInt(requiredSP.getString("index",""));
-
         fillLists();
         Collections.sort(inventoryList);
         inventoryAdapter.notifyDataSetChanged();
-
         setEmptyText();
         setAlarm();
 
@@ -180,13 +185,10 @@ public class InventoryActivity extends ActionBarActivity {
             }
             else
             {
-                rindex++;
-                requiredEditor.remove("index");
-                requiredEditor.putString("index",Integer.toString(rindex));
                 Product reqProduct = inventoryList.get(info.position);
                 requiredList.add(new Product(reqProduct.getName(), reqProduct.getExpiryDate(), reqProduct.getKey(), 1, reqProduct.getCode(), false));
                 requiredEditor.putString(Integer.toString(rindex), inventoryList.get(info.position).toString());
-                requiredEditor.commit();
+                indexUp(Requirements);
             }
         }
         else
@@ -275,10 +277,7 @@ public class InventoryActivity extends ActionBarActivity {
                 String newCode = data.getStringExtra("code");
                 boolean expires = data.getBooleanExtra("expires", true);
 
-                index+=1;
-                inventoryEditor.remove("index");
-                inventoryEditor.putString("index",Integer.toString(index));
-                inventoryEditor.commit();
+                indexUp(Inventory);
                 addProduct(newProduct, newProductExpDate, Integer.parseInt(newProductAmount), newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
@@ -311,6 +310,9 @@ public class InventoryActivity extends ActionBarActivity {
             shoppingEditor.putString("index", "0");
             shoppingEditor.commit();
         }
+
+        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
+        rindex = Integer.parseInt(requiredSP.getString("index",""));
     }
     private void fillLists()
     {
@@ -350,8 +352,25 @@ public class InventoryActivity extends ActionBarActivity {
 
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Long nextAlarm = calendar.getTimeInMillis();
-        am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000*60*60*24, pi);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);
         Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
+    }
+    private void indexUp(int SP)
+    {
+        switch(SP) {
+            case 1:
+                index+=1;
+                inventoryEditor.remove("index");
+                inventoryEditor.putString("index",Integer.toString(index));
+                inventoryEditor.commit();
+                break;
+            case 3:
+                rindex+=1;
+                requiredEditor.remove("index");
+                requiredEditor.putString("index",Integer.toString(rindex));
+                requiredEditor.commit();
+                break;
+        }
     }
 
 

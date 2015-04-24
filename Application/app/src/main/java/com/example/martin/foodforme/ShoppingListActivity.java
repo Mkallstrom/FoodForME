@@ -32,6 +32,8 @@ public class ShoppingListActivity extends ActionBarActivity {
     ListView shoppingListView;
     int sindex = 0;
     int index = 0;
+    int Inventory = 1;
+    int ShoppingList = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,14 +168,11 @@ public class ShoppingListActivity extends ActionBarActivity {
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = txtUrl.getText().toString();
-                        sindex++;
                         Product newProduct = new Product(name, Integer.toString(sindex), 1);
                         shoppingList.add(newProduct);
                         shoppingAdapter.notifyDataSetChanged();
-                        shoppingEditor.remove("index");
-                        shoppingEditor.putString("index", Integer.toString(sindex));
                         shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode() + "|" + newProduct.expires());
-                        shoppingEditor.commit();
+                        indexUp(ShoppingList);
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -240,10 +239,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                 String newCode = data.getStringExtra("code");
                 boolean expires = data.getBooleanExtra("expires",true);
 
-                index+=1;
-                inventoryEditor.remove("index");
-                inventoryEditor.putString("index",Integer.toString(index));
-                inventoryEditor.commit();
+                indexUp(Inventory);
                 addProduct(newProduct, newProductExpDate, newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
@@ -341,5 +337,22 @@ public class ShoppingListActivity extends ActionBarActivity {
         }
         shoppingEditor.commit();
         shoppingAdapter.notifyDataSetChanged();
+    }
+    private void indexUp(int SP)
+    {
+        switch(SP) {
+            case 1:
+                index+=1;
+                inventoryEditor.remove("index");
+                inventoryEditor.putString("index",Integer.toString(index));
+                inventoryEditor.commit();
+                break;
+            case 2:
+                sindex+=1;
+                shoppingEditor.remove("index");
+                shoppingEditor.putString("index",Integer.toString(sindex));
+                shoppingEditor.commit();
+                break;
+        }
     }
 }

@@ -28,8 +28,6 @@ public class RequirementActivity extends ActionBarActivity {
     ListView requiredListView;
     ArrayAdapter requiredAdapter;
 
-    private static final String TAG = "MyActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,10 +145,11 @@ public class RequirementActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    public Product parseSharedPreferences(String string, String key)
+    private Product parseSharedPreferences(String string, String key)
     {  String[] strings = string.split("\\|");
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3], Boolean.parseBoolean(strings[4]));
 
     }
+
 }
