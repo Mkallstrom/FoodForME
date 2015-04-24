@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity {
 
         new AlertDialog.Builder(this)
 
-                .setTitle("Create new refrigerator!")
+                .setTitle("Create new inventory:")
                 .setView(layout)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -112,7 +112,7 @@ public class MainActivity extends ActionBarActivity {
                         ;
                         if (sa.getCreatedAcc() == 1) {
                             //if successful
-                            InfoDialog info = new InfoDialog("Your refrigerator was successfully created.", context);
+                            InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
                             info.message();
                         } else {
                             //if failed

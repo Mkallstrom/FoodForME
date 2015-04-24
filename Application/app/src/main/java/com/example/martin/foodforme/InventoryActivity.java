@@ -41,6 +41,8 @@ public class InventoryActivity extends ActionBarActivity {
 
     ListView listView;
 
+    final static int RQS_1 = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.scanner = new Scanner(this);
@@ -123,9 +125,10 @@ public class InventoryActivity extends ActionBarActivity {
             }
         });
 
-
+        startService(new Intent(this, NotifyService.class));
 
     }
+
 
     /**
      * Check if inventorySP is empty and show text for it
