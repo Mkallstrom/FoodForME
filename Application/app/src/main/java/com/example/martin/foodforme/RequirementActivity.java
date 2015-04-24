@@ -43,6 +43,8 @@ public class RequirementActivity extends ActionBarActivity {
 
         requiredSP = getSharedPreferences("requiredSP",0);
 
+        requiredEditor = requiredSP.edit();
+
         requiredListView = (ListView) findViewById(R.id.requirementlistView);
         requiredListView.setAdapter(requiredAdapter);
         registerForContextMenu(requiredListView);
