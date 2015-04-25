@@ -557,7 +557,14 @@ public class AddProductActivity extends ActionBarActivity {
         }
 
         int success = 0;
-        try { success = json.getInt(TAG_SUCCESS); } catch (JSONException e) { e.printStackTrace(); }
+        try
+        {
+            success = json.getInt(TAG_SUCCESS);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
         if (success == 1) {
             if (databaseHasProduct) {
                 if (!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
@@ -568,6 +575,7 @@ public class AddProductActivity extends ActionBarActivity {
             }
         } else if (success == 0) {
             if (!databaseHasProduct && connection) {                                                        // if the product is not in the database and there is a connection
+                Log.d("Creating: ", productString);
                 new CreateNewProduct().execute();                                                           // Saves a new product to the database
             }
         }

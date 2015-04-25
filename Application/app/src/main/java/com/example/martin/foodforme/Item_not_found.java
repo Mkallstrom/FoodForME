@@ -16,6 +16,8 @@ public class Item_not_found extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_not_found);
         setTitle("Product Not Found");
+        TextView tv = (TextView)findViewById(R.id.productName);
+        tv.requestFocus();
     }
 
 

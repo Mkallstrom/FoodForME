@@ -341,10 +341,11 @@ public class InventoryActivity extends ActionBarActivity {
     private void setAlarm()
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 16);
+        calendar.set(Calendar.HOUR, 4);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
-        if(calendar.get(Calendar.HOUR)>=16){ calendar.add(Calendar.DATE, 1);}
+        calendar.set(Calendar.AM_PM, Calendar.PM);
+        if(calendar.get(Calendar.HOUR)>=4){ calendar.add(Calendar.DATE, 1);}
 
         Intent serviceIntent = new Intent(this, NotifyService.class);
         PendingIntent pi = PendingIntent.getService(this, 131313, serviceIntent,
