@@ -22,7 +22,7 @@ public class AccountDB extends Activity {
     private String password;
     private ArrayList<Product> inventory;
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
-
+    private int connection = 0; //1 successful, -1 failed, 0 nothing
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
     private static final String url_get_inventory = ip + "get_inventory.php"; //Get all inventory from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
@@ -55,8 +55,7 @@ public class AccountDB extends Activity {
 
     //__________*Inner class to connect and operate on database*_______________//
     private class connectDB extends AsyncTask<String, String, String> {
-        //Attributes
-        private int connection = 0; //1 successful, -1 failed, 0 nothing
+
         //JSON
         private JSONParser jsonParser = new JSONParser();
         private static final String TAG_SUCCESS = "success";
@@ -68,7 +67,7 @@ public class AccountDB extends Activity {
         protected String doInBackground(String... params) {
             checkAccount();
             if(connection == 1){
-
+            loadInventory();
             }
             return null;
         }
