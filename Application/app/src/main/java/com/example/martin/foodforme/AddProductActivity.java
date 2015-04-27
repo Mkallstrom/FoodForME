@@ -433,6 +433,7 @@ public class AddProductActivity extends ActionBarActivity {
 
                             if (!localHasProduct) {
                                 productName.setText(databaseName);
+                                Log.d("Found name", databaseName);
                             }
 
                         } else {
