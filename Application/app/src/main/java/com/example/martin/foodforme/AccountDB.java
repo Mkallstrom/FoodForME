@@ -24,7 +24,7 @@ public class AccountDB extends Activity {
     private int loadProducts = 0; //0 not done, 1 successfully loaded, -1 failed to load
 
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
-    private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
+    private static final String url_get_products = ip + "get_inventory.php"; //Get all products from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
 
     //Constructs
