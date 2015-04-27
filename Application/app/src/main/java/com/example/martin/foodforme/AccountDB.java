@@ -3,10 +3,10 @@ package com.example.martin.foodforme;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,11 +20,11 @@ public class AccountDB extends Activity {
     //Attributes
     private String username;
     private String password;
-    private ArrayList<Product> products;
-    private int loadProducts = 0; //0 not done, 1 successfully loaded, -1 failed to load
+    private ArrayList<Product> inventory;
+    private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
 
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
-    private static final String url_get_products = ip + "get_inventory.php"; //Get all products from a user
+    private static final String url_get_inventory = ip + "get_inventory.php"; //Get all inventory from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
 
     //Constructs
@@ -37,20 +37,20 @@ public class AccountDB extends Activity {
 
     //Methods
     /**
-     * Get the products for the user
+     * Get the inventory for the user
      * @return - null if failed or nothing exist, a list of items otherwise.
      */
-    public ArrayList<Product> getProducts(){
+    public ArrayList<Product> getInventory(){
         new connectDB().execute();
-        while(loadProducts == 0){
-            if(loadProducts == -1){
+        while(loadInventory == 0){
+            if(loadInventory == -1){
                 return null;
             }
-            if(loadProducts == 1){
+            if(loadInventory == 1){
                 break;
             }
         }
-        return products;
+        return inventory;
     }
 
     //__________*Inner class to connect and operate on database*_______________//
@@ -106,10 +106,10 @@ public class AccountDB extends Activity {
         }
 
         /**
-         * Fill products with items from database for
+         * Fill inventory with items from database for
          * the connected user.
          */
-        public void loadProducts(){
+        public void loadInventory(){
             // Building Parameters
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(USERNAME, username));
@@ -117,7 +117,7 @@ public class AccountDB extends Activity {
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", params);
+            JSONObject json = jsonParser.makeHttpRequest(url_get_inventory, "GET", params);
 
             // check for success tag
             try {
@@ -125,12 +125,18 @@ public class AccountDB extends Activity {
 
                 if (success == 1) {
                     //successfully
-                    //TODO fill and create the products array with all items
-                    loadProducts = 1; //Loading products success.
+                    //TODO fill and create the inventory array with all items
+                    JSONArray productObj = json
+                            .getJSONArray("inventory"); // JSON Array
+                    for(int i = 0; i < productObj.length(); i++) {
+                        JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                        inventory.add(parseDatabase(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                    }
+                    loadInventory = 1; //Loading inventory success.
 
                 } else {
                     //failed
-                    loadProducts = -1; //Loading products failed.
+                    loadInventory = -1; //Loading inventory failed.
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -138,5 +144,10 @@ public class AccountDB extends Activity {
 
         }
 
+    }
+    private Product parseDatabase(String string, String key) {
+        String[] strings = string.split("\\|"); // The double backslash is needed for some characters
+        // Namn, date, key, amount, code, expires
+        return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
     }
 }
