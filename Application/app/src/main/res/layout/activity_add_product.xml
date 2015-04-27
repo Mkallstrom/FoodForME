@@ -81,7 +81,7 @@
             android:background="@color/background_floating_material_light"
             android:layout_weight="0.25"
             android:checked="true"
-            android:textSize="15dp" />
+            android:textSize="10dp" />
 
         <Spinner
             android:layout_width="25dp"
