@@ -7,7 +7,7 @@ if (isset($_POST['refrigerator_name']) && isset($_POST['refrigerator_password'])
 	require_once __DIR__ . '/db_connect_refrigerator.php';
 	$db = new DB_CONNECT();
 	
-	$result = mysql_query("SELECT * FROM product WHERE fk_name = refrigerator_name") or die(mysql_error());
+	$result = mysql_query("SELECT inventory.data, inventory.key FROM inventory,refrigerator WHERE fk_name = refrigerator_name") or die(mysql_error());
 	
 	if (mysql_num_rows($result) > 0) {
 		$response["products"] = array();
@@ -17,11 +17,11 @@ if (isset($_POST['refrigerator_name']) && isset($_POST['refrigerator_password'])
 			$product = array();
 			
 			// TODO: get all the product info
-			$product["name"] = $row["name"];
-			$product["product_name"] = $row["product_name"];
+			$product["data"] = $row["inventory.data"];
+			$product["key"] = $row["inventory.key"];
 	
 			// push single product into final response array
-			array_push($response["barcode_to_product"], $product);
+			array_push($response["inventory"], $product);
 		}
 		
 		$response["success"] = 1;
