@@ -42,8 +42,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -628,6 +631,8 @@ public class AddProductActivity extends ActionBarActivity {
                 new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListMonths);
         Spinner spinMonth = (Spinner) findViewById(R.id.spinnerMonth);
         spinMonth.setAdapter(spinMonthAdapter);
+        int thisMonth = Calendar.getInstance().get(Calendar.MONTH);
+        spinMonth.setSelection(thisMonth);
     }
 
     private void fillSpinnerDay() {
@@ -639,6 +644,8 @@ public class AddProductActivity extends ActionBarActivity {
                 new ArrayAdapter<>(this, R.layout.simple_spinner_item, arrayListDays);
         Spinner spinDay = (Spinner) findViewById(R.id.spinnerDay);
         spinDay.setAdapter(spinDayAdapter);
+        int thisDay = Calendar.getInstance().get(Calendar.DATE);
+        spinDay.setSelection(thisDay);
     }
 
     public void clickedConnection(View view) {
@@ -649,6 +656,16 @@ public class AddProductActivity extends ActionBarActivity {
         } else {
             Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Finds today's date and returns it as a String in the format "year-month-day" (yyyy-MM-dd).
+     * @return  A string representing today's date. yyyy-MM-dd
+     */
+    private String getTodaysDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
 }
