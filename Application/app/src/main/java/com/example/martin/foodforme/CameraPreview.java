@@ -75,7 +75,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera = camera;
         Camera.Parameters parameters = mCamera.getParameters(); // Gets the current camera parameters
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE); // adds continuous auto focus to parameters
-        parameters.setRotation(90);                             // Sets the camera parameter in portrait rotation
+        parameters.setRotation(PORTRAIT_ANGLE);                             // Sets the camera parameter in portrait
         mCamera.setParameters(parameters);                      // sets the parameters to mCamera
 
     }

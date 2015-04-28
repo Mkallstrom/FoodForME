@@ -1,10 +1,16 @@
 package com.example.martin.foodforme;
 
-
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
@@ -17,11 +23,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * SOURCE: http://examples.javacodegeeks.com/android/core/hardware/camera-hardware/android-camera-example
@@ -106,24 +107,6 @@ public class CameraActivity extends Activity {
 
         capture = (Button) findViewById(R.id.button_capture);
         capture.setOnClickListener(captureListener);
-
-        /* TRYING TO DRAW A RECTANGLE */
-        /*ImageView imgView = (ImageView) this.findViewById(R.id.imageViewDraw);
-        Bitmap bmap = Bitmap.createBitmap((int) getWindowManager()
-                .getDefaultDisplay().getWidth(), (int) getWindowManager()
-                .getDefaultDisplay().getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bmap);
-        imgView.setImageBitmap(bmap);
-
-        Paint paint = new Paint();
-        paint.setColor(Color.BLUE);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10);
-        float leftx = 50;
-        float topy = 50;
-        float rightx = 100;
-        float bottomy = 150;
-        canvas.drawRect(leftx, topy, rightx, bottomy, paint);*/
     }
 
     OnClickListener switchCameraListener = new OnClickListener() {
@@ -199,6 +182,8 @@ public class CameraActivity extends Activity {
                     return;
                 }
 
+                data = cropImageByteArray(data);         // uses a custom method to crop the image
+
                 try {
                     //write the file
                     FileOutputStream fos = new FileOutputStream(pictureFile);
@@ -212,8 +197,6 @@ public class CameraActivity extends Activity {
                 } catch (IOException e) {
                 }
 
-                //refresh camera to continue preview
-                //mPreview.refreshCamera(mCamera);
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
                 finish();
@@ -229,28 +212,65 @@ public class CameraActivity extends Activity {
         }
     };
 
+    private byte[] cropImageByteArray(byte[] bytesImage) {
+        Bitmap fullSizeBmp = BitmapFactory.decodeByteArray(bytesImage, 0, bytesImage.length);
+
+        // Image calculations
+        int height = fullSizeBmp.getHeight();
+        int width = fullSizeBmp.getWidth();
+        double imageRatio = ((double)height)/width;                                       // imageRatio: the actual ratio of the captured image
+        int centerHeight = height / 2;
+        int centerWidth = width / 2;
+        // ------------------------------------------------------------------
+
+        // Preview calculations
+        int previewHeight = findViewById(R.id.camera_preview).getHeight();
+        int previewWidth = findViewById(R.id.camera_preview).getWidth();
+        double previewRatio = ((double)previewHeight)/previewWidth;                       // previewRatio: the ratio of the preview
+        // ------------------------------------------------------------------
+
+        // ImageView calculations (the rectangle). The image placed in the ImageView is 226x141 px (height = 141, width = 226)
+        double removeTopRatio = 0.6;
+        double removeSideRatio = 0.7;
+        int imageViewHeight = findViewById(R.id.imageViewDraw).getHeight();
+        int imageViewWidth = findViewById(R.id.imageViewDraw).getWidth();
+
+        // Use the preview window width and height to calculate how much of the area is covered by the rectangle
+        double comparedHeight = ((double)imageViewHeight)/previewHeight;
+        double comparedWidth = ((double)imageViewWidth)/previewWidth;
+        int calculatedHeight = (int) (removeTopRatio*comparedHeight*height);
+        int calculatedWidth = (int) (removeSideRatio*comparedWidth*width);
+        // ------------------------------------------------------------------
+
+        //int inRectHeight = (int) (imageViewHeight - (removeTopRatio*imageViewHeight));  // height of the rectangle displayed in the camera preview. 96 px on the inside.
+        //int inRectWidth = imageViewWidth; // (int) (((double)199/226)*imageViewWidth);  // width of the rectangle displayed in the camera preview. 199 px on the inside.
+
+        int halfRectHeight = calculatedHeight / 2;
+        int halfRectWidth = calculatedWidth / 2;
+
+        int startingHeightFix = (int) (imageViewHeight*0.2);
+
+        int startingHeight = centerHeight - halfRectHeight + startingHeightFix; // used as offset
+        int startingWidth = centerWidth - halfRectWidth;    // used as offset
+
+        Bitmap croppedBmp = Bitmap.createBitmap(fullSizeBmp, startingWidth, startingHeight, calculatedWidth, calculatedHeight);
+
+        return bitmapToByteArray(croppedBmp);
+    }
+
+    private byte[] bitmapToByteArray(Bitmap bmp) {
+        int fullQuality = 100;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, fullQuality, outputStream);
+        byte[] byteArray = outputStream.toByteArray();
+        return byteArray;
+    }
+
     //make picture and save to a folder
     private static File getOutputMediaFile() {
-
         File fileToOCR = new File(AddProductActivity.DATA_PATH + "/ocr.jpg"); // The image should be saved in this directory for Tesseract
         Log.d("CameraActivity: ", "The image will be saved to " + Uri.fromFile(fileToOCR));
         return fileToOCR;
-
-        /* OLD CODE
-        //if this "JCGCamera folder does not exist
-        if (!fileToOCR.exists()) {
-            //if you cannot make this folder return
-            if (!fileToOCR.mkdirs()) {
-                return null;
-            }
-        }
-
-        //take the current timeStamp
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        //and make a media file:
-        mediaFile = new File(fileToOCR.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-        */
     }
 
     private void releaseCamera() {
