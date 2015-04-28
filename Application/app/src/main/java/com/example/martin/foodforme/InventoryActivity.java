@@ -344,7 +344,6 @@ public class InventoryActivity extends ActionBarActivity {
         calendar.set(Calendar.HOUR, 4);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
-        calendar.set(Calendar.AM_PM, Calendar.PM);
         if(calendar.get(Calendar.HOUR)>=4){ calendar.add(Calendar.DATE, 1);}
 
         Intent serviceIntent = new Intent(this, NotifyService.class);

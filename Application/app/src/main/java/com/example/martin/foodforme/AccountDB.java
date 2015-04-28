@@ -24,7 +24,7 @@ public class AccountDB extends Application {
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
-    private static final String url_get_inventory = ip + "get_inventory.php"; //Get all inventory from a user
+    private static final String url_get_products = ip + "get_products.php"; //Get all inventory from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
 
 
@@ -61,6 +61,7 @@ public class AccountDB extends Application {
         private static final String TAG_SUCCESS = "success";
         private static final String USERNAME = "name";
         private static final String PASSWORD = "password";
+        private static final String LIST = "list";
 
         //Methods
         @Override
@@ -114,10 +115,11 @@ public class AccountDB extends Application {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair(USERNAME, username));
             params.add(new BasicNameValuePair(PASSWORD, password));
+            params.add(new BasicNameValuePair(LIST, "inventory"));
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_get_inventory, "GET", params);
+            JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", params);
 
             // check for success tag
             try {
