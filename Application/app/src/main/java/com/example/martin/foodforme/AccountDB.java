@@ -36,6 +36,7 @@ public class AccountDB extends Application {
 
 
     //Methods
+
     /**
      * Get the inventory for the user
      * @return - null if failed or nothing exist, a list of items otherwise.
@@ -94,6 +95,7 @@ public class AccountDB extends Application {
 
                 if (success == 1) {
                     //successfully
+
                     connection = 1; //Account was OK
 
                 } else {

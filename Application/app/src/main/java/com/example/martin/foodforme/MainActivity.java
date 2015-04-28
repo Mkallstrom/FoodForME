@@ -38,6 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
     AccountDB accountDB;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -218,6 +219,7 @@ public class MainActivity extends ActionBarActivity {
             accountEditor.putString("user", username);
             accountEditor.putString("password", password);
             accountEditor.commit();
+
         }
 
         public int getCreatedAcc(){
