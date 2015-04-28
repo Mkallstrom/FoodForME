@@ -53,6 +53,7 @@ public class MainActivity extends ActionBarActivity {
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username,password);
+            accountDB.getProducts();
         }
     }
 
@@ -193,7 +194,7 @@ public class MainActivity extends ActionBarActivity {
                     createdAcc = 1; //Account been created
 
                     storeAccountOnPhone(username,password);
-
+                    accountDB.saveProducts();
                     // closing this screen
                     //finish();
 
