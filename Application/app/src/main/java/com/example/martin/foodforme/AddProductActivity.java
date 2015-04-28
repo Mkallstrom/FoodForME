@@ -560,9 +560,23 @@ public class AddProductActivity extends ActionBarActivity {
         }
 
         int success = 0;
+        if(json == null){
+            Intent intent = new Intent();
+            intent.putExtra("product", "<<< Error! >>>");
+            intent.putExtra("expDate", "0000-00-00");
+            intent.putExtra("amount", "0");
+            intent.putExtra("code", "failed");
+            CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
+            intent.putExtra("expires", checkBox.isChecked());
+            setResult(RESULT_OK, intent);
+            finish();
+            return;
+            //TODO check if this actually works and intended and not makeing it worse
+        }
+
         try
         {
-            success = json.getInt(TAG_SUCCESS);
+             success = json.getInt(TAG_SUCCESS);
         }
         catch (JSONException e)
         {
