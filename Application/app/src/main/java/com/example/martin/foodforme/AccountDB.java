@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Andreas on 2015-04-24.
@@ -22,33 +23,92 @@ public class AccountDB extends Application {
     private String username;
     private String password;
     private ArrayList<Product> inventory = new ArrayList<>(), shoppingList = new ArrayList<>(), requirements = new ArrayList<>();
+    private int indexInventory, indexShoppingList, indexRequirements;
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int loadShoppingList = 0;
     private int loadRequirements = 0;
     private int connection = 0; //1 successful, -1 failed, 0 nothing
+    private boolean local = true;
+    private boolean firstRun = false;
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
     private static final String url_get_products = ip + "get_products.php"; //Get all inventory from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
     private static final String url_add_product = ip + "add_product.php"; //Check if password and user match and exist
+    private static final String url_delete_product = ip + "delete_product.php"; //Check if password and user match and exist
+    SharedPreferences inventorySP, shoppingSP, requiredSP;
+    SharedPreferences.Editor inventoryEditor, shoppingEditor, requiredEditor;
+    JSONParser jsonParser = new JSONParser();
 
 
     public void setDetails(String username, String password) {
+        if(firstRun) return;
         this.username = username;
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
+        local = false;
+        firstRun = true;
     }
     public ArrayList<Product> returnInventory(){ return inventory; }
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
 
-    public void setInventory(ArrayList<Product> inventory){ this.inventory = inventory;}
-    public void setShoppingList(ArrayList<Product> shoppingList){ this.shoppingList = shoppingList;}
-    public void setrequirements(ArrayList<Product> requirements){ this.requirements = requirements;}
-
     public void storeProducts() {
         Log.d("AccountDB","attempting storeproducts with connection being: " + connection);
         if(connection==1) new SaveProducts().execute();
+    }
+
+    public void loadSharedPreferences(){
+        if(firstRun) return;
+        firstRun = true;
+        SharedPreferences inventorySP = getSharedPreferences("inventorySP", 0);
+        SharedPreferences requiredSP = getSharedPreferences("requiredSP", 0);
+        SharedPreferences shoppingSP = getSharedPreferences("shoppingSP", 0);
+        inventoryEditor = inventorySP.edit();
+        shoppingEditor = shoppingSP.edit();
+        requiredEditor = requiredSP.edit();
+        username = "a";
+        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            inventoryEditor.putString("index", "0");
+            inventoryEditor.commit();
+        }
+        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            requiredEditor.putString("index", "0");
+            requiredEditor.commit();
+        }
+        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        {
+            shoppingEditor.putString("index", "0");
+            shoppingEditor.commit();
+        }
+
+        indexInventory = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
+        indexRequirements = Integer.parseInt(requiredSP.getString("index",""));
+        indexShoppingList = Integer.parseInt(shoppingSP.getString("index",""));
+
+        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                inventory.add(parseProduct(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                shoppingList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
+            }
+        }
+        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            if(!entry.getKey().equals("index"))
+            {
+                requirements.add(parseProduct(entry.getValue().toString(), entry.getKey()));
+            }
+        }
     }
     //Methods
 
@@ -168,7 +228,7 @@ public class AccountDB extends Application {
             }
         }
     }
-    private void addProduct(String name, String data, String key, String list, JSONParser parser){
+    private void insertProduct(String name, String data, String key, String list, JSONParser parser){
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("name", name));
         params.add(new BasicNameValuePair("data", data));
@@ -177,18 +237,121 @@ public class AccountDB extends Application {
         JSONObject json = parser.makeHttpRequest(url_add_product, "POST", params);
         try {
             int success = json.getInt("success");
+            String message = json.getString("message");
             if (success == 1) {
                 //successfully
                 Log.d("AccountDB", "success for add product");
 
             } else {
-                Log.d("AccountDB", "no success for add product");
+                Log.d("AccountDB", "no success for add product. Message: " + message);
                 //failed
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+    public void removeProduct(Product p, String list){
+        switch(list){
+            case "inventory":
+                inventory.remove(p);
+                break;
+            case "shoppinglist":
+                shoppingList.remove(p);
+                break;
+            default:
+                requirements.remove(p);
+                break;
+        }
+        if(local)
+        {
+            SharedPreferences.Editor editor;
+            switch(list){
+                case("inventory"):
+                    editor = inventoryEditor;
+                    break;
+                case("shoppinglist"):
+                    editor = shoppingEditor;
+                    break;
+                default:
+                    editor = requiredEditor;
+                    break;
+            }
+            editor.remove(p.getKey());
+            editor.commit();
+        }
+        else
+        {
+            deleteProduct(username,p.getKey(),list,jsonParser);
+        }
+    }
+
+    private void deleteProduct(String name, String key, String list, JSONParser parser){
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("name", name));
+        params.add(new BasicNameValuePair("key", key));
+        params.add(new BasicNameValuePair("list", list));
+        JSONObject json = parser.makeHttpRequest(url_delete_product, "POST", params);
+        try {
+            int success = json.getInt("success");
+            String message = json.getString("message");
+            if (success == 1) {
+                //successfully
+                Log.d("AccountDB", "success for delete product");
+
+            } else {
+                Log.d("AccountDB", "no success for delete product. Message: " + message);
+                //failed
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProduct(String name, String date, int amount, String code, boolean expires, String list){
+        Product newProduct;
+        switch(list){
+            case("inventory"):
+                indexInventory++;
+                newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
+                inventory.add(newProduct);
+                break;
+            case("shoppinglist"):
+                indexShoppingList++;
+                newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
+                shoppingList.add(newProduct);
+                break;
+            default:
+                indexRequirements++;
+                newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
+                requirements.add(newProduct);
+                break;
+        }
+        if(local)
+        {
+            SharedPreferences.Editor editor;
+            switch(list){
+                case("inventory"):
+                    editor = inventoryEditor;
+                    editor.putString(Integer.toString(indexInventory),newProduct.toString());
+                    break;
+                case("shoppinglist"):
+                    editor = shoppingEditor;
+                    editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
+                    break;
+                default:
+                    editor = requiredEditor;
+                    editor.putString(Integer.toString(indexRequirements),newProduct.toString());
+                    break;
+            }
+            editor.commit();
+
+        }
+        else
+        {
+            insertProduct(username,newProduct.toString(),newProduct.getKey(),list,jsonParser);
+        }
+    }
+
     private class SaveProducts extends AsyncTask<String, String, String>
     {
         private JSONParser jsonParser = new JSONParser();
@@ -200,19 +363,49 @@ public class AccountDB extends Application {
             for(Product p : inventory)
             {
                 Log.d("AccountDB", "adding product: " + p.toString());
-                addProduct(username, p.toString(), p.getKey(),"inventory",jsonParser);
+                insertProduct(username, p.toString(), p.getKey(), "inventory", jsonParser);
             }
             for(Product p : shoppingList)
             {
-                addProduct(username, p.toString(), p.getKey(),"shoppinglist",jsonParser);
+                insertProduct(username, p.toString(), p.getKey(), "shoppinglist", jsonParser);
             }
             for(Product p : requirements)
             {
-                addProduct(username, p.toString(), p.getKey(),"requirements",jsonParser);
+                insertProduct(username, p.toString(), p.getKey(), "requirements", jsonParser);
             }
             return null;
         }
 
+    }
+
+    private class ClearProducts extends AsyncTask<String, String, String>
+    {
+        private JSONParser jsonParser = new JSONParser();
+
+        //Methods
+        @Override
+        protected String doInBackground(String... params) {
+            // Building Parameters
+            for(Product p : inventory)
+            {
+                Log.d("AccountDB", "deleting product: " + p.toString());
+                deleteProduct(username,p.getKey(), "inventory", jsonParser);
+            }
+            for(Product p : shoppingList)
+            {
+                deleteProduct(username, p.getKey(), "shoppinglist", jsonParser);
+            }
+            for(Product p : requirements)
+            {
+                deleteProduct(username, p.getKey(), "requirements", jsonParser);
+            }
+            return null;
+        }
+
+    }
+    public void clearAll()
+    {
+        new ClearProducts().execute();
     }
         /**
          * Fill inventory, shopping list, and requirements with items from database for
@@ -258,7 +451,7 @@ public class AccountDB extends Application {
                                 .getJSONArray("inventory"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
                             JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
-                            shoppingList.add(parseDatabase(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                            shoppingList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadInventory = 1;
                     } else {
@@ -288,7 +481,7 @@ public class AccountDB extends Application {
                                 .getJSONArray("shoppinglist"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
                             JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
-                            shoppingList.add(parseDatabase(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                            shoppingList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadShoppingList = 1; //Loading inventory success.
 
@@ -319,7 +512,7 @@ public class AccountDB extends Application {
                                 .getJSONArray("requirements"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
                             JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
-                            requirements.add(parseDatabase(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                            requirements.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadRequirements = 1; //Loading inventory success.
 
@@ -343,7 +536,7 @@ public class AccountDB extends Application {
         }
 
 
-    private Product parseDatabase(String string, String key) {
+    private Product parseProduct(String string, String key) {
         String[] strings = string.split("\\|"); // The double backslash is needed for some characters
         // Namn, date, key, amount, code, expires
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));

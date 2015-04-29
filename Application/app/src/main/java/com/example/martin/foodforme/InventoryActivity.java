@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
@@ -27,7 +26,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Map;
 
 
 public class InventoryActivity extends ActionBarActivity {
@@ -36,24 +34,11 @@ public class InventoryActivity extends ActionBarActivity {
     AccountDB accountDB;
 
     ArrayAdapter inventoryAdapter;
-    ArrayList<Product> shoppingList = new ArrayList<>(),
-            requiredList = new ArrayList<>(),
-            inventoryList = new ArrayList<>();
+    ArrayList<Product> shoppingList, requiredList, inventoryList;
 
-    SharedPreferences inventorySP,
-            requiredSP,
-            shoppingSP;
-    SharedPreferences.Editor inventoryEditor,
-            requiredEditor,
-            shoppingEditor;
-
-    int index = 0,
-            rindex = 0,
-            REMOVE = 1,
+    int REMOVE = 1,
             EDIT = 2,
-            REQUIREMENT = 3,
-            Inventory = 1,
-            Requirements = 3;
+            REQUIREMENT = 3;
 
     ListView listView;
 
@@ -66,15 +51,11 @@ public class InventoryActivity extends ActionBarActivity {
         setTitle("Inventory");
 
         accountDB = (AccountDB) getApplicationContext();
+        inventoryList = accountDB.returnInventory();
+        shoppingList = accountDB.returnShoppingList();
+        requiredList = accountDB.returnRequirements();
 
         inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
-
-        inventorySP = getSharedPreferences("inventorySP", 0);
-        requiredSP = getSharedPreferences("requiredSP", 0);
-        shoppingSP = getSharedPreferences("shoppingSP", 0);
-        inventoryEditor = inventorySP.edit();
-        requiredEditor = requiredSP.edit();
-        shoppingEditor = shoppingSP.edit();
 
         listView = (ListView) findViewById(R.id.inventoryListView);
         listView.setAdapter(inventoryAdapter);
@@ -90,14 +71,10 @@ public class InventoryActivity extends ActionBarActivity {
             }
         });
 
-        setIndices();
-        fillLists();
         Collections.sort(inventoryList);
         inventoryAdapter.notifyDataSetChanged();
         setEmptyText();
         setAlarm();
-        accountDB.setInventory(inventoryList);
-        accountDB.storeProducts();
 
     }
 
@@ -132,9 +109,7 @@ public class InventoryActivity extends ActionBarActivity {
         if(itemID == REMOVE)
         {
             Product product = inventoryList.get(info.position);
-            inventoryEditor.remove(product.getKey());
-            inventoryEditor.commit();
-            inventoryList.remove(product);
+            accountDB.removeProduct(product,"inventory");
             inventoryAdapter.notifyDataSetChanged();
             setEmptyText();
 
@@ -151,13 +126,11 @@ public class InventoryActivity extends ActionBarActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = inventoryList.get(info.position);
-                            inventoryList.remove(item);
                             item.setAmount(Integer.toString(amount));
-                            inventoryList.add(info.position, item);
+                            accountDB.removeProduct(item, "inventory");
+                            accountDB.addProduct(item.getName(), item.getExpiryDate(), Integer.parseInt(item.getAmount()), item.getCode(), item.expires(), "inventory");
                             inventoryAdapter.notifyDataSetChanged();
-                            inventoryEditor.remove(item.getKey());
-                            inventoryEditor.putString(item.getKey(), item.toString());
-                            inventoryEditor.commit();
+                            Collections.sort(inventoryList);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -184,16 +157,13 @@ public class InventoryActivity extends ActionBarActivity {
             if(requiredItem!=null)
             {
                 requiredItem.setAmount(Integer.toString(Integer.parseInt(requiredItem.getAmount())+1));
-                requiredEditor.remove(requiredItem.getKey());
-                requiredEditor.putString(requiredItem.getKey(), requiredItem.toString());
-                requiredEditor.commit();
+                accountDB.removeProduct(requiredItem,"requirements");
+                accountDB.addProduct(requiredItem.getName(), requiredItem.getExpiryDate(), Integer.parseInt(requiredItem.getAmount()), requiredItem.getCode(), requiredItem.expires(), "requirements");
             }
             else
             {
                 Product reqProduct = inventoryList.get(info.position);
-                requiredList.add(new Product(reqProduct.getName(), reqProduct.getExpiryDate(), reqProduct.getKey(), 1, reqProduct.getCode(), false));
-                requiredEditor.putString(Integer.toString(rindex), inventoryList.get(info.position).toString());
-                indexUp(Requirements);
+                accountDB.addProduct(reqProduct.getName(), reqProduct.getExpiryDate(), Integer.parseInt(reqProduct.getAmount()), reqProduct.getCode(), reqProduct.expires(), "requirements");
             }
         }
         else
@@ -239,12 +209,9 @@ public class InventoryActivity extends ActionBarActivity {
 
     private void addProduct(String name, String date, int amount, String code, boolean expires)
     {
-        Product product = new Product(name, date, Integer.toString(index), amount, code, expires);
         // Namn, date, key, amount, code
+        accountDB.addProduct(name, date, amount, code, expires, "inventory");
 
-        inventoryEditor.putString(Integer.toString(index), product.toString());
-        inventoryEditor.commit();
-        inventoryList.add(product);
         Collections.sort(inventoryList);
         inventoryAdapter.notifyDataSetChanged();
         Product boughtItem = null;
@@ -262,12 +229,11 @@ public class InventoryActivity extends ActionBarActivity {
         if(boughtItem!=null)
         {
             boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
-            shoppingEditor.remove(boughtItem.getKey());
+            accountDB.removeProduct(boughtItem,"shoppinglist");
             if(Integer.parseInt(boughtItem.getAmount()) > 0)
             {
-                shoppingEditor.putString(boughtItem.getKey(), boughtItem.toString());
+                accountDB.addProduct(boughtItem.getName(),boughtItem.getExpiryDate(),Integer.parseInt(boughtItem.getAmount()),boughtItem.getCode(),boughtItem.expires(), "shoppinglist");
             }
-            shoppingEditor.commit();
         }
         setEmptyText();
     }
@@ -282,7 +248,6 @@ public class InventoryActivity extends ActionBarActivity {
                 String newCode = data.getStringExtra("code");
                 boolean expires = data.getBooleanExtra("expires", true);
 
-                indexUp(Inventory);
                 addProduct(newProduct, newProductExpDate, Integer.parseInt(newProductAmount), newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
@@ -298,51 +263,7 @@ public class InventoryActivity extends ActionBarActivity {
         // Namn, date, key, amount, code, expires
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
     }
-    private void setIndices()
-    {
-        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            inventoryEditor.putString("index", "0");
-            inventoryEditor.commit();
-        }
-        if(!requiredSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            requiredEditor.putString("index", "0");
-            requiredEditor.commit();
-        }
-        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            shoppingEditor.putString("index", "0");
-            shoppingEditor.commit();
-        }
 
-        index = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
-        rindex = Integer.parseInt(requiredSP.getString("index",""));
-    }
-    private void fillLists()
-    {
-        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-    }
     private void setAlarm()
     {
         Calendar calendar = Calendar.getInstance();
@@ -360,23 +281,7 @@ public class InventoryActivity extends ActionBarActivity {
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);
         Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
     }
-    private void indexUp(int SP)
-    {
-        switch(SP) {
-            case 1:
-                index+=1;
-                inventoryEditor.remove("index");
-                inventoryEditor.putString("index",Integer.toString(index));
-                inventoryEditor.commit();
-                break;
-            case 3:
-                rindex+=1;
-                requiredEditor.remove("index");
-                requiredEditor.putString("index",Integer.toString(rindex));
-                requiredEditor.commit();
-                break;
-        }
-    }
+
 
 
 

@@ -47,6 +47,9 @@ public class MainActivity extends ActionBarActivity {
         accountDB = (AccountDB) getApplicationContext();
 
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.remove("active");
+        accountEditor.commit();
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
@@ -54,6 +57,10 @@ public class MainActivity extends ActionBarActivity {
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username,password);
             accountDB.getProducts();
+        }
+        else
+        {
+            accountDB.loadSharedPreferences();
         }
     }
 
