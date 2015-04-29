@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -57,6 +58,66 @@ public class AccountDB extends Application {
     public void getProducts(){
             new loadProducts().execute();
         }
+
+
+    /**
+     * Update the account info on phone.
+     * @param user - the new value for username.
+     * @param password - the new value for password.
+     */
+    public void switchAccountOnPhone(String user, String password){
+        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.putBoolean("active", true);
+        accountEditor.putString("user", user);
+        accountEditor.putString("password", password);
+        accountEditor.commit();
+
+        //TODO is it enough to update username and password on phone like now? or we need to
+        //TODO update much more like products and remove the existing ones?
+    }
+
+    /**
+     * Check the account information exist in DB and if that is valid.
+     * @param username - username for account
+     * @param password - password for account
+     * @return true if there is an account with this username/password and match. False if not.
+     */
+    public boolean existAccountInDatabase(String username, String password){
+        JSONParser jsonParser = new JSONParser();
+        String TAG_SUCCESS = "success";
+        String USERNAME = "name";
+        String PASSWORD = "password";
+
+        // Building Parameters
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair(USERNAME, username));
+        params.add(new BasicNameValuePair(PASSWORD, password));
+        Log.d("checking account", username + password);
+
+        // getting JSON Object
+        // Note that create product url accepts POST method
+        JSONObject json = jsonParser.makeHttpRequest(url_check_account, "GET", params);
+        // check for success tag
+        try {
+            int success = json.getInt(TAG_SUCCESS);
+
+            if (success == 1) {
+                //successfully
+                connection = 1; //Account was OK
+                return true;
+            } else {
+                //failed
+                connection = -1; //Account was not OK
+                Log.d("AccountDB", "connection failed with " + username + ":" + password);
+                return false;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
 
 
     //__________*Inner class to connect and operate on database*_______________//

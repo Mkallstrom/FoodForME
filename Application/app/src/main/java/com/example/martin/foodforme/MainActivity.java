@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity {
 
         switch(item.getItemId()){
             case R.id.refrigerator_connect:
-
+            connectAccount();
                 return true;
             case R.id.create_refrigerator:
                 createAccount();
@@ -95,6 +95,74 @@ public class MainActivity extends ActionBarActivity {
 
         }
     }
+
+    /**
+     * Connect to an existing account! If the user and password matches.
+     */
+    public void connectAccount(){
+        final Context context = this;
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText username = new EditText(context);
+        username.setHint("Choose name:");
+        layout.addView(username);
+
+        final EditText password = new EditText(context);
+        password.setHint("Choose password:");
+        layout.addView(password);
+        password.setTransformationMethod(new PasswordTransformationMethod());
+        new AlertDialog.Builder(this)
+
+                .setTitle("Connect to account:")
+                .setView(layout)
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String loginName = username.getText().toString();
+                        String loginPassword = password.getText().toString();
+                        SaveAccount sa = new SaveAccount();
+                        sa.execute(new String[]{loginName, loginPassword});
+                        while (sa.getCreatedAcc() == 0) {
+                        };
+                        if (sa.getCreatedAcc() == 1) {
+                            //if successful
+                            InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
+                            info.message();
+                            accountDB.setDetails(sa.getName(),sa.getPassword());
+                        } else {
+                            //if failed
+                            InfoDialog info = new InfoDialog("Error, the database could not accept your request.", context);
+                            info.message();
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
+
+
+            String user = username.getText().toString();
+            String pass = password.getText().toString();
+
+
+        if(accountDB.existAccountInDatabase(user,pass)){
+            //success to locate account
+            accountDB.switchAccountOnPhone(user,pass);
+            InfoDialog info = new InfoDialog("You are now connected to "+user+ ".", context);
+            info.message();
+            return;
+        }
+        //failed to connect and update
+        InfoDialog info = new InfoDialog("Could not connect to account. " +
+                "Control that the username and password are correct.", context);
+        info.message();
+    }
+
+
+
 
 
     public void createAccount(){
@@ -144,7 +212,7 @@ public class MainActivity extends ActionBarActivity {
                 .show();
     }
 
-    class SaveAccount extends AsyncTask<String, String, String> {
+    public class SaveAccount extends AsyncTask<String, String, String> {
         private int createdAcc = 0;
         private String userName;
         private String password;
@@ -222,6 +290,12 @@ public class MainActivity extends ActionBarActivity {
             accountEditor.commit();
 
         }
+
+
+
+
+
+
 
         public int getCreatedAcc(){
             return createdAcc;
