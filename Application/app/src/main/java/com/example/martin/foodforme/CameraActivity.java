@@ -2,18 +2,23 @@ package com.example.martin.foodforme;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PictureCallback;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -171,7 +176,7 @@ public class CameraActivity extends Activity {
     }
 
     private PictureCallback getPictureCallback() {
-        PictureCallback picture = new PictureCallback() {
+        final PictureCallback picture = new PictureCallback() {
 
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -182,20 +187,32 @@ public class CameraActivity extends Activity {
                     return;
                 }
 
-                data = cropImageByteArray(data);         // uses a custom method to crop the image
+                saveImageByteArray(data, pictureFile);
 
+                /**
+                 * Rotate and crop the image
+                 */
                 try {
-                    //write the file
-                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                    fos.write(data);
-                    fos.close();
-                    //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
-                    //toast.show();
+                    FileInputStream inputStream = new FileInputStream(pictureFile);
+                    Bitmap realImage = BitmapFactory.decodeStream(inputStream);
+                    ExifInterface exif = new ExifInterface(AddProductActivity.DATA_PATH + "/ocr.jpg");
+                    Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION));
+                    if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
 
+                        realImage = rotateBitmap(realImage, 90);
+                    }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
+                        realImage = rotateBitmap(realImage, 270);
+                    }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
+                        realImage = rotateBitmap(realImage, 180);
+                    }
 
-                } catch (FileNotFoundException e) {
-                } catch (IOException e) {
+                    data = cropImageByteArray(bitmapToByteArray(realImage));         // uses a custom method to crop the image
+
+                } catch (Exception e) {
+                    Log.e("Camera Activity: ", "Failed to rotate or crop the saved image...");
                 }
+
+                saveImageByteArray(data, pictureFile);
 
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -203,6 +220,23 @@ public class CameraActivity extends Activity {
             }
         };
         return picture;
+    }
+
+    private void saveImageByteArray(byte[] data, File pictureFile) {
+        try {
+            //write the file
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            fos.write(data);
+            fos.close();
+            //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
+            //toast.show();
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     OnClickListener captureListener = new OnClickListener() {
@@ -264,6 +298,19 @@ public class CameraActivity extends Activity {
         bmp.compress(Bitmap.CompressFormat.PNG, fullQuality, outputStream);
         byte[] byteArray = outputStream.toByteArray();
         return byteArray;
+    }
+
+    /**
+     * SOURCE: http://stackoverflow.com/a/11024837
+     */
+    private Bitmap rotateBitmap(Bitmap bitmap, int degree) {
+        int w = bitmap.getWidth();
+        int h = bitmap.getHeight();
+
+        Matrix mtx = new Matrix();
+        mtx.postRotate(degree);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
     }
 
     //make picture and save to a folder
