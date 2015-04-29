@@ -287,4 +287,5 @@ public class AccountDB extends Application {
         // Namn, date, key, amount, code, expires
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
     }
+
 }
