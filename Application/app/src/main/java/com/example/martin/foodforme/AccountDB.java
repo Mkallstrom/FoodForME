@@ -68,7 +68,6 @@ public class AccountDB extends Application {
         inventoryEditor = inventorySP.edit();
         shoppingEditor = shoppingSP.edit();
         requiredEditor = requiredSP.edit();
-        username = "a";
         if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
         {
             inventoryEditor.putString("index", "0");
@@ -447,7 +446,6 @@ public class AccountDB extends Application {
                     if (success == 1) {
                         //successfully
                         Log.d("AccountDB", "success for get inventory");
-                        //TODO fill and create the inventory array with all items
                         JSONArray productObj = json
                                 .getJSONArray("inventory"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
@@ -477,7 +475,6 @@ public class AccountDB extends Application {
                     if (success == 1) {
                         //successfully
                         Log.d("AccountDB", "success for get shopping list");
-                        //TODO fill and create the inventory array with all items
                         JSONArray productObj = json
                                 .getJSONArray("shoppinglist"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
@@ -508,7 +505,6 @@ public class AccountDB extends Application {
                     if (success == 1) {
                         //successfully
                         Log.d("AccountDB", "success for get reqs");
-                        //TODO fill and create the inventory array with all items
                         JSONArray productObj = json
                                 .getJSONArray("requirements"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
