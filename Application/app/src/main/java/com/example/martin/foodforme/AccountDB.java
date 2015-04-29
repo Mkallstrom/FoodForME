@@ -35,14 +35,19 @@ public class AccountDB extends Application {
         this.username = username;
         this.password = password;
         Log.d("AccountDB", "set details");
-        new connectDB().execute();
-
+        new ConnectDB().execute();
     }
     public ArrayList<Product> returnInventory(){ return inventory; }
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
-    public void saveProducts() {
 
+    public void setInventory(ArrayList<Product> inventory){ this.inventory = inventory;}
+    public void setShoppingList(ArrayList<Product> shoppingList){ this.shoppingList = shoppingList;}
+    public void setrequirements(ArrayList<Product> requirements){ this.requirements = requirements;}
+
+    public void storeProducts() {
+        Log.d("AccountDB","attempting storeproducts with connection being: " + connection);
+        if(connection==1) new SaveProducts().execute();
     }
     //Methods
 
@@ -55,7 +60,7 @@ public class AccountDB extends Application {
 
 
     //__________*Inner class to connect and operate on database*_______________//
-    private class connectDB extends AsyncTask<String, String, String> {
+    private class ConnectDB extends AsyncTask<String, String, String> {
 
         //JSON
         private JSONParser jsonParser = new JSONParser();
@@ -91,12 +96,11 @@ public class AccountDB extends Application {
 
                 if (success == 1) {
                     //successfully
-
                     connection = 1; //Account was OK
-
                 } else {
                     //failed
                     connection = -1; //Account was not OK
+                    Log.d("AccountDB", "connection failed with " + username + ":" + password);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -124,7 +128,7 @@ public class AccountDB extends Application {
             e.printStackTrace();
         }
     }
-    private class saveProducts extends AsyncTask<String, String, String>
+    private class SaveProducts extends AsyncTask<String, String, String>
     {
         private JSONParser jsonParser = new JSONParser();
 
@@ -134,6 +138,7 @@ public class AccountDB extends Application {
             // Building Parameters
             for(Product p : inventory)
             {
+                Log.d("AccountDB", "adding product: " + p.toString());
                 addProduct(username, p.toString(), p.getKey(),"inventory",jsonParser);
             }
             for(Product p : shoppingList)

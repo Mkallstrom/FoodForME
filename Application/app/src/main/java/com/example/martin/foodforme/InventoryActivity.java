@@ -33,6 +33,7 @@ import java.util.Map;
 public class InventoryActivity extends ActionBarActivity {
 
     private Scanner scanner;
+    AccountDB accountDB;
 
     ArrayAdapter inventoryAdapter;
     ArrayList<Product> shoppingList = new ArrayList<>(),
@@ -64,6 +65,8 @@ public class InventoryActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Inventory");
 
+        accountDB = (AccountDB) getApplicationContext();
+
         inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
 
         inventorySP = getSharedPreferences("inventorySP", 0);
@@ -93,6 +96,8 @@ public class InventoryActivity extends ActionBarActivity {
         inventoryAdapter.notifyDataSetChanged();
         setEmptyText();
         setAlarm();
+        accountDB.setInventory(inventoryList);
+        accountDB.storeProducts();
 
     }
 

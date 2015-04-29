@@ -194,7 +194,7 @@ public class MainActivity extends ActionBarActivity {
                     createdAcc = 1; //Account been created
 
                     storeAccountOnPhone(username,password);
-                    accountDB.saveProducts();
+                    accountDB.storeProducts();
                     // closing this screen
                     //finish();
 
