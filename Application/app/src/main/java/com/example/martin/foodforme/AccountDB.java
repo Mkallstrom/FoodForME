@@ -61,9 +61,10 @@ public class AccountDB extends Application {
     public void loadSharedPreferences(){
         if(firstRun) return;
         firstRun = true;
-        SharedPreferences inventorySP = getSharedPreferences("inventorySP", 0);
-        SharedPreferences requiredSP = getSharedPreferences("requiredSP", 0);
-        SharedPreferences shoppingSP = getSharedPreferences("shoppingSP", 0);
+        Log.d("AccountDB", "loading shared prefs");
+        inventorySP = getSharedPreferences("inventorySP", 0);
+        requiredSP = getSharedPreferences("requiredSP", 0);
+        shoppingSP = getSharedPreferences("shoppingSP", 0);
         inventoryEditor = inventorySP.edit();
         shoppingEditor = shoppingSP.edit();
         requiredEditor = requiredSP.edit();

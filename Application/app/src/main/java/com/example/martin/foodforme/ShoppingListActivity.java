@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
@@ -19,19 +18,18 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collections;
 
 
 public class ShoppingListActivity extends ActionBarActivity {
 
     private Scanner scanner;
-    ArrayList<Product> shoppingList = new ArrayList<>(), requiredList = new ArrayList<>(), inventoryList = new ArrayList<>();
+    AccountDB accountDB;
+    ArrayList<Product> shoppingList, requiredList, inventoryList;
     ArrayAdapter shoppingAdapter;
-    SharedPreferences shoppingSP, requiredSP, inventorySP, localBarcodes;
-    SharedPreferences.Editor shoppingEditor, inventoryEditor;
+
     ListView shoppingListView;
-    int sindex = 0;
-    int index = 0;
+
     int Inventory = 1;
     int ShoppingList = 2;
 
@@ -43,28 +41,18 @@ public class ShoppingListActivity extends ActionBarActivity {
         Context context = this;
         setTitle("Shopping List");
 
+        accountDB = (AccountDB) getApplicationContext();
+        inventoryList = accountDB.returnInventory();
+        shoppingList = accountDB.returnShoppingList();
+        requiredList = accountDB.returnRequirements();
+
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
-
-        shoppingSP = getSharedPreferences("shoppingSP",0);
-        requiredSP = getSharedPreferences("requiredSP",0);
-        inventorySP = getSharedPreferences("inventorySP",0);
-        localBarcodes = getSharedPreferences("localBarcodes", 0);
-
-
-        shoppingEditor = shoppingSP.edit();
-        inventoryEditor = inventorySP.edit();
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
 
         shoppingListView.setAdapter(shoppingAdapter);
 
         registerForContextMenu(shoppingListView);
-
-        setIndices();
-        sindex = Integer.parseInt(shoppingSP.getString("index",""));
-        index = Integer.parseInt(inventorySP.getString("index",""));
-
-        fillLists();
 
         checkRequirements();
 
@@ -109,13 +97,10 @@ public class ShoppingListActivity extends ActionBarActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = shoppingList.get(info.position);
-                            shoppingList.remove(item);
+                            accountDB.removeProduct(item, "shopping");
                             item.setAmount(Integer.toString(amount));
-                            shoppingList.add(info.position,item);
+                            accountDB.addProduct(item.getName(),item.getExpiryDate(),Integer.parseInt(item.getAmount()),item.getCode(),item.expires(),"shopping");
                             shoppingAdapter.notifyDataSetChanged();
-                            shoppingEditor.remove(item.getKey());
-                            shoppingEditor.putString(item.getKey(), item.toString());
-                            shoppingEditor.commit();
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -126,10 +111,9 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         } else if(itemID == 2) {
             Product shoppingItem = shoppingList.get(info.position);
-            shoppingList.remove(shoppingItem);
+            accountDB.removeProduct(shoppingItem,"shopping");
             shoppingAdapter.notifyDataSetChanged();
-            shoppingEditor.remove(shoppingItem.getKey());
-            shoppingEditor.commit();
+
 
 
         } else {return false;}
@@ -168,11 +152,8 @@ public class ShoppingListActivity extends ActionBarActivity {
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = txtUrl.getText().toString();
-                        Product newProduct = new Product(name, Integer.toString(sindex), 1);
-                        shoppingList.add(newProduct);
-                        shoppingAdapter.notifyDataSetChanged();
-                        shoppingEditor.putString(Integer.toString(sindex), name + "|" + newProduct.getExpiryDate() + "|1|" + newProduct.getCode() + "|" + newProduct.expires());
-                        indexUp(ShoppingList);
+                        Product newProduct = new Product(name, "0", 1);
+                        accountDB.addProduct(newProduct.getName(),newProduct.getExpiryDate(),Integer.parseInt(newProduct.getAmount()),newProduct.getCode(),newProduct.expires(),"shopping");
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -195,12 +176,12 @@ public class ShoppingListActivity extends ActionBarActivity {
         scanner.scan();
     }
 
-    protected void addProduct(String name, String date, String code, boolean expires)
+    protected void addProduct(String name, String date, int amount, String code, boolean expires)
     {
-        Product product = new Product(name, date, Integer.toString(index), 1, code, expires);
         // Namn, date, key, amount, code
-        inventoryEditor.putString(Integer.toString(index), product.toString());
-        inventoryEditor.commit();
+        accountDB.addProduct(name, date, amount, code, expires, "inventory");
+
+        Collections.sort(inventoryList);
         Product boughtItem = null;
         if(!shoppingList.isEmpty())
         {
@@ -216,17 +197,11 @@ public class ShoppingListActivity extends ActionBarActivity {
         if(boughtItem!=null)
         {
             boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
-            shoppingEditor.remove(boughtItem.getKey());
+            accountDB.removeProduct(boughtItem, "shoppinglist");
             if(Integer.parseInt(boughtItem.getAmount()) > 0)
             {
-                shoppingEditor.putString(boughtItem.getKey(), boughtItem.toString());
+                accountDB.addProduct(boughtItem.getName(), boughtItem.getExpiryDate(), Integer.parseInt(boughtItem.getAmount()), boughtItem.getCode(), boughtItem.expires(), "shoppinglist");
             }
-            else
-            {
-                shoppingList.remove(boughtItem);
-            }
-            shoppingEditor.commit();
-            shoppingAdapter.notifyDataSetChanged();
         }
     }
 
@@ -236,11 +211,11 @@ public class ShoppingListActivity extends ActionBarActivity {
             if(resultCode == RESULT_OK) {
                 String newProduct = data.getStringExtra("product"); // Gets the name of the product
                 String newProductExpDate = data.getStringExtra("expDate"); // Gets the expiration date
+                String newProductAmount = data.getStringExtra("amount");
                 String newCode = data.getStringExtra("code");
                 boolean expires = data.getBooleanExtra("expires",true);
 
-                indexUp(Inventory);
-                addProduct(newProduct, newProductExpDate, newCode, expires);
+                addProduct(newProduct, newProductExpDate, Integer.parseInt(newProductAmount), newCode, expires);
 
             } else if (resultCode == RESULT_CANCELED) {             // addProduct was canceled
                 Toast.makeText(this, "The product was not added.", Toast.LENGTH_SHORT).show();
@@ -250,43 +225,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         }
 
     }
-    private void setIndices()
-    {
-        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            inventoryEditor.putString("index", "0");
-            inventoryEditor.commit();
-        }
-        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
-        {
-            shoppingEditor.putString("index", "0");
-            shoppingEditor.commit();
-        }
-    }
-    private void fillLists()
-    {
-        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                shoppingList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-    }
+
     private void checkRequirements()
     {
         ArrayList shoppingCodes = new ArrayList();
@@ -317,42 +256,19 @@ public class ShoppingListActivity extends ActionBarActivity {
             {
                 if(!shoppingCodes.contains(requiredCode))
                 {
-                    sindex++;
-                    shoppingEditor.remove("index");
-                    shoppingEditor.putString("index", Integer.toString(sindex));
-                    Product newProduct = new Product(requiredProduct.getName(), requiredProduct.getExpiryDate(), requiredProduct.getKey(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(), false);
-                    shoppingList.add(newProduct);
-                    Toast.makeText(this,"Added " + newProduct.getAmount() + " of " + newProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
-                    shoppingEditor.putString(Integer.toString(sindex), newProduct.toString());
+                    accountDB.addProduct(requiredProduct.getName(), requiredProduct.getExpiryDate(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(),requiredProduct.expires(), "shopping");
+                    Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount())-inventoryAmount) + " of " + requiredProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                 }
                 else if (changedItem != null)
                 {
                     Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
-                    shoppingEditor.remove(changedItem.getKey());
-                    shoppingEditor.putString(changedItem.getKey(), changedItem.toString());
+                    accountDB.removeProduct(changedItem,"shopping");
+                    accountDB.addProduct(changedItem.getName(),changedItem.getExpiryDate(),Integer.parseInt(changedItem.getAmount()),changedItem.getCode(),changedItem.expires(),"shopping");
                 }
             }
 
         }
-        shoppingEditor.commit();
         shoppingAdapter.notifyDataSetChanged();
-    }
-    private void indexUp(int SP)
-    {
-        switch(SP) {
-            case 1:
-                index+=1;
-                inventoryEditor.remove("index");
-                inventoryEditor.putString("index",Integer.toString(index));
-                inventoryEditor.commit();
-                break;
-            case 2:
-                sindex+=1;
-                shoppingEditor.remove("index");
-                shoppingEditor.putString("index",Integer.toString(sindex));
-                shoppingEditor.commit();
-                break;
-        }
     }
 }
