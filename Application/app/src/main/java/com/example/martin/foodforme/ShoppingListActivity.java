@@ -235,7 +235,6 @@ public class ShoppingListActivity extends ActionBarActivity {
             String requiredCode = requiredProduct.getCode();
             Product changedItem = null;
             int inventoryAmount = 0, shoppinglistAmount = 0;
-
             for(Product inventoryProduct : inventoryList)
             {
                 if(inventoryProduct.getCode().equals(requiredCode))
@@ -256,15 +255,15 @@ public class ShoppingListActivity extends ActionBarActivity {
             {
                 if(!shoppingCodes.contains(requiredCode))
                 {
-                    accountDB.addProduct(requiredProduct.getName(), requiredProduct.getExpiryDate(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(),requiredProduct.expires(), "shopping");
+                    accountDB.addProduct(requiredProduct.getName(), requiredProduct.getExpiryDate(), Integer.parseInt(requiredProduct.getAmount())-inventoryAmount, requiredProduct.getCode(),requiredProduct.expires(), "shoppinglist");
                     Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount())-inventoryAmount) + " of " + requiredProduct.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                 }
                 else if (changedItem != null)
                 {
                     Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
-                    accountDB.removeProduct(changedItem,"shopping");
-                    accountDB.addProduct(changedItem.getName(),changedItem.getExpiryDate(),Integer.parseInt(changedItem.getAmount()),changedItem.getCode(),changedItem.expires(),"shopping");
+                    accountDB.removeProduct(changedItem,"shoppinglist");
+                    accountDB.addProduct(changedItem.getName(),changedItem.getExpiryDate(),Integer.parseInt(changedItem.getAmount()),changedItem.getCode(),changedItem.expires(),"shoppinglist");
                 }
             }
 
