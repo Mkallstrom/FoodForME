@@ -153,7 +153,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String name = txtUrl.getText().toString();
                         Product newProduct = new Product(name, "0", 1);
-                        accountDB.addProduct(newProduct.getName(),newProduct.getExpiryDate(),Integer.parseInt(newProduct.getAmount()),newProduct.getCode(),newProduct.expires(),"shopping");
+                        accountDB.addProduct(newProduct.getName(),newProduct.getExpiryDate(),Integer.parseInt(newProduct.getAmount()),newProduct.getCode(),newProduct.expires(),"shoppinglist");
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
