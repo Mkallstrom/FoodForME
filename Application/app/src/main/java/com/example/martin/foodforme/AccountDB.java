@@ -31,10 +31,10 @@ public class AccountDB extends Application {
     private boolean local = true;
     private boolean firstRun = false;
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
-    private static final String url_get_products = ip + "get_products.php"; //Get all inventory from a user
+    private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
-    private static final String url_add_product = ip + "add_product.php"; //Check if password and user match and exist
-    private static final String url_delete_product = ip + "delete_product.php"; //Check if password and user match and exist
+    private static final String url_add_product = ip + "add_product.php"; //Adds a product from the database
+    private static final String url_delete_product = ip + "delete_product.php"; //Deletes a product from the database
     private static final String url_get_index = ip + "get_index.php"; //Get the accounts next index.
     private static final String url_increase_index = ip + "increase_index.php"; //Increase the accounts index.
     SharedPreferences inventorySP, shoppingSP, requiredSP;
@@ -93,21 +93,21 @@ public class AccountDB extends Application {
         indexRequirements = Integer.parseInt(requiredSP.getString("index",""));
         indexShoppingList = Integer.parseInt(shoppingSP.getString("index",""));
 
-        Map<String,?> keys = inventorySP.getAll();                    //Get the inventoryList into the product listview.
+        Map<String,?> keys = inventorySP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
                 inventory.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
-        keys = shoppingSP.getAll();                    //Get the inventoryList into the product listview.
+        keys = shoppingSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
                 shoppingList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
-        keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
+        keys = requiredSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals("index"))
             {
@@ -354,6 +354,9 @@ public class AccountDB extends Application {
         else
         {
             insertProduct(username,newProduct.toString(),newProduct.getKey(),list,jsonParser);
+            IncreaseIndex increaseIndex = new IncreaseIndex();
+            increaseIndex.setList(list);
+            increaseIndex.execute();
         }
     }
 
