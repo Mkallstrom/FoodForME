@@ -97,9 +97,9 @@ public class ShoppingListActivity extends ActionBarActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = shoppingList.get(info.position);
-                            accountDB.removeProduct(item, "shopping");
+                            accountDB.removeProduct(item, "shoppinglist");
                             item.setAmount(Integer.toString(amount));
-                            accountDB.addProduct(item.getName(),item.getExpiryDate(),Integer.parseInt(item.getAmount()),item.getCode(),item.expires(),"shopping");
+                            accountDB.addProduct(item.getName(),item.getExpiryDate(),Integer.parseInt(item.getAmount()),item.getCode(),item.expires(),"shoppinglist");
                             shoppingAdapter.notifyDataSetChanged();
                         }
                     })
@@ -111,7 +111,7 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         } else if(itemID == 2) {
             Product shoppingItem = shoppingList.get(info.position);
-            accountDB.removeProduct(shoppingItem,"shopping");
+            accountDB.removeProduct(shoppingItem,"shoppinglist");
             shoppingAdapter.notifyDataSetChanged();
 
 
