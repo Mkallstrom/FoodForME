@@ -353,10 +353,8 @@ public class AccountDB extends Application {
         }
         else
         {
-            insertProduct(username,newProduct.toString(),newProduct.getKey(),list,jsonParser);
-            IncreaseIndex increaseIndex = new IncreaseIndex();
-            increaseIndex.setList(list);
-            increaseIndex.execute();
+            insertProduct(username, newProduct.toString(), newProduct.getKey(), list, jsonParser);
+            increaseIndex(list);
         }
     }
 
@@ -489,7 +487,7 @@ public class AccountDB extends Application {
         private String list;
         private static final String TAG_SUCCESS = "success";
         private static final String USERNAME = "name";
-        private static final String INDEX = "index";
+        private static final String LIST = "list";
         List<NameValuePair> indexParams;
 
         //Methods
@@ -502,6 +500,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
+            indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
             // check for success tag
