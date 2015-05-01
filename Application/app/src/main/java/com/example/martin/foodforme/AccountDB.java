@@ -35,6 +35,8 @@ public class AccountDB extends Application {
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
     private static final String url_add_product = ip + "add_product.php"; //Check if password and user match and exist
     private static final String url_delete_product = ip + "delete_product.php"; //Check if password and user match and exist
+    private static final String url_get_index = ip + "get_index.php"; //Get the accounts next index.
+    private static final String url_increase_index = ip + "increase_index.php"; //Increase the accounts index.
     SharedPreferences inventorySP, shoppingSP, requiredSP;
     SharedPreferences.Editor inventoryEditor, shoppingEditor, requiredEditor;
     JSONParser jsonParser = new JSONParser();
@@ -46,6 +48,9 @@ public class AccountDB extends Application {
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
+        loadIndex("inventory");
+        loadIndex("shoppinglist");
+        loadIndex("requirements");
         local = false;
         firstRun = true;
     }
@@ -407,6 +412,116 @@ public class AccountDB extends Application {
     {
         new ClearProducts().execute();
     }
+
+    public void loadIndex(String list)
+    {
+        GetIndex getIndex = new GetIndex();
+        getIndex.setList(list);
+        getIndex.execute();
+    }
+    public void increaseIndex(String list)
+    {
+        IncreaseIndex increaseIndex = new IncreaseIndex();
+        increaseIndex.setList(list);
+        increaseIndex.execute();
+    }
+    private class GetIndex extends AsyncTask<String, String, String>
+    {
+        private JSONParser jsonParser = new JSONParser();
+        private String list;
+        private static final String TAG_SUCCESS = "success";
+        private static final String USERNAME = "name";
+        private static final String INDEX = "index";
+        List<NameValuePair> indexParams;
+
+        //Methods
+        @Override
+        protected String doInBackground(String... params) {
+            // Building Parameters
+            if(list == null){
+                Log.d("AccountDB", "list not been set!");
+                return null;
+            }
+            indexParams = new ArrayList<>();
+            indexParams.add(new BasicNameValuePair(USERNAME, username));
+
+            JSONObject json = jsonParser.makeHttpRequest(url_get_index, "GET", indexParams);
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for get " + list + " index");
+                    JSONArray productObj = json
+                            .getJSONArray(INDEX); // JSON Array
+                    JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                    switch(list){
+                        case "inventory":
+                            indexInventory = product.getInt(INDEX);
+                            break;
+                        case "shoppinglist":
+                            indexShoppingList = product.getInt(INDEX);
+                            break;
+                        case "requirements":
+                            indexRequirements = product.getInt(INDEX);
+                            break;
+                    }
+                } else {
+                    Log.d("AccountDB", "no success for get " + list + " index");
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        public void setList(String list){ this.list = list;}
+    }
+
+    private class IncreaseIndex extends AsyncTask<String, String, String>
+    {
+        private JSONParser jsonParser = new JSONParser();
+        private String list;
+        private static final String TAG_SUCCESS = "success";
+        private static final String USERNAME = "name";
+        private static final String INDEX = "index";
+        List<NameValuePair> indexParams;
+
+        //Methods
+        @Override
+        protected String doInBackground(String... params) {
+            // Building Parameters
+            if(list == null){
+                Log.d("AccountDB", "list not been set!");
+                return null;
+            }
+            indexParams = new ArrayList<>();
+            indexParams.add(new BasicNameValuePair(USERNAME, username));
+
+            JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for increase " + list + " index");
+
+                } else {
+                    Log.d("AccountDB", "no success for increase " + list + " index");
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        public void setList(String list){ this.list = list;}
+    }
+
         /**
          * Fill inventory, shopping list, and requirements with items from database for
          * the connected user.
@@ -434,6 +549,7 @@ public class AccountDB extends Application {
                 loadRequirements();
                 return null;
             }
+
             protected int loadInventory()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "inventory"));
