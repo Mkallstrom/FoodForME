@@ -13,12 +13,6 @@
             android:layout_height="fill_parent"
             android:id="@+id/camera_preview" >
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom">
-            </LinearLayout>
         </LinearLayout>
 
         <ImageView

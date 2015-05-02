@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,13 +34,14 @@ import android.widget.Toast;
 
 @SuppressWarnings("deprecation")                // Camera is deprecated, this suppresses the warnings
 public class CameraActivity extends Activity {
+    private static final String TAG = "CameraActivity";
+
     private Camera mCamera;
     private CameraPreview mPreview;
     private PictureCallback mPicture;
     private Button capture, switchCamera;
     private Context myContext;
     private LinearLayout cameraPreview;
-    private boolean cameraFront = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,22 +50,6 @@ public class CameraActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         myContext = this;
         initialize();
-    }
-
-    private int findFrontFacingCamera() {
-        int cameraId = -1;
-        // Search for the front facing camera
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            CameraInfo info = new CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == CameraInfo.CAMERA_FACING_FRONT) {
-                cameraId = i;
-                cameraFront = true;
-                break;
-            }
-        }
-        return cameraId;
     }
 
     private int findBackFacingCamera() {
@@ -79,7 +63,6 @@ public class CameraActivity extends Activity {
             Camera.getCameraInfo(i, info);
             if (info.facing == CameraInfo.CAMERA_FACING_BACK) {
                 cameraId = i;
-                cameraFront = false;
                 break;
             }
         }
@@ -95,10 +78,6 @@ public class CameraActivity extends Activity {
         }
         if (mCamera == null) {
             //if the front facing camera does not exist
-            if (findFrontFacingCamera() < 0) {
-                Toast.makeText(this, "No front facing camera found.", Toast.LENGTH_LONG).show();
-                switchCamera.setVisibility(View.GONE);
-            }
             mCamera = Camera.open(findBackFacingCamera());
             mPicture = getPictureCallback();
             mPreview.refreshCamera(mCamera);
@@ -106,6 +85,10 @@ public class CameraActivity extends Activity {
     }
 
     public void initialize() {
+        mCamera = Camera.open(findBackFacingCamera());
+
+        mPicture = getPictureCallback();
+
         cameraPreview = (LinearLayout) findViewById(R.id.camera_preview);
         mPreview = new CameraPreview(myContext, mCamera);
         cameraPreview.addView(mPreview);
@@ -114,52 +97,7 @@ public class CameraActivity extends Activity {
         capture.setOnClickListener(captureListener);
     }
 
-    OnClickListener switchCameraListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            //get the number of cameras
-            int camerasNumber = Camera.getNumberOfCameras();
-            if (camerasNumber > 1) {
-                //release the old camera instance
-                //switch camera, from the front and the back and vice versa
-
-                releaseCamera();
-                chooseCamera();
-            } else {
-                Toast toast = Toast.makeText(myContext, "Sorry, your phone has only one camera!", Toast.LENGTH_LONG);
-                toast.show();
-            }
-        }
-    };
-
-    public void chooseCamera() {
-        //if the camera preview is the front
-        if (cameraFront) {
-            int cameraId = findBackFacingCamera();
-            if (cameraId >= 0) {
-                //open the backFacingCamera
-                //set a picture callback
-                //refresh the preview
-
-                mCamera = Camera.open(cameraId);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        } else {
-            int cameraId = findFrontFacingCamera();
-            if (cameraId >= 0) {
-                //open the backFacingCamera
-                //set a picture callback
-                //refresh the preview
-
-                mCamera = Camera.open(cameraId);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        }
-    }
-
-    @Override
+   @Override
     protected void onPause() {
         super.onPause();
         //when on Pause, release camera in order to be used from other applications
@@ -187,32 +125,9 @@ public class CameraActivity extends Activity {
                     return;
                 }
 
-                saveImageByteArray(data, pictureFile);
-
-                /**
-                 * Rotate and crop the image
-                 */
-                try {
-                    FileInputStream inputStream = new FileInputStream(pictureFile);
-                    Bitmap realImage = BitmapFactory.decodeStream(inputStream);
-                    ExifInterface exif = new ExifInterface(AddProductActivity.DATA_PATH + "/ocr.jpg");
-                    Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION));
-                    if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
-
-                        realImage = rotateBitmap(realImage, 90);
-                    }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
-                        realImage = rotateBitmap(realImage, 270);
-                    }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
-                        realImage = rotateBitmap(realImage, 180);
-                    }
-
-                    data = cropImageByteArray(bitmapToByteArray(realImage));         // uses a custom method to crop the image
-
-                } catch (Exception e) {
-                    Log.e("Camera Activity: ", "Failed to rotate or crop the saved image...");
-                }
-
-                saveImageByteArray(data, pictureFile);
+                saveImageByteArray(data, pictureFile);          // saves the image taken
+                data = rotateAndCrop(data, pictureFile);        // rotates and crops the image
+                saveImageByteArray(data, pictureFile);          // saves the rotated and cropped image
 
                 Intent intent = new Intent();
                 setResult(RESULT_OK, intent);
@@ -222,16 +137,36 @@ public class CameraActivity extends Activity {
         return picture;
     }
 
+    /**
+     * Rotates (if needed) and crops the image
+     */
+    private byte[] rotateAndCrop(byte[] data, File pictureFile) {
+        try {
+            FileInputStream inputStream = new FileInputStream(pictureFile);
+            Bitmap realImage = BitmapFactory.decodeStream(inputStream);
+            ExifInterface exif = new ExifInterface(AddProductActivity.DATA_PATH + "/ocr.jpg");
+            Log.d("EXIF value", exif.getAttribute(ExifInterface.TAG_ORIENTATION));
+            if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")){
+                realImage = rotateBitmap(realImage, 90);
+            }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")){
+                realImage = rotateBitmap(realImage, 270);
+            }else if(exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")){
+                realImage = rotateBitmap(realImage, 180);
+            }
+
+            data = cropImageByteArray(bitmapToByteArray(realImage));         // uses a custom method to crop the image
+
+        } catch (Exception e) {
+            Log.e("Camera Activity: ", "Failed to rotate or crop the saved image...");
+        }
+        return data;
+    }
+
     private void saveImageByteArray(byte[] data, File pictureFile) {
         try {
-            //write the file
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(data);
             fos.close();
-            //Toast toast = Toast.makeText(myContext, "Picture saved: " + pictureFile.getName(), Toast.LENGTH_LONG);
-            //toast.show();
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -247,12 +182,11 @@ public class CameraActivity extends Activity {
     };
 
     private byte[] cropImageByteArray(byte[] bytesImage) {
-        Bitmap fullSizeBmp = BitmapFactory.decodeByteArray(bytesImage, 0, bytesImage.length);
+        Bitmap fullSizeBmp = BitmapFactory.decodeByteArray(bytesImage, 0, bytesImage.length); // This requires a lot of memory (apparently)
 
         // Image calculations
         int height = fullSizeBmp.getHeight();
         int width = fullSizeBmp.getWidth();
-        double imageRatio = ((double)height)/width;                                       // imageRatio: the actual ratio of the captured image
         int centerHeight = height / 2;
         int centerWidth = width / 2;
         // ------------------------------------------------------------------
@@ -260,9 +194,29 @@ public class CameraActivity extends Activity {
         // Preview calculations
         int previewHeight = findViewById(R.id.camera_preview).getHeight();
         int previewWidth = findViewById(R.id.camera_preview).getWidth();
-        double previewRatio = ((double)previewHeight)/previewWidth;                       // previewRatio: the ratio of the preview
         // ------------------------------------------------------------------
 
+        // TODO: Test on other devices.
+        // TODO: Make sure to crop only inside the rectangle (currently using the full imageView size)
+
+        double heightRatio = ((double) height) / previewHeight;                         // finds the height ratio between the full size image and the preview window
+        double widthRatio = ((double) width) / previewWidth;                            // finds the width ratio between the full size image and the preview window
+
+        int imageViewHeight = findViewById(R.id.imageViewDraw).getHeight();             // the height of the rectangle shown in the preview
+        int imageViewWidth = findViewById(R.id.imageViewDraw).getWidth();               // the width of the rectangle shown in the preview
+
+        // Calculate the size of the rectangle compared to the full size image
+        int rectHeight = (int) (heightRatio * imageViewHeight);                         // the height of the rectangle in comparison to the full size image
+        int rectWidth = (int) (widthRatio * imageViewWidth);                            // the width of the rectangle in comparison to the full size image
+
+        int startingHeight = centerHeight - rectHeight/2;                               // finds the starting pixel to start cropping from (y-axis)
+        int startingWidth = centerWidth - rectWidth/2;                                  // finds the starting pixel to start cropping from (x-axis)
+
+        Bitmap croppedBmp = Bitmap.createBitmap(fullSizeBmp, startingWidth, startingHeight, rectWidth, rectHeight); // crops the image
+
+        return bitmapToByteArray(croppedBmp);
+
+        /*
         // ImageView calculations (the rectangle). The image placed in the ImageView is 226x141 px (height = 141, width = 226)
         double removeTopRatio = 0.6;
         double removeSideRatio = 0.7;
@@ -290,6 +244,7 @@ public class CameraActivity extends Activity {
         Bitmap croppedBmp = Bitmap.createBitmap(fullSizeBmp, startingWidth, startingHeight, calculatedWidth, calculatedHeight);
 
         return bitmapToByteArray(croppedBmp);
+        */
     }
 
     private byte[] bitmapToByteArray(Bitmap bmp) {
