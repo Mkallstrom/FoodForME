@@ -30,9 +30,6 @@ public class ShoppingListActivity extends ActionBarActivity {
 
     ListView shoppingListView;
 
-    int Inventory = 1;
-    int ShoppingList = 2;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.scanner = new Scanner(this);

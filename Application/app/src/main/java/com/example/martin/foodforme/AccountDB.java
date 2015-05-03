@@ -312,6 +312,13 @@ public class AccountDB extends Application {
         }
     }
 
+    private void printList(){
+        for(Product p : shoppingList)
+        {
+            Log.d("Print list", p.toString() + " with key " + p.getKey());
+        }
+    }
+
     public void addProduct(String name, String date, int amount, String code, boolean expires, String list){
         Product newProduct;
         switch(list){
@@ -324,6 +331,7 @@ public class AccountDB extends Application {
                 indexShoppingList++;
                 newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
                 shoppingList.add(newProduct);
+                Log.d("Adding product", newProduct.toString() + " with key " + newProduct.getKey());
                 break;
             default:
                 indexRequirements++;
@@ -334,18 +342,25 @@ public class AccountDB extends Application {
         if(local)
         {
             SharedPreferences.Editor editor;
+
             switch(list){
                 case("inventory"):
                     editor = inventoryEditor;
                     editor.putString(Integer.toString(indexInventory),newProduct.toString());
+                    editor.remove("index");
+                    editor.putString("index", Integer.toString(indexInventory));
                     break;
                 case("shoppinglist"):
                     editor = shoppingEditor;
                     editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
+                    editor.remove("index");
+                    editor.putString("index", Integer.toString(indexShoppingList));
                     break;
                 default:
                     editor = requiredEditor;
                     editor.putString(Integer.toString(indexRequirements),newProduct.toString());
+                    editor.remove("index");
+                    editor.putString("index", Integer.toString(indexRequirements));
                     break;
             }
             editor.commit();
@@ -353,8 +368,9 @@ public class AccountDB extends Application {
         }
         else
         {
-            insertProduct(username, newProduct.toString(), newProduct.getKey(), list, jsonParser);
             increaseIndex(list);
+            insertProduct(username, newProduct.toString(), newProduct.getKey(), list, jsonParser);
+
         }
     }
 
