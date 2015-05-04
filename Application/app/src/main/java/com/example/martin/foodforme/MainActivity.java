@@ -47,6 +47,9 @@ public class MainActivity extends ActionBarActivity {
         accountDB = (AccountDB) getApplicationContext();
 
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.clear();
+        accountEditor.commit();
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
@@ -249,6 +252,9 @@ public class MainActivity extends ActionBarActivity {
             this.password = password;
             params.add(new BasicNameValuePair(USERNAME, username));
             params.add(new BasicNameValuePair(PASSWORD, password));
+            params.add(new BasicNameValuePair("indexInventory",Integer.toString(accountDB.getIndexInventory())));
+            params.add(new BasicNameValuePair("indexShoppingList",Integer.toString(accountDB.getIndexShoppingList())));
+            params.add(new BasicNameValuePair("indexRequirements",Integer.toString(accountDB.getIndexRequirements())));
 
             // getting JSON Object
             // Note that create product url accepts POST method
@@ -266,6 +272,7 @@ public class MainActivity extends ActionBarActivity {
                     createdAcc = 1; //Account been created
 
                     storeAccountOnPhone(username,password);
+                    accountDB.connected(username, password);
                     accountDB.storeProducts();
                     // closing this screen
                     //finish();

@@ -430,6 +430,11 @@ public class AccountDB extends Application {
         new ClearProducts().execute();
     }
 
+    public void connected(String username, String password){
+        this.username = username;
+        this.password = password;
+        connection = 1; }
+
     public void loadIndex(String list)
     {
         GetIndex getIndex = new GetIndex();
@@ -449,6 +454,7 @@ public class AccountDB extends Application {
         private static final String TAG_SUCCESS = "success";
         private static final String USERNAME = "name";
         private static final String INDEX = "index";
+        private static final String LIST = "list";
         List<NameValuePair> indexParams;
 
         //Methods
@@ -461,6 +467,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
+            indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_get_index, "GET", indexParams);
             // check for success tag
@@ -518,7 +525,7 @@ public class AccountDB extends Application {
             indexParams.add(new BasicNameValuePair(USERNAME, username));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
-            JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
+            JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "POST", indexParams);
             // check for success tag
             try {
                 int success = json.getInt(TAG_SUCCESS);
@@ -665,6 +672,19 @@ public class AccountDB extends Application {
 
 
         }
+
+
+    public int getIndexInventory() {
+        return indexInventory;
+    }
+
+    public int getIndexShoppingList() {
+        return indexShoppingList;
+    }
+
+    public int getIndexRequirements() {
+        return indexRequirements;
+    }
 
 
     private Product parseProduct(String string, String key) {
