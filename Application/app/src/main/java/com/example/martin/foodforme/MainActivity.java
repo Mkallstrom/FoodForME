@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,16 +48,21 @@ public class MainActivity extends ActionBarActivity {
         accountDB = (AccountDB) getApplicationContext();
 
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
-        SharedPreferences.Editor accountEditor = account.edit();
-        accountEditor.clear();
-        accountEditor.commit();
+        //SharedPreferences.Editor accountEditor = account.edit();
+        //accountEditor.clear();
+        //accountEditor.commit();
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
-            accountDB.setDetails(username,password);
+            accountDB.setDetails(username, password);
+            ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setMessage("Loading products...");
+            dialog.show();
             accountDB.getProducts();
+            while(accountDB.isLoadingProducts()){}
+            dialog.hide();
         }
         else
         {
@@ -198,7 +204,7 @@ public class MainActivity extends ActionBarActivity {
                         SaveAccount sa = new SaveAccount();
                         sa.execute(new String[]{loginName, loginPassword});
                         while (sa.getCreatedAcc() == 0) {
-                        };
+                        }
                         if (sa.getCreatedAcc() == 1) {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
@@ -272,7 +278,7 @@ public class MainActivity extends ActionBarActivity {
                     createdAcc = 1; //Account been created
 
                     storeAccountOnPhone(username,password);
-                    accountDB.connected(username, password);
+                    accountDB.connected(username,password);
                     accountDB.storeProducts();
                     // closing this screen
                     //finish();

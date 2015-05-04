@@ -27,6 +27,7 @@ public class AccountDB extends Application {
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int loadShoppingList = 0;
     private int loadRequirements = 0;
+    private boolean loadingProducts = false;
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private boolean local = true;
     private boolean firstRun = false;
@@ -184,6 +185,9 @@ public class AccountDB extends Application {
 
     }
 
+    public boolean isLoadingProducts(){
+        return loadingProducts;
+    }
 
     //__________*Inner class to connect and operate on database*_______________//
     private class ConnectDB extends AsyncTask<String, String, String> {
@@ -559,6 +563,16 @@ public class AccountDB extends Application {
             private static final String LIST = "list";
             List<NameValuePair> loadingParams;
 
+            @Override
+            protected void onPreExecute(){
+                loadingProducts = true;
+            }
+
+            @Override
+            protected void onPostExecute(String result){
+            loadingProducts = false;
+            }
+
             //Methods
             @Override
             protected String doInBackground(String... params) {
@@ -664,12 +678,6 @@ public class AccountDB extends Application {
                 }
                 return 0;
             }
-
-
-
-
-
-
 
         }
 
