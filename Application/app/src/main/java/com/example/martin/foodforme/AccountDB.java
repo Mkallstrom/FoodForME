@@ -294,25 +294,34 @@ public class AccountDB extends Application {
         }
     }
 
-    private void deleteProduct(String name, String key, String list, JSONParser parser){
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("name", name));
-        params.add(new BasicNameValuePair("key", key));
-        params.add(new BasicNameValuePair("list", list));
-        JSONObject json = parser.makeHttpRequest(url_delete_product, "POST", params);
-        try {
-            int success = json.getInt("success");
-            String message = json.getString("message");
-            if (success == 1) {
-                //successfully
-                Log.d("AccountDB", "success for delete product");
+    private class deleteProduct extends AsyncTask<String, String, String>{
 
-            } else {
-                Log.d("AccountDB", "no success for delete product. Message: " + message);
-                //failed
+        String name;
+        String key;
+        String list;
+
+        @Override
+        protected String doInBackground(String... params) {
+            List<NameValuePair> deleteparams = new ArrayList<>();
+            deleteparams.add(new BasicNameValuePair("name", name));
+            deleteparams.add(new BasicNameValuePair("key", key));
+            deleteparams.add(new BasicNameValuePair("list", list));
+            JSONObject json = jsonParser.makeHttpRequest(url_delete_product, "POST", deleteparams);
+            try {
+                int success = json.getInt("success");
+                String message = json.getString("message");
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for delete product");
+
+                } else {
+                    Log.d("AccountDB", "no success for delete product. Message: " + message);
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
         }
     }
 
