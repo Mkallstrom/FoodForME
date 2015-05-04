@@ -701,4 +701,15 @@ public class AccountDB extends Application {
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
     }
 
+    /**
+     * Give connection back to a state where it is loading. Reseting connection.
+     */
+    public void resetConnection(){
+        connection = 0;
+    }
+
+    public int getConnection(){
+        return connection;
+    }
+
 }
