@@ -60,7 +60,7 @@ public class AccountDB extends Application {
     public ArrayList<Product> returnRequirements(){ return requirements; }
 
     public void storeProducts() {
-        Log.d("AccountDB","attempting storeproducts with connection being: " + connection);
+        Log.d("AccountDB", "attempting storeproducts with connection being: " + connection);
         if(connection==1) new SaveProducts().execute();
     }
 
@@ -237,27 +237,46 @@ public class AccountDB extends Application {
             }
         }
     }
-    private void insertProduct(String name, String data, String key, String list, JSONParser parser){
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("name", name));
-        params.add(new BasicNameValuePair("data", data));
-        params.add(new BasicNameValuePair("key", key));
-        params.add(new BasicNameValuePair("list", list));
-        JSONObject json = parser.makeHttpRequest(url_add_product, "POST", params);
-        try {
-            int success = json.getInt("success");
-            String message = json.getString("message");
-            if (success == 1) {
-                //successfully
-                Log.d("AccountDB", "success for add product");
+    public class insertProduct extends AsyncTask<String, String, String>{
 
-            } else {
-                Log.d("AccountDB", "no success for add product. Message: " + message);
-                //failed
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        String name;
+        String data;
+        String key;
+        String list;
+
+        public insertProduct(String name, String data, String key, String list){
+            this.name = name;
+            this.data = data;
+            this.key = key;
+            this.list = list;
         }
+
+        @Override
+        protected String doInBackground(String... params) {
+            List<NameValuePair> insertparams = new ArrayList<>();
+            insertparams.add(new BasicNameValuePair("name", name));
+            insertparams.add(new BasicNameValuePair("data", data));
+            insertparams.add(new BasicNameValuePair("key", key));
+            insertparams.add(new BasicNameValuePair("list", list));
+            JSONObject json = jsonParser.makeHttpRequest(url_add_product, "POST", insertparams);
+            try {
+                int success = json.getInt("success");
+                String message = json.getString("message");
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for add product");
+
+                } else {
+                    Log.d("AccountDB", "no success for add product. Message: " + message);
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
     }
     public void removeProduct(Product p, String list){
         switch(list){
@@ -290,7 +309,8 @@ public class AccountDB extends Application {
         }
         else
         {
-            deleteProduct(username,p.getKey(),list,jsonParser);
+            deleteProduct dp = new deleteProduct(username,p.getKey(),list);
+            dp.execute();
         }
     }
 
@@ -299,6 +319,12 @@ public class AccountDB extends Application {
         String name;
         String key;
         String list;
+
+        public deleteProduct(String name, String key, String list){
+            this.name = name;
+            this.key = key;
+            this.list = list;
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -382,14 +408,14 @@ public class AccountDB extends Application {
         else
         {
             increaseIndex(list);
-            insertProduct(username, newProduct.toString(), newProduct.getKey(), list, jsonParser);
+            insertProduct ip = new insertProduct(username, newProduct.toString(),newProduct.getKey(),list);
+            ip.execute();
 
         }
     }
 
     private class SaveProducts extends AsyncTask<String, String, String>
     {
-        private JSONParser jsonParser = new JSONParser();
 
         //Methods
         @Override
@@ -397,50 +423,22 @@ public class AccountDB extends Application {
             // Building Parameters
             for(Product p : inventory)
             {
-                Log.d("AccountDB", "adding product: " + p.toString());
-                insertProduct(username, p.toString(), p.getKey(), "inventory", jsonParser);
+                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "inventory");
+                ip.execute();
             }
             for(Product p : shoppingList)
             {
-                insertProduct(username, p.toString(), p.getKey(), "shoppinglist", jsonParser);
+                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "shoppinglist");
+                ip.execute();
             }
             for(Product p : requirements)
             {
-                insertProduct(username, p.toString(), p.getKey(), "requirements", jsonParser);
+                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "requirements");
+                ip.execute();
             }
             return null;
         }
 
-    }
-
-    private class ClearProducts extends AsyncTask<String, String, String>
-    {
-        private JSONParser jsonParser = new JSONParser();
-
-        //Methods
-        @Override
-        protected String doInBackground(String... params) {
-            // Building Parameters
-            for(Product p : inventory)
-            {
-                Log.d("AccountDB", "deleting product: " + p.toString());
-                deleteProduct(username,p.getKey(), "inventory", jsonParser);
-            }
-            for(Product p : shoppingList)
-            {
-                deleteProduct(username, p.getKey(), "shoppinglist", jsonParser);
-            }
-            for(Product p : requirements)
-            {
-                deleteProduct(username, p.getKey(), "requirements", jsonParser);
-            }
-            return null;
-        }
-
-    }
-    public void clearAll()
-    {
-        new ClearProducts().execute();
     }
 
     public void connected(String username, String password){
@@ -572,11 +570,20 @@ public class AccountDB extends Application {
             private static final String LIST = "list";
             List<NameValuePair> loadingParams;
 
+            @Override
+            protected void onPreExecute(){
+                Log.d("AccountDB","Loading products");
+                loadingProducts = true;
+            }
+            @Override
+            protected void onPostExecute(String result){
+
+
+            }
             //Methods
             @Override
             protected String doInBackground(String... params) {
                 // Building Parameters
-                loadingProducts = true;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadInventory();
@@ -586,7 +593,9 @@ public class AccountDB extends Application {
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadRequirements();
+                Log.d("AccountDB", "Finished loading products");
                 loadingProducts = false;
+
                 return null;
             }
 
