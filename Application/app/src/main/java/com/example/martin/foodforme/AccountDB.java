@@ -370,7 +370,6 @@ public class AccountDB extends Application {
                 indexShoppingList++;
                 newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
                 shoppingList.add(newProduct);
-                Log.d("Adding product", newProduct.toString() + " with key " + newProduct.getKey());
                 break;
             default:
                 indexRequirements++;
@@ -378,6 +377,7 @@ public class AccountDB extends Application {
                 requirements.add(newProduct);
                 break;
         }
+        Log.d("addProduct", "Adding " + newProduct.toString() + " to " + list);
         if(local)
         {
             SharedPreferences.Editor editor;
@@ -424,16 +424,19 @@ public class AccountDB extends Application {
             for(Product p : inventory)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "inventory");
+                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " inventory");
                 ip.execute();
             }
             for(Product p : shoppingList)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "shoppinglist");
+                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " shopping list");
                 ip.execute();
             }
             for(Product p : requirements)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "requirements");
+                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " requirements");
                 ip.execute();
             }
             return null;

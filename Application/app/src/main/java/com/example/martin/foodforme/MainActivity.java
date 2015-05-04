@@ -47,6 +47,9 @@ public class MainActivity extends ActionBarActivity {
         accountDB = (AccountDB) getApplicationContext();
 
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        //SharedPreferences.Editor accountEditor = account.edit();
+        //accountEditor.clear();
+        //accountEditor.commit();
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
@@ -327,7 +330,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected String doInBackground(String... args) {
-            existInDB(args[0],args[1]);
+            existInDB(args[0], args[1]);
             return null;
 
         }
