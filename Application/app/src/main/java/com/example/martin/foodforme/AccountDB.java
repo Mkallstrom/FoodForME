@@ -614,8 +614,9 @@ public class AccountDB extends Application {
                         JSONArray productObj = json
                                 .getJSONArray("inventory"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
-                            JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
-                            shoppingList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                            JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
+                            Log.d("AccountDB", "Adding product to inventory: " + product.getString("data"));
+                            inventory.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadInventory = 1;
                     } else {
@@ -643,7 +644,7 @@ public class AccountDB extends Application {
                         JSONArray productObj = json
                                 .getJSONArray("shoppinglist"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
-                            JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                            JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             shoppingList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadShoppingList = 1; //Loading inventory success.
@@ -673,7 +674,7 @@ public class AccountDB extends Application {
                         JSONArray productObj = json
                                 .getJSONArray("requirements"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
-                            JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
+                            JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             requirements.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
                         loadRequirements = 1; //Loading inventory success.
