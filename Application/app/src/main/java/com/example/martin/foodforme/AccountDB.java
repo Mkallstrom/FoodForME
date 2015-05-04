@@ -27,7 +27,9 @@ public class AccountDB extends Application {
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int loadShoppingList = 0;
     private int loadRequirements = 0;
+    private int inventoryCounter = 0, shoppingListCounter = 0, requirementsCounter = 0;
     private boolean loadingProducts = false;
+    private boolean gettingIndex = false;
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private boolean local = true;
     private boolean firstRun = false;
@@ -49,9 +51,6 @@ public class AccountDB extends Application {
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
-        loadIndex("inventory");
-        loadIndex("shoppinglist");
-        loadIndex("requirements");
         local = false;
         firstRun = true;
     }
@@ -265,6 +264,21 @@ public class AccountDB extends Application {
                 if (success == 1) {
                     //successfully
                     Log.d("AccountDB", "success for add product");
+                    switch(list)
+                    {
+                        case "inventory":
+                            inventoryCounter--;
+                            if(inventoryCounter==0) Log.d("SaveProducts", "Inventory successfully saved.");
+                            break;
+                        case "shoppinglist":
+                            shoppingListCounter--;
+                            if(shoppingListCounter==0) Log.d("SaveProducts", "ShoppingList successfully saved.");
+                            break;
+                        case "requirements":
+                            requirementsCounter--;
+                            if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
+                            break;
+                    }
 
                 } else {
                     Log.d("AccountDB", "no success for add product. Message: " + message);
@@ -407,6 +421,8 @@ public class AccountDB extends Application {
         }
         else
         {
+            loadIndex(list);
+            while(gettingIndex){}
             increaseIndex(list);
             insertProduct ip = new insertProduct(username, newProduct.toString(),newProduct.getKey(),list);
             ip.execute();
@@ -421,22 +437,28 @@ public class AccountDB extends Application {
         @Override
         protected String doInBackground(String... params) {
             // Building Parameters
+            Log.d("SaveProducts", "Saving " + inventory.size() + " products to inventory");
             for(Product p : inventory)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "inventory");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " inventory");
+                inventoryCounter++;
                 ip.execute();
             }
+            Log.d("SaveProducts", "Saving " + shoppingList.size() + " products to shopping list");
             for(Product p : shoppingList)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "shoppinglist");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " shopping list");
+                shoppingListCounter++;
                 ip.execute();
             }
+            Log.d("SaveProducts", "Saving " + requirements.size() + " products to requirements");
             for(Product p : requirements)
             {
                 insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "requirements");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " requirements");
+                requirementsCounter++;
                 ip.execute();
             }
             return null;
@@ -451,6 +473,7 @@ public class AccountDB extends Application {
 
     public void loadIndex(String list)
     {
+        gettingIndex = true;
         GetIndex getIndex = new GetIndex();
         getIndex.setList(list);
         getIndex.execute();
@@ -511,7 +534,7 @@ public class AccountDB extends Application {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            gettingIndex = false;
             return null;
         }
 

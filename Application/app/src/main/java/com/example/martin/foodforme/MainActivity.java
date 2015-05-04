@@ -47,9 +47,6 @@ public class MainActivity extends ActionBarActivity {
         accountDB = (AccountDB) getApplicationContext();
 
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
-        //SharedPreferences.Editor accountEditor = account.edit();
-        //accountEditor.clear();
-        //accountEditor.commit();
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
