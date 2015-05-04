@@ -1,7 +1,6 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,12 +56,11 @@ public class MainActivity extends ActionBarActivity {
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
-            ProgressDialog dialog = new ProgressDialog(this);
-            dialog.setMessage("Loading products...");
-            dialog.show();
             accountDB.getProducts();
-            while(accountDB.isLoadingProducts()){}
-            dialog.hide();
+            boolean loading = true;
+            while(loading){
+                loading = accountDB.isLoadingProducts();
+            }
         }
         else
         {

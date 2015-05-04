@@ -563,20 +563,11 @@ public class AccountDB extends Application {
             private static final String LIST = "list";
             List<NameValuePair> loadingParams;
 
-            @Override
-            protected void onPreExecute(){
-                loadingProducts = true;
-            }
-
-            @Override
-            protected void onPostExecute(String result){
-            loadingProducts = false;
-            }
-
             //Methods
             @Override
             protected String doInBackground(String... params) {
                 // Building Parameters
+                loadingProducts = true;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadInventory();
@@ -586,6 +577,7 @@ public class AccountDB extends Application {
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadRequirements();
+                loadingProducts = false;
                 return null;
             }
 
