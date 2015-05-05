@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -274,9 +275,11 @@ public class AccountDB extends Application {
             switch(list)
             {
                 case "inventory":
+                    Collections.sort(inventory);
                     inventoryAdapter.notifyDataSetChanged();
                     break;
                 case "shoppinglist":
+                    Collections.sort(shoppingList);
                     shoppinglistAdapter.notifyDataSetChanged();
                     break;
                 case "requirements":
@@ -422,6 +425,7 @@ public class AccountDB extends Application {
                     indexInventory++;
                     newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
                     inventory.add(newProduct);
+                    Collections.sort(inventory);
                     inventoryAdapter.notifyDataSetChanged();
                     editor = inventoryEditor;
                     editor.putString(Integer.toString(indexInventory),newProduct.toString());
@@ -432,6 +436,7 @@ public class AccountDB extends Application {
                     indexShoppingList++;
                     newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
                     shoppingList.add(newProduct);
+                    Collections.sort(shoppingList);
                     shoppinglistAdapter.notifyDataSetChanged();
                     editor = shoppingEditor;
                     editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
@@ -675,9 +680,11 @@ public class AccountDB extends Application {
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadInventory();
+                Collections.sort(inventory);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadShoppingList();
+                Collections.sort(shoppingList);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadRequirements();

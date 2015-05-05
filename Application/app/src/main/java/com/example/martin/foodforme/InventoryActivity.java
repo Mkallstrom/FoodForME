@@ -212,9 +212,6 @@ public class InventoryActivity extends ActionBarActivity {
     {
         // Namn, date, key, amount, code
         accountDB.addProduct(name, date, amount, code, expires, "inventory");
-
-        Collections.sort(inventoryList);
-        inventoryAdapter.notifyDataSetChanged();
         Product boughtItem = null;
         if(!shoppingList.isEmpty())
         {
