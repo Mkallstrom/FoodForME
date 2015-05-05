@@ -258,19 +258,14 @@ public class InventoryActivity extends ActionBarActivity {
             }
 
     }
-    private Product parseSharedPreferences(String string, String key) {
-        String[] strings = string.split("\\|"); // The double backslash is needed for some characters
-        // Namn, date, key, amount, code, expires
-        return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
-    }
 
     private void setAlarm()
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 4);
+        calendar.set(Calendar.HOUR, 16);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
-        if(calendar.get(Calendar.HOUR)>=4){ calendar.add(Calendar.DATE, 1);}
+        if(calendar.get(Calendar.HOUR)>=16){ calendar.add(Calendar.DATE, 1);}
 
         Intent serviceIntent = new Intent(this, NotifyService.class);
         PendingIntent pi = PendingIntent.getService(this, 131313, serviceIntent,
@@ -281,10 +276,5 @@ public class InventoryActivity extends ActionBarActivity {
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);
         Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
     }
-
-
-
-
-
 
 }

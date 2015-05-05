@@ -50,6 +50,7 @@ public class MainActivity extends ActionBarActivity {
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
+            Log.d("Main", "Uses account is true.");
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
@@ -61,6 +62,7 @@ public class MainActivity extends ActionBarActivity {
         }
         else
         {
+            Log.d("Main", "Uses account is false.");
             accountDB.loadSharedPreferences();
         }
     }

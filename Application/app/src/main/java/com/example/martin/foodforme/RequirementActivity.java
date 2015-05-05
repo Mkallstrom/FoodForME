@@ -3,7 +3,6 @@ package com.example.martin.foodforme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
@@ -17,16 +16,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 
 public class RequirementActivity extends ActionBarActivity {
 
     ArrayList<Product> requiredList;
-    SharedPreferences requiredSP;
-    SharedPreferences.Editor requiredEditor;
     ListView requiredListView;
     ArrayAdapter requiredAdapter;
+    AccountDB accountDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,28 +31,15 @@ public class RequirementActivity extends ActionBarActivity {
         setContentView(R.layout.activity_requirement);
         Context context = this;
         setTitle("Requirements");
+        accountDB = (AccountDB) getApplicationContext();
 
-        requiredList = new ArrayList<>();
+        requiredList = accountDB.returnRequirements();
 
         requiredAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,requiredList);
-
-        requiredSP = getSharedPreferences("requiredSP",0);
-
-        requiredEditor = requiredSP.edit();
 
         requiredListView = (ListView) findViewById(R.id.requirementlistView);
         requiredListView.setAdapter(requiredAdapter);
         registerForContextMenu(requiredListView);
-
-        Map<String,?> keys = requiredSP.getAll();                    //Get the inventoryList into the product listview.
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                requiredList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
-            }
-        }
-
-        requiredAdapter.notifyDataSetChanged();
 
         requiredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -97,13 +81,9 @@ public class RequirementActivity extends ActionBarActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = requiredList.get(info.position);
-                            requiredList.remove(item);
                             item.setAmount(Integer.toString(amount));
-                            requiredList.add(info.position,item);
-                            requiredAdapter.notifyDataSetChanged();
-                            requiredEditor.remove(item.getKey());
-                            requiredEditor.putString(item.getKey(), item.toString());
-                            requiredEditor.commit();
+                            accountDB.removeProduct(item, "requirements");
+                            accountDB.addProduct(item.getName(), item.getExpiryDate(), Integer.parseInt(item.getAmount()), item.getCode(), item.expires(), "requirements");
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -115,9 +95,7 @@ public class RequirementActivity extends ActionBarActivity {
         } else if(itemID == 2) {
             Product shoppingItem = requiredList.get(info.position);
             requiredList.remove(shoppingItem);
-            requiredAdapter.notifyDataSetChanged();
-            requiredEditor.remove(shoppingItem.getKey());
-            requiredEditor.commit();
+            accountDB.removeProduct(shoppingItem, "requirements");
 
 
         } else {return false;}
