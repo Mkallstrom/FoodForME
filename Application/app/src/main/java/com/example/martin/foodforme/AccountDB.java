@@ -30,6 +30,7 @@ public class AccountDB extends Application {
     private int inventoryCounter = 0, shoppingListCounter = 0, requirementsCounter = 0;
     private boolean loadingProducts = false;
     private boolean gettingIndex = false;
+    private boolean gettingIndexFailed = false;
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private boolean local = true;
     private boolean firstRun = false;
@@ -264,17 +265,21 @@ public class AccountDB extends Application {
                 if (success == 1) {
                     //successfully
                     Log.d("AccountDB", "success for add product");
+
                     switch(list)
                     {
                         case "inventory":
+                            inventory.add(parseProduct(data, key));
                             inventoryCounter--;
                             if(inventoryCounter==0) Log.d("SaveProducts", "Inventory successfully saved.");
                             break;
                         case "shoppinglist":
+                            shoppingList.add(parseProduct(data, key));
                             shoppingListCounter--;
                             if(shoppingListCounter==0) Log.d("SaveProducts", "ShoppingList successfully saved.");
                             break;
                         case "requirements":
+                            requirements.add(parseProduct(data, key));
                             requirementsCounter--;
                             if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
                             break;
@@ -374,42 +379,34 @@ public class AccountDB extends Application {
 
     public void addProduct(String name, String date, int amount, String code, boolean expires, String list){
         Product newProduct;
-        switch(list){
-            case("inventory"):
-                indexInventory++;
-                newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
-                inventory.add(newProduct);
-                break;
-            case("shoppinglist"):
-                indexShoppingList++;
-                newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
-                shoppingList.add(newProduct);
-                break;
-            default:
-                indexRequirements++;
-                newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
-                requirements.add(newProduct);
-                break;
-        }
-        Log.d("addProduct", "Adding " + newProduct.toString() + " to " + list);
+        Log.d("addProduct", "Adding " + name + " to " + list);
         if(local)
         {
             SharedPreferences.Editor editor;
-
+            Log.d("addProduct", "Locally");
             switch(list){
                 case("inventory"):
+                    indexInventory++;
+                    newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
+                    inventory.add(newProduct);
                     editor = inventoryEditor;
                     editor.putString(Integer.toString(indexInventory),newProduct.toString());
                     editor.remove("index");
                     editor.putString("index", Integer.toString(indexInventory));
                     break;
                 case("shoppinglist"):
+                    indexShoppingList++;
+                    newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
+                    shoppingList.add(newProduct);
                     editor = shoppingEditor;
                     editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
                     editor.remove("index");
                     editor.putString("index", Integer.toString(indexShoppingList));
                     break;
                 default:
+                    indexRequirements++;
+                    newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
+                    requirements.add(newProduct);
                     editor = requiredEditor;
                     editor.putString(Integer.toString(indexRequirements),newProduct.toString());
                     editor.remove("index");
@@ -422,8 +419,28 @@ public class AccountDB extends Application {
         else
         {
             loadIndex(list);
-            while(gettingIndex){}
+            while(gettingIndex){
+                if(gettingIndexFailed) {
+                    Log.d("Failure", "Getting index failed! Product not added.");
+                    return;
+                }
+            }
             increaseIndex(list);
+            switch(list)
+            {
+                case "inventory":
+                    newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
+                    break;
+                case "shoppinglist":
+                    newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
+                    break;
+                case "requirements":
+                    newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
+                    break;
+                default:
+                    Log.d("addProduct", "List invalid.");
+                    return;
+            }
             insertProduct ip = new insertProduct(username, newProduct.toString(),newProduct.getKey(),list);
             ip.execute();
 
@@ -464,6 +481,12 @@ public class AccountDB extends Application {
             return null;
         }
 
+    }
+
+    public void clearProducts(){
+        inventory.clear();
+        shoppingList.clear();
+        requirements.clear();
     }
 
     public void connected(String username, String password){
@@ -513,6 +536,7 @@ public class AccountDB extends Application {
                 if (success == 1) {
                     //successfully
                     Log.d("AccountDB", "success for get " + list + " index");
+                    gettingIndexFailed = false;
                     JSONArray productObj = json
                             .getJSONArray(INDEX); // JSON Array
                     JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
@@ -529,6 +553,7 @@ public class AccountDB extends Application {
                     }
                 } else {
                     Log.d("AccountDB", "no success for get " + list + " index");
+                    gettingIndexFailed = true;
                     //failed
                 }
             } catch (JSONException e) {
@@ -562,7 +587,7 @@ public class AccountDB extends Application {
             indexParams.add(new BasicNameValuePair(USERNAME, username));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
-            JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "POST", indexParams);
+            JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
             // check for success tag
             try {
                 int success = json.getInt(TAG_SUCCESS);
@@ -598,6 +623,7 @@ public class AccountDB extends Application {
 
             @Override
             protected void onPreExecute(){
+                clearProducts();
                 Log.d("AccountDB","Loading products");
                 loadingProducts = true;
             }

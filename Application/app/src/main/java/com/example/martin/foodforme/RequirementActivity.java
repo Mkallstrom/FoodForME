@@ -94,7 +94,6 @@ public class RequirementActivity extends ActionBarActivity {
 
         } else if(itemID == 2) {
             Product shoppingItem = requiredList.get(info.position);
-            requiredList.remove(shoppingItem);
             accountDB.removeProduct(shoppingItem, "requirements");
 
 

@@ -227,10 +227,15 @@ public class MainActivity extends ActionBarActivity {
                 if (success == 1) {
                     // successfully created product
                     createdAcc = 1; //Account been created
-
+                    int oldConnection = accountDB.getConnection();
                     storeAccountOnPhone(username,password);
                     accountDB.connected(username,password);
-                    accountDB.storeProducts();
+                    if(oldConnection == 0) {
+                        accountDB.storeProducts();
+                    }
+                    else {
+                        accountDB.clearProducts();
+                    }
                     // closing this screen
                     //finish();
 
@@ -243,14 +248,6 @@ public class MainActivity extends ActionBarActivity {
 
 
         }
-
-
-
-
-
-
-
-
 
         public int getCreatedAcc(){
             return createdAcc;
@@ -330,13 +327,21 @@ public class MainActivity extends ActionBarActivity {
         }
 
         public boolean existInDB(String user, String pass){
+            Log.d("existsInDB", "Starting existInDB");
             accountDB.resetConnection();
-            accountDB.existAccountInDatabase(user,pass);
-            while(accountDB.getConnection() == 0) {
+            Log.d("existsInDB", "Done resetConnection");
+            accountDB.existAccountInDatabase(user, pass);
+            Log.d("existsInDB", "Done existAccountInDatabase");
+            int existsInDBConnection = 0;
+            while(existsInDBConnection == 0) {
+                existsInDBConnection = accountDB.getConnection();
+                Log.d("existsInDB", "Waiting for connection");
             }
-            if(accountDB.getConnection() == 1){
+            if(existsInDBConnection == 1){
                 //success to locate account
                 accountDB.switchAccountOnPhone(user,pass);
+                accountDB.connected(user,pass);
+                accountDB.getProducts();
                 connect = 1;
                 return true;
             }
