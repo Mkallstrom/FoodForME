@@ -39,6 +39,7 @@ public class RequirementActivity extends ActionBarActivity {
 
         requiredListView = (ListView) findViewById(R.id.requirementlistView);
         requiredListView.setAdapter(requiredAdapter);
+        accountDB.setAdapter("requirements", requiredAdapter);
         registerForContextMenu(requiredListView);
 
         requiredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

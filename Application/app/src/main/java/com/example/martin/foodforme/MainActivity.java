@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,6 +37,9 @@ public class MainActivity extends ActionBarActivity {
     private static final String USERNAME = "name";
     private static final String PASSWORD = "password";
 
+    ProgressDialog progressDialog;
+
+
     AccountDB accountDB;
 
 
@@ -54,11 +58,25 @@ public class MainActivity extends ActionBarActivity {
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
-            accountDB.getProducts();
-            boolean loading = true;
-            while(loading){
-                loading = accountDB.isLoadingProducts();
-            }
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setTitle(username);
+            progressDialog.setMessage("Loading products...");
+            progressDialog.show();
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    accountDB.getProducts();
+                    boolean loading = true;
+                    while(loading){
+                        loading = accountDB.isLoadingProducts();
+                    }
+                    progressDialog.dismiss();
+                }
+            };
+
+            new Thread(runnable).start();
+
         }
         else
         {
@@ -106,10 +124,6 @@ public class MainActivity extends ActionBarActivity {
 
         }
     }
-
-
-
-
 
     public void createAccount(){
         final Context context = this;
@@ -339,9 +353,13 @@ public class MainActivity extends ActionBarActivity {
             }
             if(existsInDBConnection == 1){
                 //success to locate account
-                accountDB.switchAccountOnPhone(user,pass);
-                accountDB.connected(user,pass);
+                accountDB.switchAccountOnPhone(user, pass);
+                accountDB.connected(user, pass);
                 accountDB.getProducts();
+                boolean loading = true;
+                while(loading){
+                    loading = accountDB.isLoadingProducts();
+                }
                 connect = 1;
                 return true;
             }

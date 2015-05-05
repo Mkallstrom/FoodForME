@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -27,6 +28,7 @@ public class AccountDB extends Application {
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int loadShoppingList = 0;
     private int loadRequirements = 0;
+    private ArrayAdapter inventoryAdapter, shoppinglistAdapter, requirementsAdapter;
     private int inventoryCounter = 0, shoppingListCounter = 0, requirementsCounter = 0;
     private boolean loadingProducts = false;
     private boolean gettingIndex = false;
@@ -58,6 +60,22 @@ public class AccountDB extends Application {
     public ArrayList<Product> returnInventory(){ return inventory; }
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
+
+    public void setAdapter(String list, ArrayAdapter adapter){
+        switch(list) {
+            case "inventory":
+                inventoryAdapter = adapter;
+                break;
+            case "shoppinglist":
+                shoppinglistAdapter = adapter;
+                break;
+            case "requirements":
+                requirementsAdapter = adapter;
+                break;
+            default:
+                break;
+        }
+    }
 
     public void storeProducts() {
         Log.d("AccountDB", "attempting storeproducts with connection being: " + connection);
@@ -252,6 +270,21 @@ public class AccountDB extends Application {
         }
 
         @Override
+        protected void onPostExecute(String result){
+            switch(list)
+            {
+                case "inventory":
+                    inventoryAdapter.notifyDataSetChanged();
+                    break;
+                case "shoppinglist":
+                    shoppinglistAdapter.notifyDataSetChanged();
+                    break;
+                case "requirements":
+                    requirementsAdapter.notifyDataSetChanged();
+                    break;
+            }
+        }
+        @Override
         protected String doInBackground(String... params) {
             List<NameValuePair> insertparams = new ArrayList<>();
             insertparams.add(new BasicNameValuePair("name", name));
@@ -389,6 +422,7 @@ public class AccountDB extends Application {
                     indexInventory++;
                     newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
                     inventory.add(newProduct);
+                    inventoryAdapter.notifyDataSetChanged();
                     editor = inventoryEditor;
                     editor.putString(Integer.toString(indexInventory),newProduct.toString());
                     editor.remove("index");
@@ -398,6 +432,7 @@ public class AccountDB extends Application {
                     indexShoppingList++;
                     newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
                     shoppingList.add(newProduct);
+                    shoppinglistAdapter.notifyDataSetChanged();
                     editor = shoppingEditor;
                     editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
                     editor.remove("index");
@@ -407,6 +442,7 @@ public class AccountDB extends Application {
                     indexRequirements++;
                     newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
                     requirements.add(newProduct);
+                    requirementsAdapter.notifyDataSetChanged();
                     editor = requiredEditor;
                     editor.putString(Integer.toString(indexRequirements),newProduct.toString());
                     editor.remove("index");

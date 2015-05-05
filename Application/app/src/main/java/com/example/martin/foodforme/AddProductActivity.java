@@ -310,7 +310,7 @@ public class AddProductActivity extends ActionBarActivity {
 
         if (recognizedText.length() != 0) {
 
-            // Create a dialog to display the text
+            // Create a progressDialog to display the text
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(recognizedText)
                     .setCancelable(false)
@@ -370,7 +370,7 @@ public class AddProductActivity extends ActionBarActivity {
          * *
          */
         protected void onPostExecute(String file_url) {
-            // dismiss the dialog once done
+            // dismiss the progressDialog once done
         }
 
     }
@@ -459,7 +459,7 @@ public class AddProductActivity extends ActionBarActivity {
          * *
          */
         protected void onPostExecute(String file_url) {
-            pDialog.dismiss(); // the progress dialog can be dismissed
+            pDialog.dismiss(); // the progress progressDialog can be dismissed
 
             if (!databaseHasProduct && !localHasProduct) { // product was not in the local nor global database
                 Intent intent = new Intent(context, Item_not_found.class);

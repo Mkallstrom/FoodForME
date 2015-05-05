@@ -30,7 +30,7 @@ public class InfoDialog extends ActionBarActivity{
                 })
 
                 /*.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
+                    public void onClick(DialogInterface progressDialog, int whichButton) {
                     }
                 })*/
                 .show();

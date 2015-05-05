@@ -44,6 +44,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         requiredList = accountDB.returnRequirements();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
+        accountDB.setAdapter("shoppinglist", shoppingAdapter);
 
         shoppingListView = (ListView) findViewById(R.id.shoppinglistView);
 
