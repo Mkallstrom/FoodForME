@@ -111,10 +111,6 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-
-
-
-
     public void createAccount(){
         final Context context = this;
         LinearLayout layout = new LinearLayout(context);
@@ -163,6 +159,20 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    /**
+     * Store the account info on phone
+     * @param username - the username for the database
+     * @param password - password for username to login with
+     */
+    public void storeAccountOnPhone(String username, String password){
+        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.putBoolean("active", true);
+        accountEditor.putString("user", username);
+        accountEditor.putString("password", password);
+        accountEditor.commit();
+
+    }
 
 
 
@@ -234,20 +244,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-        /**
-         * Store the account info on phone
-         * @param username - the username for the database
-         * @param password - password for username to login with
-         */
-        public void storeAccountOnPhone(String username, String password){
-            SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
-            SharedPreferences.Editor accountEditor = account.edit();
-            accountEditor.putBoolean("active", true);
-            accountEditor.putString("user", username);
-            accountEditor.putString("password", password);
-            accountEditor.commit();
 
-        }
 
 
 
@@ -290,21 +287,19 @@ public class MainActivity extends ActionBarActivity {
                         String loginPassword = password.getText().toString();
                         ConnectToAccount ca = new ConnectToAccount();
                         ca.execute(new String[]{loginName, loginPassword});
-                        while (ca.getConnect() == 0) {
-                            if (ca.getConnect() == 1) {
-                                InfoDialog info = new InfoDialog("You are now connected to " + loginName + ".", context);
-                                info.message();
-                                ca.resetConnect();
-                                return;
-                            }
-                            if (ca.getConnect() == -1) {
-                                InfoDialog info = new InfoDialog("Could not connect to account. " +
-                                        "Control that the username and password are correct.", context);
-                                info.message();
-                                ca.resetConnect();
-                                return;
-                            }
-
+                        ca.resetConnect();
+                        while (ca.getConnect() == 0){}
+                        if (ca.getConnect() == 1) {
+                            storeAccountOnPhone(loginName,loginPassword);
+                            InfoDialog info = new InfoDialog("You are now connected to " + loginName + ".", context);
+                            info.message();
+                            return;
+                        }
+                        else {
+                            InfoDialog info = new InfoDialog("Could not connect to account. " +
+                                    "Control that the username and password are correct.", context);
+                            info.message();
+                            return;
                         }
 
                     }
