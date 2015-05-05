@@ -291,25 +291,35 @@ public class AddProductActivity extends ActionBarActivity {
         baseApi.setDebug(true);
         baseApi.init(DATA_PATH, lang);
         baseApi.setImage(bitmap);
-
-        String recognizedText = baseApi.getUTF8Text();
+        //String whiteList = "ACEFJKLMNOPRSTU1234567890";                 // White list certain characters
+        //baseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, whiteList);  // Set the white list to baseApi
+        String recognizedText = baseApi.getUTF8Text();                  // extracts the text from the image
 
         baseApi.end();
 
         // You now have the text in recognizedText var, you can do anything with it.
-        // We will display a stripped out trimmed alpha-numeric version of it (if lang is eng)
+        // We will display a stripped out trimmed alpha-numeric version of it (if lang is eng [using swe now])
         // so that garbage doesn't make it to the display.
 
         Log.v(TAG, "OCRED TEXT: " + recognizedText);
 
+        String unmodifiedString = recognizedText;
+
         if (lang.equalsIgnoreCase("swe")) {
-            recognizedText = recognizedText.replaceAll("[^a-zA-Z0-9]+", " ");
+            recognizedText = recognizedText.replaceAll("[^A-Z0-9]+", " ");
         }
 
         recognizedText = recognizedText.trim();
 
-        if (recognizedText.length() != 0) {
+        String expirationDate = extractExpDate(recognizedText);
+        if(expirationDate == null) {
+            Log.e(TAG, "Failed to extract the expiration date");
+        } else {
+            // TODO: set the date as expiration date
+            Toast.makeText(context, "Expiration date: " + expirationDate, Toast.LENGTH_SHORT).show();
+        }
 
+        if (recognizedText.length() != 0) {
             // Create a progressDialog to display the text
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(recognizedText)
@@ -320,6 +330,52 @@ public class AddProductActivity extends ActionBarActivity {
         }
 
         // Cycle done.
+    }
+
+    /**
+     * Extracts the expiration date from a string (produced by Tesseract)
+     * @param text - extracted text from image
+     * @return - expiration date
+     */
+    private String extractExpDate(String text) {
+        Log.i(TAG, "Starting expiration date extraction in method extractExpDate");
+        String extractedDate = null;
+        String[] monthStrings = {"JAN","FEB","MAR","APR","MAJ","JUN","JUL","AUG","SEP","OKT","NOV","DEC"};
+        String yyyy, MM, dd;
+
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isDigit(c)) {
+                builder.append(c);
+            }
+        }
+        String digits = builder.toString();
+        if(digits.length() >= 8) {
+            dd = digits.substring(0, 2);
+            MM = digits.substring(2, 4);
+            yyyy = digits.substring(4, 8);
+        } else {
+            return null;
+        }
+
+        return yyyy + "-" + MM + "-" + dd;
+
+        // TODO: Extend the functionality to cover more advanced dates
+
+        /*
+        Spinner spinnerYear = (Spinner) findViewById(R.id.spinnerYear);
+        int numOfSpinnerItems = spinnerYear.getAdapter().getCount();
+        String[] allYears = new String[numOfSpinnerItems];
+
+        for(int i = 0; i < numOfSpinnerItems; i++) {
+            String tempYear = spinnerYear.getAdapter().getItem(i).toString();
+            if(text.contains(tempYear)) {
+                yyyy = Integer.parseInt(tempYear);
+                break;
+            }
+        }
+        */
     }
 
     class CreateNewProduct extends AsyncTask<String, String, String> {

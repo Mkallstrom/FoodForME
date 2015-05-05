@@ -21,7 +21,15 @@
             android:id="@+id/imageViewDraw"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/expiration_date_rectangle_128" />
+            android:src="@drawable/expiration_date_rectangle_separate_tiny" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageViewText"
+            android:src="@drawable/expiration_date_rectangle_separate_text_tiny"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/imageViewDraw" />
     </RelativeLayout>
 
     <LinearLayout

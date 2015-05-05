@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -177,7 +179,10 @@ public class CameraActivity extends Activity {
     OnClickListener captureListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            mCamera.takePicture(null, null, mPicture);
+            mCamera.takePicture(null, null, mPicture);                                              // take the picture
+            ImageView rectangle = (ImageView) findViewById(R.id.imageViewDraw);
+            rectangle.setImageResource(R.drawable.expiration_date_rectangle_separate_tiny_white);   // change the imageView to white stroked
+            Toast.makeText(myContext, "Cropping image and extracting the date...", Toast.LENGTH_LONG).show();
         }
     };
 
@@ -215,36 +220,6 @@ public class CameraActivity extends Activity {
         Bitmap croppedBmp = Bitmap.createBitmap(fullSizeBmp, startingWidth, startingHeight, rectWidth, rectHeight); // crops the image
 
         return bitmapToByteArray(croppedBmp);
-
-        /*
-        // ImageView calculations (the rectangle). The image placed in the ImageView is 226x141 px (height = 141, width = 226)
-        double removeTopRatio = 0.6;
-        double removeSideRatio = 0.7;
-        int imageViewHeight = findViewById(R.id.imageViewDraw).getHeight();
-        int imageViewWidth = findViewById(R.id.imageViewDraw).getWidth();
-
-        // Use the preview window width and height to calculate how much of the area is covered by the rectangle
-        double comparedHeight = ((double)imageViewHeight)/previewHeight;
-        double comparedWidth = ((double)imageViewWidth)/previewWidth;
-        int calculatedHeight = (int) (removeTopRatio*comparedHeight*height);
-        int calculatedWidth = (int) (removeSideRatio*comparedWidth*width);
-        // ------------------------------------------------------------------
-
-        //int inRectHeight = (int) (imageViewHeight - (removeTopRatio*imageViewHeight));  // height of the rectangle displayed in the camera preview. 96 px on the inside.
-        //int inRectWidth = imageViewWidth; // (int) (((double)199/226)*imageViewWidth);  // width of the rectangle displayed in the camera preview. 199 px on the inside.
-
-        int halfRectHeight = calculatedHeight / 2;
-        int halfRectWidth = calculatedWidth / 2;
-
-        int startingHeightFix = (int) (imageViewHeight*0.2);
-
-        int startingHeight = centerHeight - halfRectHeight + startingHeightFix; // used as offset
-        int startingWidth = centerWidth - halfRectWidth;    // used as offset
-
-        Bitmap croppedBmp = Bitmap.createBitmap(fullSizeBmp, startingWidth, startingHeight, calculatedWidth, calculatedHeight);
-
-        return bitmapToByteArray(croppedBmp);
-        */
     }
 
     private byte[] bitmapToByteArray(Bitmap bmp) {
