@@ -30,7 +30,7 @@ public class MainActivity extends ActionBarActivity {
 
     private Context context;
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip address for database
-    private static final String url_create_account = ip + "create_refrigerator.php"; //Create account
+    private static final String url_create_account = ip + "create_account.php"; //Create account
     JSONParser jsonParser = new JSONParser();
     //JSON names
     private static final String TAG_SUCCESS = "success";
@@ -112,18 +112,18 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item){
 
         switch(item.getItemId()){
-            case R.id.refrigerator_connect:
+            case R.id.account_connect:
                 //new connectToAccount().execute();
                 this.connectAccount();
                 return true;
-            case R.id.create_refrigerator:
+            case R.id.create_account:
                 createAccount();
                 return true;
             default:
                 return false;
 
-        }
-    }
+}
+}
 
     public void createAccount(){
         final Context context = this;

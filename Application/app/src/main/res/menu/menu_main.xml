@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/refrigerator_connect" android:title="@string/refrigerator_connect"
+    <item android:id="@+id/account_connect" android:title="@string/refrigerator_connect"
         android:orderInCategory="100" app:showAsAction="never" />
-    <item android:id="@+id/create_refrigerator" android:title="@string/create_refrigerator"
+    <item android:id="@+id/create_account" android:title="@string/create_refrigerator"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>
 

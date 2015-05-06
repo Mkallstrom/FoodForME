@@ -291,6 +291,7 @@ public class AccountDB extends Application {
         protected String doInBackground(String... params) {
             List<NameValuePair> insertparams = new ArrayList<>();
             insertparams.add(new BasicNameValuePair("name", name));
+            insertparams.add(new BasicNameValuePair("password", password));
             insertparams.add(new BasicNameValuePair("data", data));
             insertparams.add(new BasicNameValuePair("key", key));
             insertparams.add(new BasicNameValuePair("list", list));
@@ -385,6 +386,7 @@ public class AccountDB extends Application {
         protected String doInBackground(String... params) {
             List<NameValuePair> deleteparams = new ArrayList<>();
             deleteparams.add(new BasicNameValuePair("name", name));
+            deleteparams.add(new BasicNameValuePair("password", password));
             deleteparams.add(new BasicNameValuePair("key", key));
             deleteparams.add(new BasicNameValuePair("list", list));
             JSONObject json = jsonParser.makeHttpRequest(url_delete_product, "POST", deleteparams);
@@ -568,6 +570,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
+            indexParams.add(new BasicNameValuePair("password", password));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_get_index, "GET", indexParams);
@@ -626,6 +629,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
+            indexParams.add(new BasicNameValuePair("password", password));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
@@ -676,17 +680,21 @@ public class AccountDB extends Application {
             //Methods
             @Override
             protected String doInBackground(String... params) {
+                Log.d("VAD SOM HESLT", "TEXTER");
                 // Building Parameters
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
+                loadingParams.add(new BasicNameValuePair("password", password));
                 loadInventory();
                 Collections.sort(inventory);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
+                loadingParams.add(new BasicNameValuePair("password", password));
                 loadShoppingList();
                 Collections.sort(shoppingList);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
+                loadingParams.add(new BasicNameValuePair("password", password));
                 loadRequirements();
                 Log.d("AccountDB", "Finished loading products");
                 loadingProducts = false;
