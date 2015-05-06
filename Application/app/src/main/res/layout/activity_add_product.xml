@@ -79,9 +79,25 @@
             android:text="Expires"
             android:id="@+id/expiresCheck"
             android:background="@color/background_floating_material_light"
-            android:layout_weight="0.25"
+            android:layout_weight="0.30"
             android:checked="true"
             android:textSize="10dp" />
+
+        <Spinner
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinnerDay"
+            android:layout_weight="0.20"
+            android:spinnerMode="dropdown"
+            android:background="@color/background_floating_material_light" />
+
+        <Spinner
+            android:layout_width="25dp"
+            android:layout_height="match_parent"
+            android:id="@+id/spinnerMonth"
+            android:layout_weight="0.20"
+            android:spinnerMode="dropdown"
+            android:background="@color/background_floating_material_light" />
 
         <Spinner
             android:layout_width="25dp"
@@ -89,23 +105,7 @@
             android:id="@+id/spinnerYear"
             android:spinnerMode="dropdown"
             android:background="@color/background_floating_material_light"
-            android:layout_weight="0.25" />
-
-        <Spinner
-            android:layout_width="25dp"
-            android:layout_height="match_parent"
-            android:id="@+id/spinnerMonth"
-            android:layout_weight="0.25"
-            android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light" />
-
-        <Spinner
-            android:layout_width="25dp"
-            android:layout_height="match_parent"
-            android:id="@+id/spinnerDay"
-            android:layout_weight="0.25"
-            android:spinnerMode="dropdown"
-            android:background="@color/background_floating_material_light" />
+            android:layout_weight="0.30" />
 
     </LinearLayout>
 

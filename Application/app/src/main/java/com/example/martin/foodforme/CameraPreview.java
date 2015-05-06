@@ -67,13 +67,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         Camera.Parameters parameters = mCamera.getParameters();
         Camera.Size optimalSize = getOptimalPreviewSize(mSupportedPreviewSizes, getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
         if(optimalSize != null) {
-            Log.i(TAG, "Setting camera preview size to: " + optimalSize.toString());
+            Log.i(TAG, "Setting camera preview size to: " + optimalSize.width + "x" + optimalSize.height);
             parameters.setPreviewSize(optimalSize.width, optimalSize.height);
             if(mSupportedPictureSizes.contains(optimalSize)) {
-                Log.i(TAG, "Setting camera picture size to: " + optimalSize.toString());
+                Log.i(TAG, "Setting camera picture size to: " + optimalSize.width + "x" + optimalSize.height);
                 parameters.setPictureSize(optimalSize.width, optimalSize.height);           // This sets the picture size to the same as the preview size
             } else {
-                Log.e(TAG, "setPreviewAndPictureSize. Failed to set picture size to " + optimalSize.toString());
+                Log.e(TAG, "setPreviewAndPictureSize. Failed to set picture size to " + optimalSize.width + "x" + optimalSize.height);
             }
         } else {
             Log.e(TAG, "setPreviewAndPictureSize. optimalSize == null");
