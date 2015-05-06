@@ -321,15 +321,19 @@ public class MainActivity extends ActionBarActivity {
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle(accountDB.getUsername());
         progressDialog.setMessage("Loading products...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(3);
         progressDialog.show();
 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 accountDB.getProducts();
-                boolean loading = true;
-                while(loading){
-                    loading = accountDB.isLoadingProducts();
+                int loading = 0;
+                while(loading < 3){
+                    loading = accountDB.getLoadingProducts();
+                    progressDialog.setProgress(loading);
                 }
                 progressDialog.dismiss();
             }

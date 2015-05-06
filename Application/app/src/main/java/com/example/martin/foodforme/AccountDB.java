@@ -31,7 +31,7 @@ public class AccountDB extends Application {
     private int loadRequirements = 0;
     private ArrayAdapter inventoryAdapter, shoppinglistAdapter, requirementsAdapter;
     private int inventoryCounter = 0, shoppingListCounter = 0, requirementsCounter = 0;
-    private boolean loadingProducts = false;
+    private int loadingProducts = 3;
     private boolean gettingIndex = false;
     private boolean gettingIndexFailed = false;
     private int connection = 0; //1 successful, -1 failed, 0 nothing
@@ -63,7 +63,7 @@ public class AccountDB extends Application {
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
     public String getUsername() { return username; }
-    public boolean isLoadingProducts(){ return loadingProducts; }
+    public int getLoadingProducts(){ return loadingProducts; }
 
     public void setAdapter(String list, ArrayAdapter adapter){
         switch(list) {
@@ -700,7 +700,7 @@ public class AccountDB extends Application {
             protected void onPreExecute(){
                 clearProducts();
                 Log.d("AccountDB","Loading products");
-                loadingProducts = true;
+                loadingProducts = 0;
             }
             @Override
             protected void onPostExecute(String result){
@@ -715,17 +715,20 @@ public class AccountDB extends Application {
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadInventory();
                 Collections.sort(inventory);
+                loadingProducts++;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadShoppingList();
                 Collections.sort(shoppingList);
+                loadingProducts++;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadRequirements();
+                loadingProducts++;
                 Log.d("AccountDB", "Finished loading products");
-                loadingProducts = false;
+
                 return null;
             }
 
