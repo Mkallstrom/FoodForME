@@ -87,6 +87,8 @@ public class AddProductActivity extends ActionBarActivity {
     private static final String TAG_PRODUCT = "product";
     private static final String TAG_BARCODE = "barcode";
 
+    AccountDB accountDB;
+
     //Methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +96,9 @@ public class AddProductActivity extends ActionBarActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_add_product);
-        setTitle("Add Product");
         context = this;
+        accountDB = (AccountDB) getApplicationContext();
+        setTitle(accountDB.getUsername() + " - Add Product");
 
         String[] paths = new String[]{DATA_PATH, DATA_PATH + "tessdata/"};
         for (String path : paths) {

@@ -58,9 +58,12 @@ public class AccountDB extends Application {
         local = false;
         firstRun = true;
     }
+
     public ArrayList<Product> returnInventory(){ return inventory; }
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
+    public String getUsername() { return username; }
+    public boolean isLoadingProducts(){ return loadingProducts; }
 
     public void setAdapter(String list, ArrayAdapter adapter){
         switch(list) {
@@ -153,13 +156,11 @@ public class AccountDB extends Application {
     public void switchAccountOnPhone(String user, String password){
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
         SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.clear();
         accountEditor.putBoolean("active", true);
         accountEditor.putString("user", user);
         accountEditor.putString("password", password);
         accountEditor.commit();
-
-        //TODO is it enough to update username and password on phone like now? or we need to
-        //TODO update much more like products and remove the existing ones?
     }
 
     /**
@@ -206,9 +207,7 @@ public class AccountDB extends Application {
 
     }
 
-    public boolean isLoadingProducts(){
-        return loadingProducts;
-    }
+
 
     //__________*Inner class to connect and operate on database*_______________//
     private class ConnectDB extends AsyncTask<String, String, String> {
@@ -337,37 +336,31 @@ public class AccountDB extends Application {
 
     }
     public void removeProduct(Product p, String list){
-        switch(list){
-            case "inventory":
-                inventory.remove(p);
-                break;
-            case "shoppinglist":
-                shoppingList.remove(p);
-                break;
-            default:
-                requirements.remove(p);
-                break;
-        }
         if(local)
         {
             SharedPreferences.Editor editor;
             switch(list){
-                case("inventory"):
+                case "inventory":
                     editor = inventoryEditor;
+                    inventory.remove(p);
                     break;
-                case("shoppinglist"):
+                case "shoppinglist":
                     editor = shoppingEditor;
+                    shoppingList.remove(p);
+                    break;
+                case "requirements":
+                    editor = requiredEditor;
+                    requirements.remove(p);
                     break;
                 default:
-                    editor = requiredEditor;
-                    break;
+                    return;
             }
             editor.remove(p.getKey());
             editor.commit();
         }
         else
         {
-            deleteProduct dp = new deleteProduct(username,p.getKey(),list);
+            deleteProduct dp = new deleteProduct(username, password, p.getKey(),list);
             dp.execute();
         }
     }
@@ -377,11 +370,31 @@ public class AccountDB extends Application {
         String name;
         String key;
         String list;
+        String password;
 
-        public deleteProduct(String name, String key, String list){
+        public deleteProduct(String name, String password, String key, String list){
             this.name = name;
             this.key = key;
             this.list = list;
+            this.password = password;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            switch(list)
+            {
+                case "inventory":
+                    Collections.sort(inventory);
+                    inventoryAdapter.notifyDataSetChanged();
+                    break;
+                case "shoppinglist":
+                    Collections.sort(shoppingList);
+                    shoppinglistAdapter.notifyDataSetChanged();
+                    break;
+                case "requirements":
+                    requirementsAdapter.notifyDataSetChanged();
+                    break;
+            }
         }
 
         @Override
@@ -398,6 +411,18 @@ public class AccountDB extends Application {
                 if (success == 1) {
                     //successfully
                     Log.d("AccountDB", "success for delete product");
+                    switch(list)
+                    {
+                        case "inventory":
+                            inventory.remove(keyToProduct(key, inventory));
+                            break;
+                        case "shoppinglist":
+                            shoppingList.remove(keyToProduct(key, shoppingList));
+                            break;
+                        case "requirements":
+                            requirements.remove(keyToProduct(key, requirements));
+                            break;
+                    }
 
                 } else {
                     Log.d("AccountDB", "no success for delete product. Message: " + message);
@@ -558,6 +583,7 @@ public class AccountDB extends Application {
         private String list;
         private static final String TAG_SUCCESS = "success";
         private static final String USERNAME = "name";
+        private static final String PASSWORD = "password";
         private static final String INDEX = "index";
         private static final String LIST = "list";
         List<NameValuePair> indexParams;
@@ -572,7 +598,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
-            indexParams.add(new BasicNameValuePair("password", password));
+            indexParams.add(new BasicNameValuePair(PASSWORD, password));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_get_index, "GET", indexParams);
@@ -618,6 +644,7 @@ public class AccountDB extends Application {
         private String list;
         private static final String TAG_SUCCESS = "success";
         private static final String USERNAME = "name";
+        private static final String PASSWORD = "password";
         private static final String LIST = "list";
         List<NameValuePair> indexParams;
 
@@ -631,7 +658,7 @@ public class AccountDB extends Application {
             }
             indexParams = new ArrayList<>();
             indexParams.add(new BasicNameValuePair(USERNAME, username));
-            indexParams.add(new BasicNameValuePair("password", password));
+            indexParams.add(new BasicNameValuePair(PASSWORD, password));
             indexParams.add(new BasicNameValuePair(LIST, list));
 
             JSONObject json = jsonParser.makeHttpRequest(url_increase_index, "GET", indexParams);
@@ -665,6 +692,7 @@ public class AccountDB extends Application {
             private JSONParser jsonParser = new JSONParser();
             private static final String TAG_SUCCESS = "success";
             private static final String USERNAME = "name";
+            private static final String PASSWORD = "password";
             private static final String LIST = "list";
             List<NameValuePair> loadingParams;
 
@@ -676,31 +704,28 @@ public class AccountDB extends Application {
             }
             @Override
             protected void onPostExecute(String result){
-
-
             }
             //Methods
             @Override
             protected String doInBackground(String... params) {
-                Log.d("VAD SOM HESLT", "TEXTER");
+                Log.d("getProducts", "Initiating product loading...");
                 // Building Parameters
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
-                loadingParams.add(new BasicNameValuePair("password", password));
+                loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadInventory();
                 Collections.sort(inventory);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
-                loadingParams.add(new BasicNameValuePair("password", password));
+                loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadShoppingList();
                 Collections.sort(shoppingList);
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
-                loadingParams.add(new BasicNameValuePair("password", password));
+                loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadRequirements();
                 Log.d("AccountDB", "Finished loading products");
                 loadingProducts = false;
-
                 return null;
             }
 
@@ -836,6 +861,15 @@ public class AccountDB extends Application {
 
     public int getConnection(){
         return connection;
+    }
+
+    private Product keyToProduct (String key, ArrayList<Product> list)
+    {
+                for (Product p : list)
+                {
+                    if(p.getKey() == key) return p;
+                }
+        return null;
     }
 
 }

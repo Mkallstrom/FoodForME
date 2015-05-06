@@ -7,10 +7,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,11 +26,14 @@ import java.util.Map;
  */
 public class NotifyService extends Service {
 
+    boolean local;
     ArrayList<Product> inventoryList = new ArrayList<>();
     ArrayList<Product> expiringProducts = new ArrayList<>();
-    String title, details = "";
-    int today = 0, tomorrow = 0, dayAfterTomorrow = 0;
+    String title, details = "", username, password;
+    int today = 0, tomorrow = 0, dayAfterTomorrow = 0, inventoryLoader = 0;
     private final static String TAG = "Notifications";
+    private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
+    private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -34,9 +45,22 @@ public class NotifyService extends Service {
         super.onCreate();
 
         Log.v(TAG, "Service started");
+        SharedPreferences account = getSharedPreferences("account", MODE_PRIVATE);
+        local = !account.getBoolean("active", false);
+        if(!local) {
+            username = account.getString("user", "No user was found!");
+            password = account.getString("password", "No password found!");
+        }
         buildList();                                        // Make list of expiring products.
-        buildText();                                        // Make title and detail strings for the notification.
-        if (!expiringProducts.isEmpty()) sendNotification();// Send notification.
+        if(local | inventoryLoader == 1)
+        {
+            Log.d("Service", "Building text for notification");
+            buildText();                                        // Make title and detail strings for the notification.
+        }
+        if (!expiringProducts.isEmpty()) {
+            Log.d("Service", "Sending notification");
+            sendNotification();// Send notification.
+        }
         Log.v(TAG, "Service stopped");
         stopSelf();
     }
@@ -44,7 +68,7 @@ public class NotifyService extends Service {
 
     public void sendNotification()
     {
-        Intent targetIntent = new Intent(this, InventoryActivity.class);
+        Intent targetIntent = new Intent(this, MainActivity.class);
         @SuppressWarnings("deprecation")
         Notification noti = new Notification.Builder(this)
                 .setAutoCancel(true)
@@ -74,7 +98,9 @@ public class NotifyService extends Service {
     {
         for(Product p : inventoryList)
         {
+            Log.d("buildText","Found product " + p.toString() + " which is expiring in " + p.daysUntilExpired());
             if(p.daysUntilExpired() >= 0 && p.daysUntilExpired() < 3) {
+                Log.d("buildText", "Adding to expiring products: " + p.toString());
                 expiringProducts.add(p);
                 switch (p.daysUntilExpired())
                 {
@@ -107,14 +133,79 @@ public class NotifyService extends Service {
     }
     public void buildList()
     {
-        SharedPreferences inventorySP = getSharedPreferences("inventorySP",0);
-        Map<String,?> keys = inventorySP.getAll();
-        for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
-            {
-                inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+        if(local)
+        {
+            SharedPreferences inventorySP = getSharedPreferences("inventorySP", 0);
+            Map<String, ?> keys = inventorySP.getAll();
+            for (Map.Entry<String, ?> entry : keys.entrySet()) {
+                if (!entry.getKey().equals("index")) {
+                    inventoryList.add(parseSharedPreferences(entry.getValue().toString(), entry.getKey()));
+                }
             }
         }
+        else
+        {
+            new loadProducts().execute();
+            while(inventoryLoader == 0){}
+        }
     }
+    private class loadProducts extends AsyncTask<String, String, String>
+    {
+        private JSONParser jsonParser = new JSONParser();
+        private static final String TAG_SUCCESS = "success";
+        private static final String USERNAME = "name";
+        private static final String PASSWORD = "password";
+        private static final String LIST = "list";
+        List<NameValuePair> loadingParams;
 
+        @Override
+        protected void onPreExecute(){
+            Log.d("NotifyService","Loading inventory");
+            inventoryLoader = 0;
+        }
+        @Override
+        protected void onPostExecute(String result){
+        }
+        //Methods
+        @Override
+        protected String doInBackground(String... params) {
+            Log.d("getProducts", "Initiating product loading...");
+            // Building Parameters
+            loadingParams = new ArrayList<>();
+            loadingParams.add(new BasicNameValuePair(USERNAME, username));
+            loadingParams.add(new BasicNameValuePair(PASSWORD, password));
+            loadingParams.add(new BasicNameValuePair(LIST, "inventory"));
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
+
+            if(json == null){
+                inventoryLoader = -1;
+                return null; //Failed HTTP request
+            }
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for get inventory");
+                    JSONArray productObj = json
+                            .getJSONArray("inventory"); // JSON Array
+                    for(int i = 0; i < productObj.length(); i++) {
+                        JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
+                        Log.d("AccountDB", "Adding product to inventory: " + product.getString("data"));
+                        inventoryList.add(parseSharedPreferences(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
+                    }
+                    inventoryLoader = 1;
+                } else {
+                    Log.d("AccountDB", "no success for get inventory");
+                    inventoryLoader = -1;
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
 }

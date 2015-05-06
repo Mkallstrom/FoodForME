@@ -48,9 +48,9 @@ public class InventoryActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
         Context context = this;
-        setTitle("Inventory");
-
         accountDB = (AccountDB) getApplicationContext();
+        setTitle(accountDB.getUsername() + "'s Inventory");
+
         inventoryList = accountDB.returnInventory();
         shoppingList = accountDB.returnShoppingList();
         requiredList = accountDB.returnRequirements();
@@ -260,15 +260,16 @@ public class InventoryActivity extends ActionBarActivity {
     private void setAlarm()
     {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 16);
+        /*if(calendar.get(Calendar.HOUR)>=4){
+            calendar.add(Calendar.DATE, 1);
+        }*/
+        calendar.set(Calendar.AM_PM, Calendar.PM);
+        calendar.set(Calendar.HOUR, 4);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
-        if(calendar.get(Calendar.HOUR)>=16){ calendar.add(Calendar.DATE, 1);}
-
         Intent serviceIntent = new Intent(this, NotifyService.class);
         PendingIntent pi = PendingIntent.getService(this, 131313, serviceIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
-
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Long nextAlarm = calendar.getTimeInMillis();
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);

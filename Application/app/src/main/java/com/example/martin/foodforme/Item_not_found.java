@@ -11,11 +11,14 @@ import android.widget.TextView;
 
 public class Item_not_found extends ActionBarActivity {
 
+    AccountDB accountDB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_not_found);
-        setTitle("Product Not Found");
+        accountDB = (AccountDB) getApplicationContext();
+        setTitle(accountDB.getUsername() + " - Product not found");
         TextView tv = (TextView)findViewById(R.id.productName);
         tv.requestFocus();
     }

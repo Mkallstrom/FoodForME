@@ -39,7 +39,6 @@ public class MainActivity extends ActionBarActivity {
 
     ProgressDialog progressDialog;
 
-
     AccountDB accountDB;
 
 
@@ -58,24 +57,8 @@ public class MainActivity extends ActionBarActivity {
             String username = account.getString("user", "No user was found!");
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setTitle(username);
-            progressDialog.setMessage("Loading products...");
-            progressDialog.show();
-
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    accountDB.getProducts();
-                    boolean loading = true;
-                    while(loading){
-                        loading = accountDB.isLoadingProducts();
-                    }
-                    progressDialog.dismiss();
-                }
-            };
-
-            new Thread(runnable).start();
+            setTitle(username);
+            loadProducts();
 
         }
         else
@@ -150,8 +133,10 @@ public class MainActivity extends ActionBarActivity {
                         String loginPassword = password.getText().toString();
                         SaveAccount sa = new SaveAccount();
                         sa.execute(new String[]{loginName, loginPassword});
+                        createDialog(loginName);
                         while (sa.getCreatedAcc() == 0) {
                         }
+                        progressDialog.dismiss();
                         if (sa.getCreatedAcc() == 1) {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
@@ -172,6 +157,12 @@ public class MainActivity extends ActionBarActivity {
                 .show();
     }
 
+    private void createDialog(String name){
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle(name);
+        progressDialog.setMessage("Creating account...");
+        progressDialog.show();
+    }
 
     /**
      * Store the account info on phone
@@ -185,7 +176,6 @@ public class MainActivity extends ActionBarActivity {
         accountEditor.putString("user", username);
         accountEditor.putString("password", password);
         accountEditor.commit();
-
     }
 
 
@@ -305,7 +295,9 @@ public class MainActivity extends ActionBarActivity {
                         }
                         if (ca.getConnect() == 1) {
                             storeAccountOnPhone(loginName,loginPassword);
+                            loadProducts();
                             InfoDialog info = new InfoDialog("You are now connected to " + loginName + ".", context);
+                            setTitle(loginName);
                             info.message();
                             return;
                         }
@@ -325,6 +317,27 @@ public class MainActivity extends ActionBarActivity {
                 .show();
     }
 
+    private void loadProducts(){
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle(accountDB.getUsername());
+        progressDialog.setMessage("Loading products...");
+        progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.getProducts();
+                boolean loading = true;
+                while(loading){
+                    loading = accountDB.isLoadingProducts();
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
+    }
+
     //___________*Connect to account*_________//
     public class ConnectToAccount extends AsyncTask<String, String, String> {
         private int connect = 0; //0 waiting no result. 1 successfully connected. 0 Failed to connect
@@ -340,29 +353,20 @@ public class MainActivity extends ActionBarActivity {
         protected String doInBackground(String... args) {
             existInDB(args[0], args[1]);
             return null;
-
         }
 
         public boolean existInDB(String user, String pass){
-            Log.d("existsInDB", "Starting existInDB");
             accountDB.resetConnection();
-            Log.d("existsInDB", "Done resetConnection");
             accountDB.existAccountInDatabase(user, pass);
-            Log.d("existsInDB", "Done existAccountInDatabase");
             int existsInDBConnection = 0;
             while(existsInDBConnection == 0) {
                 existsInDBConnection = accountDB.getConnection();
                 Log.d("existsInDB", "Waiting for connection");
             }
-            if(existsInDBConnection == 1){
+            if(existsInDBConnection == 1) {
                 //success to locate account
                 accountDB.switchAccountOnPhone(user, pass);
                 accountDB.connected(user, pass);
-                accountDB.getProducts();
-                boolean loading = true;
-                while(loading){
-                    loading = accountDB.isLoadingProducts();
-                }
                 connect = 1;
                 return true;
             }

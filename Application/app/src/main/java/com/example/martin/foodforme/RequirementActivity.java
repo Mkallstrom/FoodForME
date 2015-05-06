@@ -30,8 +30,8 @@ public class RequirementActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_requirement);
         Context context = this;
-        setTitle("Requirements");
         accountDB = (AccountDB) getApplicationContext();
+        setTitle(accountDB.getUsername() + "'s Requirements");
 
         requiredList = accountDB.returnRequirements();
 
