@@ -314,15 +314,17 @@ public class AddProductActivity extends ActionBarActivity {
         String expirationDate = extractExpDate(recognizedText);
         if(expirationDate == null) {
             Log.e(TAG, "Failed to extract the expiration date");
+            Toast.makeText(context, "Could not extract the date. Please try again or set it manually.", Toast.LENGTH_SHORT).show();
         } else {
             // TODO: set the date as expiration date
-            Toast.makeText(context, "Expiration date: " + expirationDate, Toast.LENGTH_SHORT).show();
+            int[] parsedDate = Product.dateStringToArray(expirationDate);
+            setSpinnerDate(parsedDate);
         }
 
         if (recognizedText.length() != 0) {
             // Create a progressDialog to display the text
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(recognizedText)
+            builder.setMessage("Tesseract: " + recognizedText)
                     .setCancelable(false)
                     .setPositiveButton("OK", null);
             AlertDialog alert = builder.create();
@@ -338,8 +340,7 @@ public class AddProductActivity extends ActionBarActivity {
      * @return - expiration date
      */
     private String extractExpDate(String text) {
-        Log.i(TAG, "Starting expiration date extraction in method extractExpDate");
-        String extractedDate = null;
+        Log.i("extractExpDate", "Starting expiration date extraction in method extractExpDate");
         String[] monthStrings = {"JAN","FEB","MAR","APR","MAJ","JUN","JUL","AUG","SEP","OKT","NOV","DEC"};
         String yyyy, MM, dd;
 
@@ -351,31 +352,39 @@ public class AddProductActivity extends ActionBarActivity {
             }
         }
         String digits = builder.toString();
-        if(digits.length() >= 8) {
+        if(digits.length() >= 8) {              // date format: dd MM yyyy
             dd = digits.substring(0, 2);
             MM = digits.substring(2, 4);
             yyyy = digits.substring(4, 8);
-        } else {
+        } else if(digits.length() == 6){        // date format: dd MM yy
+            dd = digits.substring(0, 2);
+            MM = digits.substring(2, 4);
+            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+            yyyy = Integer.toString(thisYear).substring(0,2) + digits.substring(4, 6);
+        }else {
             return null;
         }
 
-        return yyyy + "-" + MM + "-" + dd;
+        String extractedDateString = yyyy + "-" + MM + "-" + dd;
+        Log.d("extractExpDate", "extracted date: " + extractedDateString);
+        return extractedDateString;
 
         // TODO: Extend the functionality to cover more advanced dates
+    }
 
-        /*
-        Spinner spinnerYear = (Spinner) findViewById(R.id.spinnerYear);
-        int numOfSpinnerItems = spinnerYear.getAdapter().getCount();
-        String[] allYears = new String[numOfSpinnerItems];
+    private void setSpinnerDate(int[] date) {
+        int year = date[0];
+        int month = date[1];
+        int day = date[2];
 
-        for(int i = 0; i < numOfSpinnerItems; i++) {
-            String tempYear = spinnerYear.getAdapter().getItem(i).toString();
-            if(text.contains(tempYear)) {
-                yyyy = Integer.parseInt(tempYear);
-                break;
-            }
+        try {
+            setSpinnerYear(year);
+            setSpinnerMonth(month);
+            setSpinnerDay(day);
+            Log.d("setSpinnerDate", "Date successfully set to: Day: " + day + ", Month: " + month + ", Year: " + year);
+        } catch (Exception e) {
+            Log.e("setSpinnerDate", e.getMessage());
         }
-        */
     }
 
     class CreateNewProduct extends AsyncTask<String, String, String> {
@@ -669,7 +678,17 @@ public class AddProductActivity extends ActionBarActivity {
         finish();
     }
 
-    // Extracts the expiration date set by the user
+    public void clickedConnection(View view) {
+        CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+        checkBox.toggle();
+        if (checkBox.isChecked()) {
+            Toast.makeText(context, "You are connected to the database", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Extracts the expiration date set in the spinners
     private String expDateString() {
         Spinner spinner = (Spinner) findViewById(R.id.spinnerYear);
         String selectedYear = spinner.getSelectedItem().toString();
@@ -718,13 +737,50 @@ public class AddProductActivity extends ActionBarActivity {
         spinDay.setSelection(thisDay);
     }
 
-    public void clickedConnection(View view) {
-        CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
-        checkBox.toggle();
-        if (checkBox.isChecked()) {
-            Toast.makeText(context, "You are connected to the database", Toast.LENGTH_SHORT).show();
+    private void setSpinnerDay(int day) throws Exception{
+        Spinner spinnerDay = (Spinner) findViewById(R.id.spinnerDay);
+        int numOfSpinnerItems = spinnerDay.getAdapter().getCount();
+        if(day >= 1 && day <= 31) {
+            for (int i = 0; i < numOfSpinnerItems; i++) {
+                int tempDay = Integer.parseInt(spinnerDay.getAdapter().getItem(i).toString());
+                if (day == tempDay) {
+                    spinnerDay.setSelection(i);
+                }
+            }
         } else {
-            Toast.makeText(context, "You are not connected to the database", Toast.LENGTH_SHORT).show();
+            throw new Exception("Could not set day: " + day);
+        }
+    }
+
+    private void setSpinnerMonth(int month) throws Exception {
+        Spinner spinnerMonth = (Spinner) findViewById(R.id.spinnerMonth);
+        int numOfSpinnerItems = spinnerMonth.getAdapter().getCount();
+        if(month >= 1 && month <= 12) {
+            for (int i = 0; i < numOfSpinnerItems; i++) {
+                int tempMonth = Integer.parseInt(spinnerMonth.getAdapter().getItem(i).toString());
+                if (month == tempMonth) {
+                    spinnerMonth.setSelection(i);
+                }
+            }
+        } else {
+            throw new Exception("Could not set month: " + month);
+        }
+    }
+
+    private void setSpinnerYear(int year) throws Exception {
+        Spinner spinnerYear = (Spinner) findViewById(R.id.spinnerYear);
+        int numOfSpinnerItems = spinnerYear.getAdapter().getCount();
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        int lastAcceptedYear = Integer.parseInt(spinnerYear.getAdapter().getItem(numOfSpinnerItems - 1).toString());
+        if(year >= thisYear && year <= lastAcceptedYear) {
+            for (int i = 0; i < numOfSpinnerItems; i++) {
+                int tempYear = Integer.parseInt(spinnerYear.getAdapter().getItem(i).toString());
+                if (year == tempYear) {
+                    spinnerYear.setSelection(i);
+                }
+            }
+        } else {
+            throw new Exception("Could not set year: " + year);
         }
     }
 

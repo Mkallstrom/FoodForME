@@ -174,7 +174,7 @@ public class Product implements Comparable<Product>{
      * @param date  A date in the format "year-month-day" (yyyy-MM-dd).
      * @return      if successful int array [year,month,day], else [0,0,0]
      */
-    private int[] dateStringToArray(String date) {
+    public static int[] dateStringToArray(String date) {
         try {
             String[] splitDate = date.split("-");
             int parsedYear = Integer.parseInt(splitDate[0]);

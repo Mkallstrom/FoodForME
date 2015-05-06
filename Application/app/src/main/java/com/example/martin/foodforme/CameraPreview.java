@@ -61,27 +61,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void setPreviewAndPictureSize() {
-        // supported preview sizes
-        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes();
-        for(Camera.Size str: mSupportedPreviewSizes)
-            Log.d(TAG, "Preview size: " + str.width + "/" + str.height);
-
-        mSupportedPictureSizes = mCamera.getParameters().getSupportedPictureSizes();
-        for(Camera.Size str: mSupportedPictureSizes)
-            Log.d(TAG, "Picture size: " + str.width + "/" + str.height);
+        mSupportedPreviewSizes = mCamera.getParameters().getSupportedPreviewSizes(); // supported camera preview sizes
+        mSupportedPictureSizes = mCamera.getParameters().getSupportedPictureSizes(); // supported camera picture sizes
 
         Camera.Parameters parameters = mCamera.getParameters();
         Camera.Size optimalSize = getOptimalPreviewSize(mSupportedPreviewSizes, getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
         if(optimalSize != null) {
+            Log.i(TAG, "Setting camera preview size to: " + optimalSize.toString());
             parameters.setPreviewSize(optimalSize.width, optimalSize.height);
+            if(mSupportedPictureSizes.contains(optimalSize)) {
+                Log.i(TAG, "Setting camera picture size to: " + optimalSize.toString());
+                parameters.setPictureSize(optimalSize.width, optimalSize.height);           // This sets the picture size to the same as the preview size
+            } else {
+                Log.e(TAG, "setPreviewAndPictureSize. Failed to set picture size to " + optimalSize.toString());
+            }
         } else {
             Log.e(TAG, "setPreviewAndPictureSize. optimalSize == null");
-        }
-
-        if(mSupportedPictureSizes.contains(optimalSize)) {
-            parameters.setPictureSize(optimalSize.width, optimalSize.height);           // This sets the picture size to the same as the preview size
-        } else {
-            Log.e(TAG, "setPreviewAndPictureSize. Failed to set picture size to " + optimalSize.toString());
         }
 
         mCamera.setParameters(parameters);
