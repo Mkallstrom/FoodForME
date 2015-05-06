@@ -299,7 +299,10 @@ public class MainActivity extends ActionBarActivity {
                         ConnectToAccount ca = new ConnectToAccount();
                         ca.execute(new String[]{loginName, loginPassword});
                         ca.resetConnect();
-                        while (ca.getConnect() == 0){}
+                        int connectionState = ca.getConnect();
+                        while (connectionState == 0){
+                            connectionState = ca.getConnect();
+                        }
                         if (ca.getConnect() == 1) {
                             storeAccountOnPhone(loginName,loginPassword);
                             InfoDialog info = new InfoDialog("You are now connected to " + loginName + ".", context);

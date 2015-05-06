@@ -189,7 +189,9 @@ public class AccountDB extends Application {
 
             if (success == 1) {
                 //successfully
+                Log.d("AccountDB", "connection successful with " + username + ":" + password);
                 connection = 1; //Account was OK
+
                 return true;
             } else {
                 //failed
@@ -708,6 +710,10 @@ public class AccountDB extends Application {
                 // getting JSON Object
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
+
+                if(json == null){
+                    return -1; //Failed HTTP request
+                }
                 // check for success tag
                 try {
                     int success = json.getInt(TAG_SUCCESS);
@@ -738,6 +744,9 @@ public class AccountDB extends Application {
                 // getting JSON Object
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
+                if(json == null){
+                    return -1; //Failed HTTP request
+                }
                 // check for success tag
                 try {
                     int success = json.getInt(TAG_SUCCESS);
@@ -768,6 +777,9 @@ public class AccountDB extends Application {
                 // getting JSON Object
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
+                if(json == null){
+                    return -1; //Failed HTTP request
+                }
                 // check for success tag
                 try {
                     int success = json.getInt(TAG_SUCCESS);
