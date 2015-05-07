@@ -55,7 +55,12 @@ public class AccountDB extends Application {
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
-        local = false;
+        if(connection == 1){
+            local = false;
+        }
+        if(connection == -1) {
+            local = true;
+        }
         firstRun = true;
     }
 
