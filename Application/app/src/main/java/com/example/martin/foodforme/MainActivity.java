@@ -102,11 +102,28 @@ public class MainActivity extends ActionBarActivity {
             case R.id.create_account:
                 createAccount();
                 return true;
+            case R.id.disconnect:
+                disconnect();
+                return true;
+            case R.id.copy_to_local:
+                copyToLocal();
+                return true;
             default:
                 return false;
 
 }
 }
+    public void copyToLocal(){
+        accountDB.copyToLocal();
+    }
+    public void disconnect(){
+        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+        SharedPreferences.Editor accountEditor = account.edit();
+        accountEditor.clear();
+        accountEditor.commit();
+        setTitle("FoodForME");
+        accountDB.disconnect();
+    }
 
     public void createAccount(){
         final Context context = this;
@@ -134,10 +151,12 @@ public class MainActivity extends ActionBarActivity {
                         SaveAccount sa = new SaveAccount();
                         sa.execute(new String[]{loginName, loginPassword});
                         createDialog(loginName);
-                        while (sa.getCreatedAcc() == 0) {
+                        int savingAccount = 0;
+                        while (savingAccount == 0) {
+                            savingAccount = sa.getCreatedAcc();
                         }
                         progressDialog.dismiss();
-                        if (sa.getCreatedAcc() == 1) {
+                        if (savingAccount == 1) {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
                             info.message();

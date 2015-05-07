@@ -7,5 +7,9 @@
         android:orderInCategory="100" app:showAsAction="never" />
     <item android:id="@+id/create_account" android:title="Create account"
         android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/disconnect" android:title="Disconnect"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/copy_to_local" android:title="Copy to local"
+        android:orderInCategory="100" app:showAsAction="never" />
 </menu>
 

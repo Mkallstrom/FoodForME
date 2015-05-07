@@ -98,7 +98,8 @@ public class AddProductActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_product);
         context = this;
         accountDB = (AccountDB) getApplicationContext();
-        setTitle(accountDB.getUsername() + " - Add Product");
+        if(!accountDB.isLocal()) setTitle(accountDB.getUsername() + " - Add Product");
+        else setTitle("Add Product");
 
         String[] paths = new String[]{DATA_PATH, DATA_PATH + "tessdata/"};
         for (String path : paths) {

@@ -63,6 +63,7 @@ public class AccountDB extends Application {
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
     public String getUsername() { return username; }
+    public boolean isLocal(){ return local; }
     public int getLoadingProducts(){ return loadingProducts; }
 
     public void setAdapter(String list, ArrayAdapter adapter){
@@ -84,6 +85,49 @@ public class AccountDB extends Application {
     public void storeProducts() {
         Log.d("AccountDB", "attempting storeproducts with connection being: " + connection);
         if(connection==1) new SaveProducts().execute();
+    }
+
+    public void disconnect(){
+        local = true;
+        firstRun = false;
+        clearProducts();
+        loadSharedPreferences();
+    }
+
+    public void copyToLocal(){
+        inventorySP = getSharedPreferences("inventorySP", 0);
+        requiredSP = getSharedPreferences("requiredSP", 0);
+        shoppingSP = getSharedPreferences("shoppingSP", 0);
+        inventoryEditor = inventorySP.edit();
+        shoppingEditor = shoppingSP.edit();
+        requiredEditor = requiredSP.edit();
+        inventoryEditor.clear();
+        shoppingEditor.clear();
+        requiredEditor.clear();
+        loadIndex("inventory");
+        while(gettingIndex){}
+        if(gettingIndexFailed) return;
+        loadIndex("shoppinglist");
+        while(gettingIndex){}
+        if(gettingIndexFailed) return;
+        loadIndex("requirements");
+        while(gettingIndex){}
+        if(gettingIndexFailed) return;
+        inventoryEditor.putString("index", Integer.toString(indexInventory));
+        shoppingEditor.putString("index", Integer.toString(indexShoppingList));
+        requiredEditor.putString("index", Integer.toString(indexRequirements));
+        for(Product p : inventory){
+            inventoryEditor.putString(p.getKey(),p.toString());
+        }
+        for(Product p : shoppingList){
+            shoppingEditor.putString(p.getKey(),p.toString());
+        }
+        for(Product p : requirements){
+            requiredEditor.putString(p.getKey(),p.toString());
+        }
+        inventoryEditor.commit();
+        shoppingEditor.commit();
+        requiredEditor.commit();
     }
 
     public void loadSharedPreferences(){
@@ -276,15 +320,21 @@ public class AccountDB extends Application {
             switch(list)
             {
                 case "inventory":
-                    Collections.sort(inventory);
-                    inventoryAdapter.notifyDataSetChanged();
+                    if(inventoryAdapter!=null) {
+                        Collections.sort(inventory);
+                        inventoryAdapter.notifyDataSetChanged();
+                    }
                     break;
                 case "shoppinglist":
-                    Collections.sort(shoppingList);
-                    shoppinglistAdapter.notifyDataSetChanged();
+                    if(shoppinglistAdapter!=null) {
+                        Collections.sort(shoppingList);
+                        shoppinglistAdapter.notifyDataSetChanged();
+                    }
                     break;
                 case "requirements":
-                    requirementsAdapter.notifyDataSetChanged();
+                    if(requirementsAdapter!=null) {
+                        requirementsAdapter.notifyDataSetChanged();
+                    }
                     break;
             }
         }

@@ -37,7 +37,8 @@ public class ShoppingListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_shopping_list);
         Context context = this;
         accountDB = (AccountDB) getApplicationContext();
-        setTitle(accountDB.getUsername() + "'s Shopping List");
+        if(!accountDB.isLocal())setTitle(accountDB.getUsername() + "'s Shopping List");
+        else setTitle("Shopping List");
 
         inventoryList = accountDB.returnInventory();
         shoppingList = accountDB.returnShoppingList();

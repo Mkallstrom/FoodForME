@@ -49,7 +49,8 @@ public class InventoryActivity extends ActionBarActivity {
         setContentView(R.layout.activity_inventory);
         Context context = this;
         accountDB = (AccountDB) getApplicationContext();
-        setTitle(accountDB.getUsername() + "'s Inventory");
+        if(!accountDB.isLocal())setTitle(accountDB.getUsername() + "'s Inventory");
+        else setTitle("Inventory");
 
         inventoryList = accountDB.returnInventory();
         shoppingList = accountDB.returnShoppingList();
