@@ -179,6 +179,9 @@ public class CameraActivity extends Activity {
     OnClickListener captureListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
+            Button captureButton = (Button) findViewById(R.id.button_capture);
+            captureButton.setEnabled(false);
+            captureButton.setClickable(false);                                                      // do not let the user click again, which would cause an exception
             mCamera.takePicture(null, null, mPicture);                                              // take the picture
             ImageView rectangle = (ImageView) findViewById(R.id.imageViewDraw);
             rectangle.setImageResource(R.drawable.expiration_date_rectangle_separate_tiny_white);   // change the imageView to white stroked
