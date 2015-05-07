@@ -66,11 +66,14 @@ public class AccountDB extends Application {
 
     /**
      * Check if there was a connection setup and then
-     * set the local to false;
+     * set the local to correct value;
      */
     public void checkLocal(){
         if(connection == 1){
             local = false;
+        }
+        if(connection == -1 || connection == 0){
+            local = true;
         }
     }
 
