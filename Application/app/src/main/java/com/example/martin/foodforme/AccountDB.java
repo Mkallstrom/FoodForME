@@ -114,6 +114,7 @@ public class AccountDB extends Application {
         firstRun = false;
         clearProducts();
         loadSharedPreferences();
+        connection = 0;
     }
 
     public void copyToLocal(){
