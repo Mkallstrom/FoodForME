@@ -37,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
     private static final String USERNAME = "name";
     private static final String PASSWORD = "password";
 
-    private boolean firstRun= false; //False if first time true if runned before
+    private boolean firstRun = true; //False if first time true if runned before
 
     ProgressDialog progressDialog;
 
@@ -60,9 +60,9 @@ public class MainActivity extends ActionBarActivity {
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
             setTitle(username);
-            if(firstRun == false){
+            if(firstRun){
                 loadProducts();
-                firstRun = true;
+                firstRun = false;
             }
 
 
