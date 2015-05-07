@@ -77,16 +77,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void toInventory(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
     }
 
     public void toList(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, ShoppingListActivity.class);
         startActivity(intent);
     }
 
     public void toRequirement(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, RequirementActivity.class);
         startActivity(intent);
     }

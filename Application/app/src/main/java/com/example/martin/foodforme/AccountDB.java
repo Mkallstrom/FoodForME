@@ -64,6 +64,16 @@ public class AccountDB extends Application {
         firstRun = true;
     }
 
+    /**
+     * Check if there was a connection setup and then
+     * set the local to false;
+     */
+    public void checkLocal(){
+        if(connection == 1){
+            local = false;
+        }
+    }
+
     public ArrayList<Product> returnInventory(){ return inventory; }
     public ArrayList<Product> returnShoppingList(){ return shoppingList; }
     public ArrayList<Product> returnRequirements(){ return requirements; }
