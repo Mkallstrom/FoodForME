@@ -60,7 +60,7 @@ public class MainActivity extends ActionBarActivity {
             String password = account.getString("password", "No password found!");
             accountDB.setDetails(username, password);
             setTitle(username);
-            if(firstRun){
+            if(firstRun == false){
                 loadProducts();
                 firstRun = true;
             }
