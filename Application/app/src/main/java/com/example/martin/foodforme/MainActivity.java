@@ -250,6 +250,7 @@ public class MainActivity extends ActionBarActivity {
                 if (success == 1) {
                     // successfully created product
                     createdAcc = 1; //Account been created
+                    accountDB.setLocal(false);
                     int oldConnection = accountDB.getConnection();
                     storeAccountOnPhone(username,password);
                     accountDB.connected(username,password);

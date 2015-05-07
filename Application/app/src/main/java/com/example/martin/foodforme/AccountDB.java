@@ -82,6 +82,10 @@ public class AccountDB extends Application {
         }
     }
 
+    public void setLocal(Boolean bool){
+        local = bool;
+    }
+
     public void storeProducts() {
         Log.d("AccountDB", "attempting storeproducts with connection being: " + connection);
         if(connection==1) new SaveProducts().execute();
