@@ -284,6 +284,11 @@ public class AccountDB extends Application {
             // getting JSON Object
             // Note that create product url accepts POST method
             JSONObject json = jsonParser.makeHttpRequest(url_check_account, "GET", params);
+
+            if(json == null){
+                connection = -1;
+                return;
+            }
             // check for success tag
             try {
                 int success = json.getInt(TAG_SUCCESS);
@@ -368,6 +373,67 @@ public class AccountDB extends Application {
                             break;
                         case "requirements":
                             requirements.add(parseProduct(data, key));
+                            requirementsCounter--;
+                            if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
+                            break;
+                    }
+
+                } else {
+                    Log.d("AccountDB", "no success for add product. Message: " + message);
+                    //failed
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+    }
+    public class SaveProduct extends AsyncTask<String, String, String>{
+
+        String name;
+        String data;
+        String key;
+        String list;
+
+        public SaveProduct(String name, String data, String key, String list){
+            this.name = name;
+            this.data = data;
+            this.key = key;
+            this.list = list;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            List<NameValuePair> insertparams = new ArrayList<>();
+            insertparams.add(new BasicNameValuePair("name", name));
+            insertparams.add(new BasicNameValuePair("password", password));
+            insertparams.add(new BasicNameValuePair("data", data));
+            insertparams.add(new BasicNameValuePair("key", key));
+            insertparams.add(new BasicNameValuePair("list", list));
+            JSONObject json = jsonParser.makeHttpRequest(url_add_product, "POST", insertparams);
+            try {
+                int success = json.getInt("success");
+                String message = json.getString("message");
+                if (success == 1) {
+                    //successfully
+                    Log.d("AccountDB", "success for add product");
+                    switch(list)
+                    {
+                        case "inventory":
+                            inventoryCounter--;
+                            if(inventoryCounter==0) Log.d("SaveProducts", "Inventory successfully saved.");
+                            break;
+                        case "shoppinglist":
+                            shoppingListCounter--;
+                            if(shoppingListCounter==0) Log.d("SaveProducts", "ShoppingList successfully saved.");
+                            break;
+                        case "requirements":
                             requirementsCounter--;
                             if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
                             break;
@@ -485,13 +551,6 @@ public class AccountDB extends Application {
         }
     }
 
-    private void printList(){
-        for(Product p : shoppingList)
-        {
-            Log.d("Print list", p.toString() + " with key " + p.getKey());
-        }
-    }
-
     public void addProduct(String name, String date, int amount, String code, boolean expires, String list){
         Product newProduct;
         Log.d("addProduct", "Adding " + name + " to " + list);
@@ -577,26 +636,26 @@ public class AccountDB extends Application {
             Log.d("SaveProducts", "Saving " + inventory.size() + " products to inventory");
             for(Product p : inventory)
             {
-                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "inventory");
+                SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "inventory");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " inventory");
                 inventoryCounter++;
-                ip.execute();
+                sp.execute();
             }
             Log.d("SaveProducts", "Saving " + shoppingList.size() + " products to shopping list");
             for(Product p : shoppingList)
             {
-                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "shoppinglist");
+                SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "shoppinglist");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " shopping list");
                 shoppingListCounter++;
-                ip.execute();
+                sp.execute();
             }
             Log.d("SaveProducts", "Saving " + requirements.size() + " products to requirements");
             for(Product p : requirements)
             {
-                insertProduct ip = new insertProduct(username, p.toString(), p.getKey(), "requirements");
+                SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "requirements");
                 Log.d("SaveProducts", "Saving " + p.toString() + " to " + " requirements");
                 requirementsCounter++;
-                ip.execute();
+                sp.execute();
             }
             return null;
         }
@@ -612,6 +671,7 @@ public class AccountDB extends Application {
     public void connected(String username, String password){
         this.username = username;
         this.password = password;
+        local = false;
         connection = 1; }
 
     public void loadIndex(String list)

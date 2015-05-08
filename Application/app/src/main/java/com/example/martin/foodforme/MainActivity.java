@@ -37,6 +37,11 @@ public class MainActivity extends ActionBarActivity {
     private static final String USERNAME = "name";
     private static final String PASSWORD = "password";
 
+    SharedPreferences account;
+
+    String username;
+    String password;
+
     ProgressDialog progressDialog;
 
     AccountDB accountDB;
@@ -48,18 +53,15 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         context=this;
         accountDB = (AccountDB) getApplicationContext();
+        account = getSharedPreferences("account", MODE_PRIVATE);
 
-        SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
         boolean usesAccount = account.getBoolean("active", false);
         if(usesAccount)
         {
+            username = account.getString("user", "No user was found!");
+            password = account.getString("password", "No password found!");
             Log.d("Main", "Uses account is true.");
-            String username = account.getString("user", "No user was found!");
-            String password = account.getString("password", "No password found!");
-            accountDB.setDetails(username, password);
-            setTitle(username);
-            loadProducts();
-
+            connect();
         }
         else
         {
@@ -67,7 +69,37 @@ public class MainActivity extends ActionBarActivity {
             accountDB.loadSharedPreferences();
         }
     }
+    private void connect(){
 
+        accountDB.setDetails(username, password);
+        int connecting = 0;
+        while(connecting == 0){
+            connecting = accountDB.getConnection();
+        }
+        if(connecting == -1){
+            new AlertDialog.Builder(this)
+
+                    .setTitle("Connection failed")
+                    .setMessage("Try again?")
+                    .setPositiveButton("Try again", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            connect();
+                        }
+                    })
+                    .setNegativeButton("Use local data", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            accountDB.resetConnection();
+                            disconnect();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+        else {
+            setTitle(username);
+            loadProducts();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,6 +192,7 @@ public class MainActivity extends ActionBarActivity {
                             //if successful
                             InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
                             info.message();
+                            setTitle(loginName);
                             accountDB.setDetails(sa.getName(),sa.getPassword());
                         } else {
                             //if failed
@@ -213,7 +246,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected String doInBackground(String... args) {
-            createAccountDB(args[0],args[1]);
+            createAccountDB(args[0], args[1]);
             return null;
 
         }
