@@ -17,25 +17,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class MainActivity extends ActionBarActivity {
 
     private Context context;
-    private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip address for database
-    private static final String url_create_account = ip + "create_account.php"; //Create account
-    JSONParser jsonParser = new JSONParser();
-    //JSON names
-    private static final String TAG_SUCCESS = "success";
-    private static final String USERNAME = "name";
-    private static final String PASSWORD = "password";
 
     SharedPreferences account;
 
@@ -70,7 +55,6 @@ public class MainActivity extends ActionBarActivity {
         }
     }
     private void connect(){
-
         accountDB.setDetails(username, password);
         int connecting = 0;
         while(connecting == 0){
@@ -93,6 +77,7 @@ public class MainActivity extends ActionBarActivity {
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setCancelable(false)
                     .show();
         }
         else {
@@ -131,17 +116,21 @@ public class MainActivity extends ActionBarActivity {
 
         switch(item.getItemId()){
             case R.id.account_connect:
-                //new connectToAccount().execute();
                 this.connectAccount();
                 return true;
             case R.id.create_account:
                 createAccount();
                 return true;
             case R.id.disconnect:
-                disconnect();
+                if(!accountDB.isLocal()) {
+                    disconnect();
+                }
                 return true;
             case R.id.copy_to_local:
-                copyToLocal();
+                Log.d("options", String.valueOf(accountDB.isLocal()));
+                if(!accountDB.isLocal()) {
+                    copyToLocal();
+                }
                 return true;
             default:
                 return false;
@@ -149,6 +138,29 @@ public class MainActivity extends ActionBarActivity {
 }
 }
     public void copyToLocal(){
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setTitle(accountDB.getUsername());
+        progressDialog.setMessage("Copying products...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(100);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.copyToLocal();
+                int loading = 0;
+                while(loading < 100){
+                    loading = accountDB.getSavingProgress();
+                    progressDialog.setProgress(loading);
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
         accountDB.copyToLocal();
     }
     public void disconnect(){
@@ -183,25 +195,7 @@ public class MainActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String loginName = username.getText().toString();
                         String loginPassword = password.getText().toString();
-                        SaveAccount sa = new SaveAccount();
-                        sa.execute(new String[]{loginName, loginPassword});
-                        createDialog(loginName);
-                        int savingAccount = 0;
-                        while (savingAccount == 0) {
-                            savingAccount = sa.getCreatedAcc();
-                        }
-                        progressDialog.dismiss();
-                        if (savingAccount == 1) {
-                            //if successful
-                            InfoDialog info = new InfoDialog("A new inventory was successfully created.", context);
-                            info.message();
-                            setTitle(loginName);
-                            accountDB.setDetails(sa.getName(),sa.getPassword());
-                        } else {
-                            //if failed
-                            InfoDialog info = new InfoDialog("Error, the database could not accept your request.", context);
-                            info.message();
-                        }
+                        saveAccount(loginName,loginPassword);
 
                     }
                 })
@@ -211,12 +205,50 @@ public class MainActivity extends ActionBarActivity {
                 })
                 .show();
     }
+    private void saveAccount(String name, String password){
 
-    private void createDialog(String name){
+        final String username = name, pass = password;
+
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle(name);
         progressDialog.setMessage("Creating account...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(accountDB.getTotalProducts());
+        progressDialog.setCancelable(false);
         progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.saveAccount(username, pass);
+                int loading = 0;
+                while(loading < accountDB.getTotalProducts() && loading!= -1){
+                    loading = accountDB.getSavingProgress();
+                    progressDialog.setProgress(loading);
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
+        this.progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+                if(progressDialog.getProgress()!=-1) {
+                    InfoDialog id = new InfoDialog("Account successfully created.", context);
+                    setTitle(username);
+                    id.message();
+                }
+                else
+                {
+                    InfoDialog id = new InfoDialog("Account could not be created.", context);
+                    id.message();
+                }
+            }
+        });
+
     }
 
     /**
@@ -235,86 +267,7 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-    public class SaveAccount extends AsyncTask<String, String, String> {
-        private int createdAcc = 0;
-        private String userName;
-        private String password;
-        /**
-         * Before starting background thread
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
 
-        @Override
-        protected String doInBackground(String... args) {
-            createAccountDB(args[0],args[1]);
-            return null;
-
-        }
-
-
-        /**
-         * Create account in database cloud.
-         *
-         * @param username - the chosen username for user.
-         * @param password - the chosen password for the user.
-         */
-        private void createAccountDB(String username, String password) {
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<>();
-            this.userName = username;
-            this.password = password;
-            params.add(new BasicNameValuePair(USERNAME, username));
-            params.add(new BasicNameValuePair(PASSWORD, password));
-            params.add(new BasicNameValuePair("indexInventory",Integer.toString(accountDB.getIndexInventory())));
-            params.add(new BasicNameValuePair("indexShoppingList",Integer.toString(accountDB.getIndexShoppingList())));
-            params.add(new BasicNameValuePair("indexRequirements",Integer.toString(accountDB.getIndexRequirements())));
-
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_account,
-                    "POST", params);
-            // check log cat for response
-            Log.d("Create Response", json.toString());
-
-            // check for success tag
-            try {
-                int success = json.getInt(TAG_SUCCESS);
-
-                if (success == 1) {
-                    // successfully created product
-                    createdAcc = 1; //Account been created
-                    accountDB.setLocal(false);
-                    int oldConnection = accountDB.getConnection();
-                    storeAccountOnPhone(username,password);
-                    accountDB.connected(username,password);
-                    if(oldConnection == 0) {
-                        accountDB.storeProducts();
-                    }
-                    else {
-                        accountDB.clearProducts();
-                    }
-                    // closing this screen
-                    //finish();
-
-                } else {
-                    createdAcc = -1; //Account failed to be created
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-        }
-
-        public int getCreatedAcc(){
-            return createdAcc;
-        }
-        public String getName() { return userName; }
-        public String getPassword() { return password; }
-    }
 
 
 
@@ -380,6 +333,7 @@ public class MainActivity extends ActionBarActivity {
         progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
         progressDialog.setProgress(0);
         progressDialog.setMax(3);
+        progressDialog.setCancelable(false);
         progressDialog.show();
 
         Runnable runnable = new Runnable() {

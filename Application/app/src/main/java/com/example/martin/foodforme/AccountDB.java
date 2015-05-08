@@ -37,6 +37,7 @@ public class AccountDB extends Application {
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private boolean local = true;
     private boolean firstRun = false;
+    private int savingProgress = 0;
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
     private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
@@ -44,6 +45,10 @@ public class AccountDB extends Application {
     private static final String url_delete_product = ip + "delete_product.php"; //Deletes a product from the database
     private static final String url_get_index = ip + "get_index.php"; //Get the accounts next index.
     private static final String url_increase_index = ip + "increase_index.php"; //Increase the accounts index.
+    private static final String url_create_account = ip + "create_account.php"; //Create account
+    private static final String TAG_SUCCESS = "success";
+    private static final String USERNAME = "name";
+    private static final String PASSWORD = "password";
     SharedPreferences inventorySP, shoppingSP, requiredSP;
     SharedPreferences.Editor inventoryEditor, shoppingEditor, requiredEditor;
     JSONParser jsonParser = new JSONParser();
@@ -55,6 +60,7 @@ public class AccountDB extends Application {
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
+        while(connection == 0){}
         if(connection == 1){
             local = false;
         }
@@ -83,6 +89,11 @@ public class AccountDB extends Application {
     public String getUsername() { return username; }
     public boolean isLocal(){ return local; }
     public int getLoadingProducts(){ return loadingProducts; }
+    public int getSavingProgress(){return savingProgress; }
+
+    public int getTotalProducts(){
+        return inventory.size()+shoppingList.size()+requirements.size();
+    }
 
     public void setAdapter(String list, ArrayAdapter adapter){
         switch(list) {
@@ -118,6 +129,12 @@ public class AccountDB extends Application {
     }
 
     public void copyToLocal(){
+        savingProgress = 0;
+        int total = inventory.size() + shoppingList.size() + requirements.size();
+        Log.d("Total products", Integer.toString(total));
+        int tenPercent = total/10;
+        Log.d("Ten percent", Integer.toString(tenPercent));
+        int saved = 0;
         inventorySP = getSharedPreferences("inventorySP", 0);
         requiredSP = getSharedPreferences("requiredSP", 0);
         shoppingSP = getSharedPreferences("shoppingSP", 0);
@@ -141,16 +158,26 @@ public class AccountDB extends Application {
         requiredEditor.putString("index", Integer.toString(indexRequirements));
         for(Product p : inventory){
             inventoryEditor.putString(p.getKey(),p.toString());
+            Log.d("CopyLocal inventory", "Adding " + p.toString());
+            saved++;
+            if(saved > tenPercent*savingProgress) savingProgress+=10;
         }
         for(Product p : shoppingList){
             shoppingEditor.putString(p.getKey(),p.toString());
+            Log.d("CopyLocal shoppinglist", "Adding " + p.toString());
+            saved++;
+            if(saved > tenPercent*savingProgress) savingProgress+=10;
         }
         for(Product p : requirements){
             requiredEditor.putString(p.getKey(),p.toString());
+            Log.d("CopyLocal requirements", "Adding " + p.toString());
+            saved++;
+            if(saved > tenPercent*savingProgress) savingProgress+=10;
         }
         inventoryEditor.commit();
         shoppingEditor.commit();
         requiredEditor.commit();
+        savingProgress = 100;
     }
 
     public void loadSharedPreferences(){
@@ -386,20 +413,15 @@ public class AccountDB extends Application {
                     {
                         case "inventory":
                             inventory.add(parseProduct(data, key));
-                            inventoryCounter--;
-                            if(inventoryCounter==0) Log.d("SaveProducts", "Inventory successfully saved.");
                             break;
                         case "shoppinglist":
                             shoppingList.add(parseProduct(data, key));
-                            shoppingListCounter--;
-                            if(shoppingListCounter==0) Log.d("SaveProducts", "ShoppingList successfully saved.");
                             break;
                         case "requirements":
                             requirements.add(parseProduct(data, key));
-                            requirementsCounter--;
-                            if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
                             break;
                     }
+
 
                 } else {
                     Log.d("AccountDB", "no success for add product. Message: " + message);
@@ -450,15 +472,15 @@ public class AccountDB extends Application {
                     {
                         case "inventory":
                             inventoryCounter--;
-                            if(inventoryCounter==0) Log.d("SaveProducts", "Inventory successfully saved.");
+                            savingProgress++;
                             break;
                         case "shoppinglist":
                             shoppingListCounter--;
-                            if(shoppingListCounter==0) Log.d("SaveProducts", "ShoppingList successfully saved.");
+                            savingProgress++;
                             break;
                         case "requirements":
                             requirementsCounter--;
-                            if(requirementsCounter==0) Log.d("SaveProducts", "Requirements successfully saved.");
+                            savingProgress++;
                             break;
                     }
 
@@ -651,6 +673,10 @@ public class AccountDB extends Application {
 
     private class SaveProducts extends AsyncTask<String, String, String>
     {
+        @Override
+        protected void onPreExecute(){
+            savingProgress = 0;
+        }
 
         //Methods
         @Override
@@ -1006,6 +1032,91 @@ public class AccountDB extends Application {
                     if(p.getKey() == key) return p;
                 }
         return null;
+    }
+
+    public void saveAccount(String name, String password){ new SaveAccount(name, password).execute();}
+    public class SaveAccount extends AsyncTask<String, String, String> {
+        private String username;
+        private String password;
+        /**
+         * Before starting background thread
+         */
+
+        public SaveAccount(String name, String password){
+            this.username = name;
+            this.password = password;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            createAccountDB();
+            return null;
+
+        }
+        public void storeAccountOnPhone(String username, String password){
+            SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
+            SharedPreferences.Editor accountEditor = account.edit();
+            accountEditor.putBoolean("active", true);
+            accountEditor.putString("user", username);
+            accountEditor.putString("password", password);
+            accountEditor.commit();
+        }
+
+
+        /**
+         * Create account in database cloud.
+         *
+         *
+         */
+        private void createAccountDB() {
+            // Building Parameters
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair(USERNAME, username));
+            params.add(new BasicNameValuePair(PASSWORD, password));
+            params.add(new BasicNameValuePair("indexInventory",Integer.toString(indexInventory)));
+            params.add(new BasicNameValuePair("indexShoppingList",Integer.toString(indexShoppingList)));
+            params.add(new BasicNameValuePair("indexRequirements",Integer.toString(indexRequirements)));
+
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jsonParser.makeHttpRequest(url_create_account,
+                    "POST", params);
+            // check log cat for response
+            Log.d("Create Response", json.toString());
+
+            // check for success tag
+            try {
+                int success = json.getInt(TAG_SUCCESS);
+
+                if (success == 1) {
+                    // successfully created product
+                    local = false;
+                    int oldConnection = connection;
+                    storeAccountOnPhone(username,password);
+                    connected(username,password);
+                    if(oldConnection == 0) {
+                        storeProducts();
+                    }
+                    else {
+                        clearProducts();
+                    }
+                    // closing this screen
+                    //finish();
+
+                } else {
+                    savingProgress = -1; //Account failed to be created
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
 }
