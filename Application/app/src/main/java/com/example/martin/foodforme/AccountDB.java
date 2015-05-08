@@ -914,6 +914,7 @@ public class AccountDB extends Application {
                 }
                 return 0;
             }
+
             protected int loadShoppingList()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "shoppinglist"));
@@ -947,6 +948,8 @@ public class AccountDB extends Application {
                 }
             return 0;
             }
+
+
             protected int loadRequirements()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "requirements"));

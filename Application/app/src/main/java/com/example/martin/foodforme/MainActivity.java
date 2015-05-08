@@ -173,6 +173,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void createAccount(){
+        if(!Network.isNetworkAvailable(this)){
+            accountDB.resetConnection();
+            InfoDialog id = new InfoDialog("No connection.", this);
+            id.message();
+           return;
+        }
         final Context context = this;
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -275,6 +281,12 @@ public class MainActivity extends ActionBarActivity {
      * Connect to an existing account! If the user and password matches.
      */
     public void connectAccount(){
+        if(!Network.isNetworkAvailable(this)){
+            accountDB.resetConnection();
+            InfoDialog id = new InfoDialog("No connection.", this);
+            id.message();
+            return;
+        }
         final Context context = this;
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
