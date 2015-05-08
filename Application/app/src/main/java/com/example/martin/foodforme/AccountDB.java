@@ -24,20 +24,26 @@ public class AccountDB extends Application {
     //Attributes
     private String username;
     private String password;
+
     private ArrayList<Product> inventory = new ArrayList<>(), shoppingList = new ArrayList<>(), requirements = new ArrayList<>();
+    private ArrayAdapter inventoryAdapter, shoppinglistAdapter, requirementsAdapter;
+
     private int indexInventory, indexShoppingList, indexRequirements;
+
     private int loadInventory = 0; //0 not done, 1 successfully loaded, -1 failed to load
     private int loadShoppingList = 0;
     private int loadRequirements = 0;
-    private ArrayAdapter inventoryAdapter, shoppinglistAdapter, requirementsAdapter;
-    private int inventoryCounter = 0, shoppingListCounter = 0, requirementsCounter = 0;
-    private int loadingProducts = 3;
+
     private boolean gettingIndex = false;
     private boolean gettingIndexFailed = false;
+
     private int connection = 0; //1 successful, -1 failed, 0 nothing
     private boolean local = true;
     private boolean firstRun = false;
+
+    private int loadingProgress = 3;
     private int savingProgress = 0;
+
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
     private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
     private static final String url_check_account = ip + "check_account.php"; //Check if password and user match and exist
@@ -49,8 +55,10 @@ public class AccountDB extends Application {
     private static final String TAG_SUCCESS = "success";
     private static final String USERNAME = "name";
     private static final String PASSWORD = "password";
+
     SharedPreferences inventorySP, shoppingSP, requiredSP;
     SharedPreferences.Editor inventoryEditor, shoppingEditor, requiredEditor;
+
     JSONParser jsonParser = new JSONParser();
 
 
@@ -88,7 +96,7 @@ public class AccountDB extends Application {
     public ArrayList<Product> returnRequirements(){ return requirements; }
     public String getUsername() { return username; }
     public boolean isLocal(){ return local; }
-    public int getLoadingProducts(){ return loadingProducts; }
+    public int getLoadingProgress(){ return loadingProgress; }
     public int getSavingProgress(){return savingProgress; }
 
     public int getTotalProducts(){
@@ -468,21 +476,7 @@ public class AccountDB extends Application {
                 if (success == 1) {
                     //successfully
                     Log.d("AccountDB", "success for add product");
-                    switch(list)
-                    {
-                        case "inventory":
-                            inventoryCounter--;
-                            savingProgress++;
-                            break;
-                        case "shoppinglist":
-                            shoppingListCounter--;
-                            savingProgress++;
-                            break;
-                        case "requirements":
-                            requirementsCounter--;
-                            savingProgress++;
-                            break;
-                    }
+                    savingProgress++;
 
                 } else {
                     Log.d("AccountDB", "no success for add product. Message: " + message);
@@ -686,24 +680,18 @@ public class AccountDB extends Application {
             for(Product p : inventory)
             {
                 SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "inventory");
-                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " inventory");
-                inventoryCounter++;
                 sp.execute();
             }
             Log.d("SaveProducts", "Saving " + shoppingList.size() + " products to shopping list");
             for(Product p : shoppingList)
             {
                 SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "shoppinglist");
-                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " shopping list");
-                shoppingListCounter++;
                 sp.execute();
             }
             Log.d("SaveProducts", "Saving " + requirements.size() + " products to requirements");
             for(Product p : requirements)
             {
                 SaveProduct sp = new SaveProduct(username, p.toString(), p.getKey(), "requirements");
-                Log.d("SaveProducts", "Saving " + p.toString() + " to " + " requirements");
-                requirementsCounter++;
                 sp.execute();
             }
             return null;
@@ -859,7 +847,7 @@ public class AccountDB extends Application {
             protected void onPreExecute(){
                 clearProducts();
                 Log.d("AccountDB","Loading products");
-                loadingProducts = 0;
+                loadingProgress = 0;
             }
             @Override
             protected void onPostExecute(String result){
@@ -874,18 +862,18 @@ public class AccountDB extends Application {
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadInventory();
                 Collections.sort(inventory);
-                loadingProducts++;
+                loadingProgress++;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadShoppingList();
                 Collections.sort(shoppingList);
-                loadingProducts++;
+                loadingProgress++;
                 loadingParams = new ArrayList<>();
                 loadingParams.add(new BasicNameValuePair(USERNAME, username));
                 loadingParams.add(new BasicNameValuePair(PASSWORD, password));
                 loadRequirements();
-                loadingProducts++;
+                loadingProgress++;
                 Log.d("AccountDB", "Finished loading products");
 
                 return null;
@@ -1029,7 +1017,7 @@ public class AccountDB extends Application {
     {
                 for (Product p : list)
                 {
-                    if(p.getKey() == key) return p;
+                    if(p.getKey().equals(key)) return p;
                 }
         return null;
     }

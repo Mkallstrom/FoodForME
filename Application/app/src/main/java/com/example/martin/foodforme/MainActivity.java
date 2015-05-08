@@ -342,7 +342,7 @@ public class MainActivity extends ActionBarActivity {
                 accountDB.getProducts();
                 int loading = 0;
                 while(loading < 3){
-                    loading = accountDB.getLoadingProducts();
+                    loading = accountDB.getLoadingProgress();
                     progressDialog.setProgress(loading);
                 }
                 progressDialog.dismiss();
