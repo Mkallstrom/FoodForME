@@ -23,9 +23,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
 
 public class InventoryActivity extends ActionBarActivity {
@@ -275,6 +278,18 @@ public class InventoryActivity extends ActionBarActivity {
         Long nextAlarm = calendar.getTimeInMillis();
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);
         Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
+    }
+
+    /**
+     * Add the produt in list without haveing any barcode or in need
+     * of useing the camera!
+     */
+    public void addProductNoBarcode(View view){
+        Intent intent = new Intent(this, AddProductActivity.class);
+        String message = accountDB.getNoBarcode();
+        intent.putExtra("result", message);         //Send the result to the add product activity.
+        this.startActivityForResult(intent, 100);
+
     }
 
 }

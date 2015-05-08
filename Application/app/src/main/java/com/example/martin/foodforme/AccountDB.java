@@ -60,6 +60,7 @@ public class AccountDB extends Application {
     SharedPreferences.Editor inventoryEditor, shoppingEditor, requiredEditor;
 
     JSONParser jsonParser = new JSONParser();
+    private String noBarcode = "No barcode";
 
 
     public void setDetails(String username, String password) {
@@ -1105,6 +1106,10 @@ public class AccountDB extends Application {
 
 
         }
+    }
+
+    public String getNoBarcode(){
+        return noBarcode;
     }
 
 }

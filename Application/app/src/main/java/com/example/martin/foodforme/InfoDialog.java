@@ -35,4 +35,5 @@ public class InfoDialog extends ActionBarActivity{
                 })*/
                 .show();
     }
+
 }

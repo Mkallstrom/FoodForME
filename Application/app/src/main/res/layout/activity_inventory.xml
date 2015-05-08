@@ -9,20 +9,6 @@
     android:id="@+id/inventoryLayout">
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:background="@drawable/blankb"
-        android:text="Scan"
-        android:id="@+id/scanButton"
-        android:onClick="scanBarcode"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
- />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +28,49 @@
         android:layout_height="match_parent"
         android:id="@+id/inventoryListView"
         tools:listitem="@android:layout/simple_list_item_2"
-        android:layout_above="@+id/scanButton"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/linearLayout5" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:weightSum="1"
+        android:id="@+id/linearLayout5"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:text="Add product"
+            android:id="@+id/add_product"
+            android:onClick="addProductNoBarcode"
+            android:layout_alignBottom="@+id/inventoryListView"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="0.5"
+            android:background="@drawable/blankb" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:background="@drawable/blankb"
+            android:text="Scan"
+            android:id="@+id/scanButton"
+            android:onClick="scanBarcode"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_weight="0.5" />
+
+    </LinearLayout>
 
 </RelativeLayout>

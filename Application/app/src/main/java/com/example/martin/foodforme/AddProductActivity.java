@@ -151,32 +151,35 @@ public class AddProductActivity extends ActionBarActivity {
         barcode = callingIntent.getExtras().getString("result");
         codeView = (TextView) findViewById(R.id.codeView);
         codeView.setText(barcode);
+        if(barcode.equals(accountDB.getNoBarcode()))
+        {}
+        else {
+            try {
+                //make a URL to a known source
+                URL url = new URL(ip);
 
-        try {
-            //make a URL to a known source
-            URL url = new URL(ip);
+                //open a connection to that source
+                HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
+                urlConnect.setConnectTimeout(1000);
 
-            //open a connection to that source
-            HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
-            urlConnect.setConnectTimeout(1000);
+                //trying to retrieve data from the source. If there
+                //is no connection, this line will fail
+                Object objData = urlConnect.getContent();
+                CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
+                checkBox.setChecked(true);
+                connection = true;
+                new GetProductDetails().execute(); // AsyncTask created searching the database
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d("Connection failed: ", ip);
+            }
 
-            //trying to retrieve data from the source. If there
-            //is no connection, this line will fail
-            Object objData = urlConnect.getContent();
-            CheckBox checkBox = (CheckBox) findViewById(R.id.connectionCheck);
-            checkBox.setChecked(true);
-            connection = true;
-            new GetProductDetails().execute(); // AsyncTask created searching the database
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("Connection failed: ", ip);
-        }
-
-        if (localBarcodes.contains(barcode))                 //Local database has the code.
-        {
-            String foundName = localBarcodes.getString(barcode, "Not found");
-            productName.setText(foundName);
-            localHasProduct = true;
+            if (localBarcodes.contains(barcode))                 //Local database has the code.
+            {
+                String foundName = localBarcodes.getString(barcode, "Not found");
+                productName.setText(foundName);
+                localHasProduct = true;
+            }
         }
 
         // Fills the spinner with years
@@ -487,6 +490,7 @@ public class AddProductActivity extends ActionBarActivity {
          */
         protected String doInBackground(String... params) {
 
+
             // updating UI from Background Thread
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -637,56 +641,54 @@ public class AddProductActivity extends ActionBarActivity {
         String barcode = codeView.getText().toString();
         SharedPreferences.Editor editor = localBarcodes.edit();
         String amount = productAmount.getText().toString();
-
-        if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
-        {                                                                                                    // -> replace with new name.
-            editor.remove(codeView.getText().toString());
-            editor.putString(barcode, productString);
-            editor.apply();
-        } else if (!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
-        {
-            editor.putString(barcode, productString);
-            editor.apply();
-        }
-
-        int success = 0;
-        if(json == null){
-            Intent intent = new Intent();
-            intent.putExtra("product", "<<<Error! Connection failed in process.>>>");
-            intent.putExtra("expDate", "0000-00-00");
-            intent.putExtra("amount", "0");
-            intent.putExtra("code", "failed");
-            CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
-            intent.putExtra("expires", checkBox.isChecked());
-            setResult(RESULT_OK, intent);
-            finish();
-            return;
-            //TODO check if this actually works and intended and not makeing it worse
-        }
-
-        try
-        {
-             success = json.getInt(TAG_SUCCESS);
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-        if (success == 1) {
-            if (databaseHasProduct) {
-                if (!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
-                {
-                    Log.d("Saving: ", productString);
-                    new SaveProductDetails().execute();
-                }                                                                        // Saves the new String to the database
+        if(barcode.equals(accountDB.getNoBarcode())){}
+        else {
+            if (localBarcodes.contains(barcode) && !localBarcodes.getString(barcode, "").equals(productString))   //Local database has the barcode but the name does not match (user changed it)
+            {                                                                                                    // -> replace with new name.
+                editor.remove(codeView.getText().toString());
+                editor.putString(barcode, productString);
+                editor.apply();
+            } else if (!localBarcodes.contains(barcode))                                                             //Local database does not have the barcode.
+            {
+                editor.putString(barcode, productString);
+                editor.apply();
             }
-        } else if (success == 0) {
-            if (!databaseHasProduct && connection) {                                                        // if the product is not in the database and there is a connection
-                Log.d("Creating: ", productString);
-                new CreateNewProduct().execute();                                                           // Saves a new product to the database
+
+            int success = 0;
+            if (json == null) {
+                Intent intent = new Intent();
+                intent.putExtra("product", "<<<Error! Connection failed in process.>>>");
+                intent.putExtra("expDate", "0000-00-00");
+                intent.putExtra("amount", "0");
+                intent.putExtra("code", "failed");
+                CheckBox checkBox = (CheckBox) findViewById(R.id.expiresCheck);
+                intent.putExtra("expires", checkBox.isChecked());
+                setResult(RESULT_OK, intent);
+                finish();
+                return;
+                //TODO check if this actually works and intended and not makeing it worse
+            }
+
+            try {
+                success = json.getInt(TAG_SUCCESS);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (success == 1) {
+                if (databaseHasProduct) {
+                    if (!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
+                    {
+                        Log.d("Saving: ", productString);
+                        new SaveProductDetails().execute();
+                    }                                                                        // Saves the new String to the database
+                }
+            } else if (success == 0) {
+                if (!databaseHasProduct && connection) {                                                        // if the product is not in the database and there is a connection
+                    Log.d("Creating: ", productString);
+                    new CreateNewProduct().execute();                                                           // Saves a new product to the database
+                }
             }
         }
-
         Intent intent = new Intent();
         intent.putExtra("product", productString);
         intent.putExtra("expDate", expDateString());
