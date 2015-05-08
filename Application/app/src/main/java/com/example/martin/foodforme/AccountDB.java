@@ -55,8 +55,26 @@ public class AccountDB extends Application {
         this.password = password;
         Log.d("AccountDB", "set details");
         new ConnectDB().execute();
-        local = false;
+        if(connection == 1){
+            local = false;
+        }
+        if(connection == -1) {
+            local = true;
+        }
         firstRun = true;
+    }
+
+    /**
+     * Check if there was a connection setup and then
+     * set the local to correct value;
+     */
+    public void checkLocal(){
+        if(connection == 1){
+            local = false;
+        }
+        if(connection == -1 || connection == 0){
+            local = true;
+        }
     }
 
     public ArrayList<Product> returnInventory(){ return inventory; }
@@ -82,6 +100,10 @@ public class AccountDB extends Application {
         }
     }
 
+    public void setLocal(Boolean bool){
+        local = bool;
+    }
+
     public void storeProducts() {
         Log.d("AccountDB", "attempting storeproducts with connection being: " + connection);
         if(connection==1) new SaveProducts().execute();
@@ -92,6 +114,7 @@ public class AccountDB extends Application {
         firstRun = false;
         clearProducts();
         loadSharedPreferences();
+        connection = 0;
     }
 
     public void copyToLocal(){

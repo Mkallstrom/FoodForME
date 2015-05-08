@@ -652,7 +652,7 @@ public class AddProductActivity extends ActionBarActivity {
         int success = 0;
         if(json == null){
             Intent intent = new Intent();
-            intent.putExtra("product", "<<< Error! >>>");
+            intent.putExtra("product", "<<<Error! Connection failed in process.>>>");
             intent.putExtra("expDate", "0000-00-00");
             intent.putExtra("amount", "0");
             intent.putExtra("code", "failed");

@@ -21,6 +21,7 @@
         android:name=".AccountDB" >
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,17 +42,20 @@
         </activity>
         <activity
             android:name=".AddProductActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_add_product"
             android:parentActivityName=".InventoryActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ShoppingListActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_list"
             android:parentActivityName=".MainActivity" >
         </activity>
         <activity
             android:name=".RequirementActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_required_list"
             android:parentActivityName=".MainActivity" >
         </activity>

@@ -109,16 +109,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void toInventory(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
     }
 
     public void toList(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, ShoppingListActivity.class);
         startActivity(intent);
     }
 
     public void toRequirement(View view){
+        accountDB.checkLocal();
         Intent intent = new Intent(this, RequirementActivity.class);
         startActivity(intent);
     }
@@ -246,7 +249,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected String doInBackground(String... args) {
-            createAccountDB(args[0], args[1]);
+            createAccountDB(args[0],args[1]);
             return null;
 
         }
@@ -283,6 +286,7 @@ public class MainActivity extends ActionBarActivity {
                 if (success == 1) {
                     // successfully created product
                     createdAcc = 1; //Account been created
+                    accountDB.setLocal(false);
                     int oldConnection = accountDB.getConnection();
                     storeAccountOnPhone(username,password);
                     accountDB.connected(username,password);
