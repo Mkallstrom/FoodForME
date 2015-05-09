@@ -1,5 +1,6 @@
 package com.example.martin.foodforme;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -17,9 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Andreas on 2015-04-24.
- */
 public class AccountDB extends Application {
     //Attributes
     private String accountUsername;
@@ -35,10 +33,6 @@ public class AccountDB extends Application {
     private int indexInventory,
             indexShoppingList,
             indexRequirements;
-
-    private int loadInventory = 0, //0 not done, 1 successfully loaded, -1 failed to load
-            loadShoppingList = 0,
-            loadRequirements = 0;
 
     private boolean gettingIndex = false,
             gettingIndexFailed = false;
@@ -77,6 +71,13 @@ public class AccountDB extends Application {
 
     //Methods
 
+
+    /**
+     * Sets the username and password and attempts a connection to the database.
+     * If connection is successful, local is set to false.
+     * @param username - The username of the account.
+     * @param password - The password of the account.
+     */
     public void connectToDatabase(String username, String password) {
         if(firstRun) //AccountDB already initiated
         {
@@ -98,6 +99,11 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * Sets the username and password, sets up database use by disabling local.
+     * @param username - The username of the account.
+     * @param password - The password of the account.
+     */
     public void connected(String username, String password){
         this.accountUsername = username;
         this.accountPassword = password;
@@ -105,6 +111,9 @@ public class AccountDB extends Application {
         connection = 1;
     }
 
+    /**
+     * Disconnects the application from the database, setting local to true and reloading the products from the shared preferences.
+     */
     public void disconnect(){
         local = true;
         firstRun = false;
@@ -114,8 +123,8 @@ public class AccountDB extends Application {
     }
 
     /**
-     * Check if there was a connection setup and then
-     * set the local to correct value;
+     * Checks if there was a connection setup and then
+     * sets the local to correct value.
      */
     public void checkLocal(){
         if(connection == 1){
@@ -126,11 +135,10 @@ public class AccountDB extends Application {
         }
     }
 
-    public void setLocal(Boolean bool){
-        local = bool;
-    }
-
-
+    /**
+     * Copies all products in the current inventory, shopping, and requirements lists to the shared preferences.
+     */
+    @SuppressLint("CommitPrefEdits")
     public void copyToLocal(){
         savingProgress = 0;
 
@@ -188,6 +196,10 @@ public class AccountDB extends Application {
         savingProgress = 100;
     }
 
+    /**
+     * Loads products from the shared preferences.
+     */
+    @SuppressWarnings("Annotator")
     public void loadSharedPreferences(){
         if(firstRun) //AccountDB already initiated
         {
@@ -243,8 +255,13 @@ public class AccountDB extends Application {
             }
         }
     }
-    //Methods
 
+    /**
+     * Attempts a connection to the database with a username and a password. Sets connection to the appropriate value afterwards.
+     * @param username - The username of the account.
+     * @param password - The password of the account.
+     * @return - Success of connection.
+     */
     public boolean existsAccountInDatabase(String username, String password){
         JSONParser jsonParser = new JSONParser();
 
@@ -297,7 +314,7 @@ public class AccountDB extends Application {
 
 
         /**
-         * Check if account exist with that name and accountPassword.
+         * Check if account exists with that name and accountPassword.
          * attribute connection is set to 1 if OK or -1 if failed.
          */
         public void checkAccount() {
@@ -333,6 +350,16 @@ public class AccountDB extends Application {
         }
     }
 
+
+    /**
+     * Adds a product to a list. If local is true, the product is added to the shared preferences, else to the database.
+     * @param name - Name of product.
+     * @param date - Expiry date of product.
+     * @param amount - Amount of product.
+     * @param code - Barcode of product.
+     * @param expires - Whether the product can expire or not.
+     * @param list - List product is part of.
+     */
     public void addProduct(String name, String date, int amount, String code, boolean expires, String list){
         Product newProduct;
         Log.d("addProduct", "Adding " + name + " to " + list);
@@ -411,6 +438,9 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * AsyncTask that is used to add a product to the database.
+     */
     public class AddToDatabase extends AsyncTask<String, String, String>{
 
         String name;
@@ -418,6 +448,14 @@ public class AccountDB extends Application {
         String key;
         String list;
 
+
+        /**
+         * Adds a product to the database.
+         * @param name - Name of account.
+         * @param data - Data of product.
+         * @param key - Key of product.
+         * @param list - List product is part of.
+         */
         public AddToDatabase(String name, String data, String key, String list){
             this.name = name;
             this.data = data;
@@ -490,6 +528,10 @@ public class AccountDB extends Application {
 
 
     }
+
+    /**
+     * AsyncTask that saves a product to the database.
+     */
     public class SaveInDatabase extends AsyncTask<String, String, String>{
 
         String name;
@@ -497,6 +539,13 @@ public class AccountDB extends Application {
         String key;
         String list;
 
+        /**
+         * Saves a product to the database.
+         * @param name - Name of account.
+         * @param data - Data of product.
+         * @param key - Key of product.
+         * @param list - List product is part of.
+         */
         public SaveInDatabase(String name, String data, String key, String list){
             this.name = name;
             this.data = data;
@@ -504,10 +553,6 @@ public class AccountDB extends Application {
             this.list = list;
         }
 
-        @Override
-        protected void onPostExecute(String result){
-
-        }
         @Override
         protected String doInBackground(String... params) {
             List<NameValuePair> insertparams = new ArrayList<>();
@@ -537,6 +582,12 @@ public class AccountDB extends Application {
 
 
     }
+
+    /**
+     * Deletes a product. If local is true, it deletes the product from the shared preferences, else from the database.
+     * @param deletedProduct - Product to be deleted.
+     * @param list - List product is part of.
+     */
     public void deleteProduct(Product deletedProduct, String list){
         if(local)
         {
@@ -567,6 +618,9 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * AsyncTask used to delete a product from the database.
+     */
     private class DeleteFromDatabase extends AsyncTask<String, String, String>{
 
         String name;
@@ -574,6 +628,13 @@ public class AccountDB extends Application {
         String list;
         String password;
 
+        /**
+         * Deletes a product from the database.
+         * @param name - Name of account.
+         * @param password - Password of account.
+         * @param key - Key of product.
+         * @param list - List product is part of.
+         */
         public DeleteFromDatabase(String name, String password, String key, String list){
             this.name = name;
             this.key = key;
@@ -637,13 +698,18 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * Starts a SaveProducts that saves all products to the database.
+     */
     public void saveProducts() {
         if(connection==1) {
             new SaveProducts().execute();
         }
     }
 
-
+    /**
+     * AsyncTask that saves all products to the database.
+     */
     private class SaveProducts extends AsyncTask<String, String, String>
     {
         @Override
@@ -678,6 +744,10 @@ public class AccountDB extends Application {
 
     }
 
+    /**
+     * Gets the index of 'list' from the database.
+     * @param list - The list to get the index for.
+     */
     public void getIndex(String list)
     {
         gettingIndex = true;
@@ -685,12 +755,21 @@ public class AccountDB extends Application {
         getIndex.setList(list);
         getIndex.execute();
     }
+
+    /**
+     * Increases the index of 'list' in the database.
+     * @param list - The list to increase the index for.
+     */
     public void increaseIndex(String list)
     {
         IncreaseIndex increaseIndex = new IncreaseIndex();
         increaseIndex.setList(list);
         increaseIndex.execute();
     }
+
+    /**
+     * AsyncTask that gets an index from the database.
+     */
     private class GetIndex extends AsyncTask<String, String, String>
     {
         private JSONParser jsonParser = new JSONParser();
@@ -747,6 +826,9 @@ public class AccountDB extends Application {
         public void setList(String list){ this.list = list;}
     }
 
+    /**
+     * AsyncTask that increases an index in the database.
+     */
     private class IncreaseIndex extends AsyncTask<String, String, String>
     {
         private JSONParser jsonParser = new JSONParser();
@@ -790,22 +872,15 @@ public class AccountDB extends Application {
 
 
     /**
-     * Get the inventoryList for the user
+     * Starts a LoadProducts to load all products from the database.
      */
     public void loadProducts(){
         new LoadProducts().execute();
     }
 
     /**
-     * Check the account information exist in DB and if that is valid.
-     * @param username - accountUsername for account
-     * @param password - accountPassword for account
-     * @return true if there is an account with this accountUsername/accountPassword and match. False if not.
+     * AsyncTask that loads all products from the database.
      */
-        /**
-         * Fill inventoryList, shopping list, and requirementsList with items from database for
-         * the connected user.
-         */
     private class LoadProducts extends AsyncTask<String, String, String>
         {
             private JSONParser jsonParser = new JSONParser();
@@ -847,6 +922,10 @@ public class AccountDB extends Application {
                 return null;
             }
 
+            /**
+             * Loads all products for the inventory from the database.
+             * @return - 1 if success, -1 if fail.
+             */
             protected int loadInventory()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "inventory"));
@@ -870,18 +949,21 @@ public class AccountDB extends Application {
                             Log.d("AccountDB", "Adding product to inventoryList: " + product.getString("data"));
                             inventoryList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
-                        loadInventory = 1;
                     } else {
                         Log.d("AccountDB", "no success for get inventoryList");
+                        return -1;
                         //failed
-                        loadInventory = -1; //Loading inventoryList failed.
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return 0;
+                return 1;
             }
 
+            /**
+             * Loads all products for the shopping list from the database.
+             * @return - 1 if success, -1 if fail.
+             */
             protected int loadShoppingList()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "shoppinglist"));
@@ -889,7 +971,7 @@ public class AccountDB extends Application {
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
                 if(json == null){
-                    return -1; //Failed HTTP request
+                    return -1;
                 }
                 // check for success tag
                 try {
@@ -903,20 +985,22 @@ public class AccountDB extends Application {
                             JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             shoppingList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
-                        loadShoppingList = 1; //Loading inventoryList success.
 
                     } else {
                         Log.d("AccountDB", "no success for get shopping");
+                        return -1;
                         //failed
-                        loadShoppingList = -1; //Loading inventoryList failed.
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            return 0;
+            return 1;
             }
 
-
+            /**
+             * Loads all products for the requirements from the database.
+             * @return - 1 if success, -1 if fail.
+             */
             protected int loadRequirements()
             {
                 loadingParams.add(new BasicNameValuePair(LIST, "requirements"));
@@ -938,32 +1022,36 @@ public class AccountDB extends Application {
                             JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             requirementsList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
                         }
-                        loadRequirements = 1; //Loading inventoryList success.
 
                     } else {
                         Log.d("AccountDB", "no success for get reqs");
+                        return -1;
                         //failed
-                        loadRequirements = -1; //Loading inventoryList failed.
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                return 0;
+                return 1;
             }
 
         }
 
+    /**
+     * Starts a SaveAccount to create and save an account in the database.
+     * @param name - Username of account.
+     * @param password - Password of account.
+     */
     public void saveAccount(String name, String password)
     {
         new SaveAccount(name, password).execute();
     }
 
+    /**
+     * AsyncTask that creates and saves an account in the database.
+     */
     public class SaveAccount extends AsyncTask<String, String, String> {
         private String username;
         private String password;
-        /**
-         * Before starting background thread
-         */
 
         public SaveAccount(String name, String password){
             this.username = name;
@@ -983,9 +1071,7 @@ public class AccountDB extends Application {
         }
 
         /**
-         * Create account in database cloud.
-         *
-         *
+         * Creates an account in the database.
          */
         private void createAccountDB() {
             // Building Parameters
@@ -1033,6 +1119,12 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * Stores the account details in the shared preferences.
+     * @param username - Username of account.
+     * @param password - Password of account.
+     */
+    @SuppressLint("CommitPrefEdits")
     public void storeAccountOnPhone(String username, String password){
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
         SharedPreferences.Editor accountEditor = account.edit();
@@ -1043,23 +1135,32 @@ public class AccountDB extends Application {
     }
 
     /**
-     * Update the account info on phone.
-     * @param user - the new value for accountUsername.
-     * @param password - the new value for accountPassword.
+     * Switches the account details stored in the shared preferences.
+     * @param user - Username of account.
+     * @param password - Password of account.
      */
     public void switchAccountOnPhone(String user, String password){
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
         SharedPreferences.Editor accountEditor = account.edit();
         accountEditor.clear();
+        accountEditor.commit();
         storeAccountOnPhone(user, password);
     }
 
+    /**
+     * Clears the current lists. Does not affect the data in the shared preferences or in the database, just in the current session.
+     */
     public void clearProducts(){
         inventoryList.clear();
         shoppingList.clear();
         requirementsList.clear();
     }
 
+    /**
+     * Sets a list adapter.
+     * @param list - The list to set the adapter for.
+     * @param adapter - The adapter.
+     */
     public void setAdapter(String list, ArrayAdapter adapter){
         switch(list) {
             case "inventory":
@@ -1077,27 +1178,44 @@ public class AccountDB extends Application {
     }
 
     /**
-     * Give connection back to a state where it is loading. Reseting connection.
+     * Resets connection to 0 to show that it is unconnected.
      */
     public void resetConnection(){
         connection = 0;
     }
 
+    /**
+     * Creates and returns a product by parsing a string and giving it the given key.
+     * @param string - The data of the product.
+     * @param key - The key of the product.
+     * @return - The created product.
+     */
     private Product parseProduct(String string, String key) {
         String[] strings = string.split("\\|"); // The double backslash is needed for some characters
-        // Namn, date, key, amount, code, expires
         return new Product(strings[0], strings[1], key, Integer.parseInt(strings[2]), strings[3], Boolean.valueOf(strings[4]));
     }
 
+    /**
+     * Finds a product in the list with the given key.
+     * @param key - The key to look for.
+     * @param list - The list to look in.
+     * @return - The first found product in the list with the key. If none are found, returns null.
+     */
     private Product keyToProduct (String key, ArrayList<Product> list)
     {
         for (Product p : list)
         {
-            if(p.getKey().equals(key)) return p;
+            if(p.getKey().equals(key)) {
+                return p;
+            }
         }
         return null;
     }
 
+    /**
+     * Returns the amount of products in all lists combined.
+     * @return - The amount of products in inventory + shopping list + requirements.
+     */
     public int getTotalProducts(){
         return inventoryList.size()+shoppingList.size()+ requirementsList.size();
     }
@@ -1111,14 +1229,5 @@ public class AccountDB extends Application {
     public int getLoadingProgress(){ return loadingProgress; }
     public int getSavingProgress(){return savingProgress; }
     public int getConnection(){ return connection; }
-    public int getIndexInventory() {
-        return indexInventory;
-    }
-    public int getIndexShoppingList() {
-        return indexShoppingList;
-    }
-    public int getIndexRequirements() {
-        return indexRequirements;
-    }
 
 }
