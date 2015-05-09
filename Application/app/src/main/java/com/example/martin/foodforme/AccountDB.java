@@ -60,18 +60,20 @@ public class AccountDB extends Application {
     private static final String url_create_account = ip + "create_account.php"; //Create account
     private static final String TAG_SUCCESS = "success";
     private static final String USERNAME = "name";
-    private static final String PASSWORD = "accountPassword";
+    private static final String PASSWORD = "password";
+    private static final String LIST = "list";
+    private static final String INDEX = "index";
 
-    SharedPreferences inventorySP,
-            shoppingSP,
-            requirementSP;
-    SharedPreferences.Editor inventoryEditor,
-            shoppingEditor,
-            requirementEditor;
+    private SharedPreferences inventorySP,
+                shoppingSP,
+                requirementSP;
+    private SharedPreferences.Editor inventoryEditor,
+                shoppingEditor,
+                requirementEditor;
 
-    JSONParser jsonParser = new JSONParser();
+    private JSONParser jsonParser = new JSONParser();
 
-    private static String noBarcode = "No barcode";
+    private static final String noBarcode = "No barcode";
 
     //Methods
 
@@ -87,7 +89,6 @@ public class AccountDB extends Application {
         new ConnectDB().execute();
         while(connection == 0)
         {
-            Log.d("AccountDB", "Waiting for connection.");
         }
         if(connection == 1){
             local = false;
@@ -147,19 +148,19 @@ public class AccountDB extends Application {
         shoppingEditor.clear();
         requirementEditor.clear();
 
-        getIndex("inventoryList");
+        getIndex("inventory");
         while(gettingIndex){}
         if(gettingIndexFailed) return;
         getIndex("shoppinglist");
         while(gettingIndex){}
         if(gettingIndexFailed) return;
-        getIndex("requirementsList");
+        getIndex("requirements");
         while(gettingIndex){}
         if(gettingIndexFailed) return;
 
-        inventoryEditor.putString("index", Integer.toString(indexInventory));
-        shoppingEditor.putString("index", Integer.toString(indexShoppingList));
-        requirementEditor.putString("index", Integer.toString(indexRequirements));
+        inventoryEditor.putString(INDEX, Integer.toString(indexInventory));
+        shoppingEditor.putString(INDEX, Integer.toString(indexShoppingList));
+        requirementEditor.putString(INDEX, Integer.toString(indexRequirements));
 
         for(Product p : inventoryList){
             inventoryEditor.putString(p.getKey(),p.toString());
@@ -200,43 +201,43 @@ public class AccountDB extends Application {
         inventoryEditor = inventorySP.edit();
         shoppingEditor = shoppingSP.edit();
         requirementEditor = requirementSP.edit();
-        if(!inventorySP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        if(!inventorySP.contains(INDEX))                            //If file does not contain the index, add it starting from 0.
         {
-            inventoryEditor.putString("index", "0");
+            inventoryEditor.putString(INDEX, "0");
             inventoryEditor.commit();
         }
-        if(!requirementSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        if(!requirementSP.contains(INDEX))                            //If file does not contain the index, add it starting from 0.
         {
-            requirementEditor.putString("index", "0");
+            requirementEditor.putString(INDEX, "0");
             requirementEditor.commit();
         }
-        if(!shoppingSP.contains("index"))                            //If file does not contain the index, add it starting from 0.
+        if(!shoppingSP.contains(INDEX))                            //If file does not contain the index, add it starting from 0.
         {
-            shoppingEditor.putString("index", "0");
+            shoppingEditor.putString(INDEX, "0");
             shoppingEditor.commit();
         }
 
-        indexInventory = Integer.parseInt(inventorySP.getString("index",""));  //Get and save the index.
-        indexRequirements = Integer.parseInt(requirementSP.getString("index",""));
-        indexShoppingList = Integer.parseInt(shoppingSP.getString("index", ""));
+        indexInventory = Integer.parseInt(inventorySP.getString(INDEX,""));  //Get and save the index.
+        indexRequirements = Integer.parseInt(requirementSP.getString(INDEX,""));
+        indexShoppingList = Integer.parseInt(shoppingSP.getString(INDEX, ""));
 
         Map<String,?> keys = inventorySP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
+            if(!entry.getKey().equals(INDEX))
             {
                 inventoryList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
         keys = shoppingSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
+            if(!entry.getKey().equals(INDEX))
             {
                 shoppingList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
         keys = requirementSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
-            if(!entry.getKey().equals("index"))
+            if(!entry.getKey().equals(INDEX))
             {
                 requirementsList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
@@ -246,9 +247,6 @@ public class AccountDB extends Application {
 
     public boolean existsAccountInDatabase(String username, String password){
         JSONParser jsonParser = new JSONParser();
-        String TAG_SUCCESS = "success";
-        String USERNAME = "name";
-        String PASSWORD = "password";
 
         // Building Parameters
         List<NameValuePair> params = new ArrayList<>();
@@ -289,9 +287,6 @@ public class AccountDB extends Application {
 
         //JSON
         private JSONParser jsonParser = new JSONParser();
-        private static final String TAG_SUCCESS = "success";
-        private static final String USERNAME = "name";
-        private static final String PASSWORD = "accountPassword";
 
         //Methods
         @Override
@@ -346,7 +341,7 @@ public class AccountDB extends Application {
             SharedPreferences.Editor editor;
             Log.d("addProduct", "Locally");
             switch(list){
-                case("inventoryList"):
+                case("inventory"):
                     indexInventory++;
                     newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
                     inventoryList.add(newProduct);
@@ -354,8 +349,8 @@ public class AccountDB extends Application {
                     inventoryAdapter.notifyDataSetChanged();
                     editor = inventoryEditor;
                     editor.putString(Integer.toString(indexInventory),newProduct.toString());
-                    editor.remove("index");
-                    editor.putString("index", Integer.toString(indexInventory));
+                    editor.remove(INDEX);
+                    editor.putString(INDEX, Integer.toString(indexInventory));
                     break;
                 case("shoppinglist"):
                     indexShoppingList++;
@@ -365,19 +360,22 @@ public class AccountDB extends Application {
                     shoppinglistAdapter.notifyDataSetChanged();
                     editor = shoppingEditor;
                     editor.putString(Integer.toString(indexShoppingList),newProduct.toString());
-                    editor.remove("index");
-                    editor.putString("index", Integer.toString(indexShoppingList));
+                    editor.remove(INDEX);
+                    editor.putString(INDEX, Integer.toString(indexShoppingList));
                     break;
-                default:
+                case("requirements"):
                     indexRequirements++;
                     newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
                     requirementsList.add(newProduct);
                     requirementsAdapter.notifyDataSetChanged();
                     editor = requirementEditor;
                     editor.putString(Integer.toString(indexRequirements),newProduct.toString());
-                    editor.remove("index");
-                    editor.putString("index", Integer.toString(indexRequirements));
+                    editor.remove(INDEX);
+                    editor.putString(INDEX, Integer.toString(indexRequirements));
                     break;
+                default:
+                    Log.d("addProduct", "List invalid");
+                    return;
             }
             editor.commit();
 
@@ -394,13 +392,13 @@ public class AccountDB extends Application {
             increaseIndex(list);
             switch(list)
             {
-                case "inventoryList":
+                case "inventory":
                     newProduct = new Product(name, date, Integer.toString(indexInventory), amount, code, expires);
                     break;
                 case "shoppinglist":
                     newProduct = new Product(name, date, Integer.toString(indexShoppingList), amount, code, expires);
                     break;
-                case "requirementsList":
+                case "requirements":
                     newProduct = new Product(name, date, Integer.toString(indexRequirements), amount, code, expires);
                     break;
                 default:
@@ -431,7 +429,7 @@ public class AccountDB extends Application {
         protected void onPostExecute(String result){
             switch(list)
             {
-                case "inventoryList":
+                case "inventory":
                     if(inventoryAdapter!=null) {
                         Collections.sort(inventoryList);
                         inventoryAdapter.notifyDataSetChanged();
@@ -443,7 +441,7 @@ public class AccountDB extends Application {
                         shoppinglistAdapter.notifyDataSetChanged();
                     }
                     break;
-                case "requirementsList":
+                case "requirements":
                     if(requirementsAdapter!=null) {
                         requirementsAdapter.notifyDataSetChanged();
                     }
@@ -454,7 +452,7 @@ public class AccountDB extends Application {
         protected String doInBackground(String... params) {
             List<NameValuePair> insertparams = new ArrayList<>();
             insertparams.add(new BasicNameValuePair("name", name));
-            insertparams.add(new BasicNameValuePair("accountPassword", accountPassword));
+            insertparams.add(new BasicNameValuePair("password", accountPassword));
             insertparams.add(new BasicNameValuePair("data", data));
             insertparams.add(new BasicNameValuePair("key", key));
             insertparams.add(new BasicNameValuePair("list", list));
@@ -468,13 +466,13 @@ public class AccountDB extends Application {
 
                     switch(list)
                     {
-                        case "inventoryList":
+                        case "inventory":
                             inventoryList.add(parseProduct(data, key));
                             break;
                         case "shoppinglist":
                             shoppingList.add(parseProduct(data, key));
                             break;
-                        case "requirementsList":
+                        case "requirements":
                             requirementsList.add(parseProduct(data, key));
                             break;
                     }
@@ -514,7 +512,7 @@ public class AccountDB extends Application {
         protected String doInBackground(String... params) {
             List<NameValuePair> insertparams = new ArrayList<>();
             insertparams.add(new BasicNameValuePair("name", name));
-            insertparams.add(new BasicNameValuePair("accountPassword", accountPassword));
+            insertparams.add(new BasicNameValuePair("password", accountPassword));
             insertparams.add(new BasicNameValuePair("data", data));
             insertparams.add(new BasicNameValuePair("key", key));
             insertparams.add(new BasicNameValuePair("list", list));
@@ -544,7 +542,7 @@ public class AccountDB extends Application {
         {
             SharedPreferences.Editor editor;
             switch(list){
-                case "inventoryList":
+                case "inventory":
                     editor = inventoryEditor;
                     inventoryList.remove(deletedProduct);
                     break;
@@ -552,7 +550,7 @@ public class AccountDB extends Application {
                     editor = shoppingEditor;
                     shoppingList.remove(deletedProduct);
                     break;
-                case "requirementsList":
+                case "requirements":
                     editor = requirementEditor;
                     requirementsList.remove(deletedProduct);
                     break;
@@ -587,7 +585,7 @@ public class AccountDB extends Application {
         protected void onPostExecute(String result){
             switch(list)
             {
-                case "inventoryList":
+                case "inventory":
                     Collections.sort(inventoryList);
                     inventoryAdapter.notifyDataSetChanged();
                     break;
@@ -595,7 +593,7 @@ public class AccountDB extends Application {
                     Collections.sort(shoppingList);
                     shoppinglistAdapter.notifyDataSetChanged();
                     break;
-                case "requirementsList":
+                case "requirements":
                     requirementsAdapter.notifyDataSetChanged();
                     break;
             }
@@ -605,7 +603,7 @@ public class AccountDB extends Application {
         protected String doInBackground(String... params) {
             List<NameValuePair> deleteparams = new ArrayList<>();
             deleteparams.add(new BasicNameValuePair("name", name));
-            deleteparams.add(new BasicNameValuePair("accountPassword", password));
+            deleteparams.add(new BasicNameValuePair("password", password));
             deleteparams.add(new BasicNameValuePair("key", key));
             deleteparams.add(new BasicNameValuePair("list", list));
             JSONObject json = jsonParser.makeHttpRequest(url_delete_product, "POST", deleteparams);
@@ -617,13 +615,13 @@ public class AccountDB extends Application {
                     Log.d("AccountDB", "success for delete product");
                     switch(list)
                     {
-                        case "inventoryList":
+                        case "inventory":
                             inventoryList.remove(keyToProduct(key, inventoryList));
                             break;
                         case "shoppinglist":
                             shoppingList.remove(keyToProduct(key, shoppingList));
                             break;
-                        case "requirementsList":
+                        case "requirements":
                             requirementsList.remove(keyToProduct(key, requirementsList));
                             break;
                     }
@@ -660,7 +658,7 @@ public class AccountDB extends Application {
             Log.d("SaveProducts", "Saving " + inventoryList.size() + " products to inventoryList");
             for(Product p : inventoryList)
             {
-                SaveInDatabase sp = new SaveInDatabase(accountUsername, p.toString(), p.getKey(), "inventoryList");
+                SaveInDatabase sp = new SaveInDatabase(accountUsername, p.toString(), p.getKey(), "inventory");
                 sp.execute();
             }
             Log.d("SaveProducts", "Saving " + shoppingList.size() + " products to shopping list");
@@ -672,7 +670,7 @@ public class AccountDB extends Application {
             Log.d("SaveProducts", "Saving " + requirementsList.size() + " products to requirementsList");
             for(Product p : requirementsList)
             {
-                SaveInDatabase sp = new SaveInDatabase(accountUsername, p.toString(), p.getKey(), "requirementsList");
+                SaveInDatabase sp = new SaveInDatabase(accountUsername, p.toString(), p.getKey(), "requirements");
                 sp.execute();
             }
             return null;
@@ -697,11 +695,6 @@ public class AccountDB extends Application {
     {
         private JSONParser jsonParser = new JSONParser();
         private String list;
-        private static final String TAG_SUCCESS = "success";
-        private static final String USERNAME = "name";
-        private static final String PASSWORD = "accountPassword";
-        private static final String INDEX = "index";
-        private static final String LIST = "list";
         List<NameValuePair> indexParams;
 
         //Methods
@@ -729,13 +722,13 @@ public class AccountDB extends Application {
                             .getJSONArray(INDEX); // JSON Array
                     JSONObject product = productObj.getJSONObject(0);   // get first product object from JSON Array
                     switch(list){
-                        case "inventoryList":
+                        case "inventory":
                             indexInventory = product.getInt(INDEX);
                             break;
                         case "shoppinglist":
                             indexShoppingList = product.getInt(INDEX);
                             break;
-                        case "requirementsList":
+                        case "requirements":
                             indexRequirements = product.getInt(INDEX);
                             break;
                     }
@@ -758,10 +751,6 @@ public class AccountDB extends Application {
     {
         private JSONParser jsonParser = new JSONParser();
         private String list;
-        private static final String TAG_SUCCESS = "success";
-        private static final String USERNAME = "name";
-        private static final String PASSWORD = "accountPassword";
-        private static final String LIST = "list";
         List<NameValuePair> indexParams;
 
         //Methods
@@ -820,10 +809,6 @@ public class AccountDB extends Application {
     private class LoadProducts extends AsyncTask<String, String, String>
         {
             private JSONParser jsonParser = new JSONParser();
-            private static final String TAG_SUCCESS = "success";
-            private static final String USERNAME = "name";
-            private static final String PASSWORD = "accountPassword";
-            private static final String LIST = "list";
             List<NameValuePair> loadingParams;
 
             @Override
@@ -864,7 +849,7 @@ public class AccountDB extends Application {
 
             protected int loadInventory()
             {
-                loadingParams.add(new BasicNameValuePair(LIST, "inventoryList"));
+                loadingParams.add(new BasicNameValuePair(LIST, "inventory"));
                 // getting JSON Object
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
@@ -879,7 +864,7 @@ public class AccountDB extends Application {
                         //successfully
                         Log.d("AccountDB", "success for get inventoryList");
                         JSONArray productObj = json
-                                .getJSONArray("inventoryList"); // JSON Array
+                                .getJSONArray("inventory"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
                             JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             Log.d("AccountDB", "Adding product to inventoryList: " + product.getString("data"));
@@ -934,7 +919,7 @@ public class AccountDB extends Application {
 
             protected int loadRequirements()
             {
-                loadingParams.add(new BasicNameValuePair(LIST, "requirementsList"));
+                loadingParams.add(new BasicNameValuePair(LIST, "requirements"));
                 // getting JSON Object
                 // Note that create product url accepts POST method
                 JSONObject json = jsonParser.makeHttpRequest(url_get_products, "GET", loadingParams);
@@ -948,7 +933,7 @@ public class AccountDB extends Application {
                         //successfully
                         Log.d("AccountDB", "success for get reqs");
                         JSONArray productObj = json
-                                .getJSONArray("requirementsList"); // JSON Array
+                                .getJSONArray("requirements"); // JSON Array
                         for(int i = 0; i < productObj.length(); i++) {
                             JSONObject product = productObj.getJSONObject(i);   // get first product object from JSON Array
                             requirementsList.add(parseProduct(product.getString("data"), product.getString("key"))); // sets databaseName to what was found in the database
@@ -1077,13 +1062,13 @@ public class AccountDB extends Application {
 
     public void setAdapter(String list, ArrayAdapter adapter){
         switch(list) {
-            case "inventoryList":
+            case "inventory":
                 inventoryAdapter = adapter;
                 break;
             case "shoppinglist":
                 shoppinglistAdapter = adapter;
                 break;
-            case "requirementsList":
+            case "requirements":
                 requirementsAdapter = adapter;
                 break;
             default:
