@@ -26,11 +26,17 @@ import java.util.Map;
  */
 public class NotifyService extends Service {
 
-    boolean local;
-    ArrayList<Product> inventoryList = new ArrayList<>();
-    ArrayList<Product> expiringProducts = new ArrayList<>();
-    String title, details = "", username, password;
-    int today = 0, tomorrow = 0, dayAfterTomorrow = 0, inventoryLoader = 0;
+    private boolean local;
+    private ArrayList<Product> inventoryList = new ArrayList<>();
+    private ArrayList<Product> expiringProducts = new ArrayList<>();
+    private String title,
+            details = "",
+            username,
+            password;
+    int today = 0,
+            tomorrow = 0,
+            dayAfterTomorrow = 0,
+            inventoryLoader = 0;
     private final static String TAG = "Notifications";
     private static final String ip = "http://ffm.student.it.uu.se/cloud/"; // Ip-address for database
     private static final String url_get_products = ip + "get_products.php"; //Get all products from a user
@@ -169,7 +175,7 @@ public class NotifyService extends Service {
         //Methods
         @Override
         protected String doInBackground(String... params) {
-            Log.d("getProducts", "Initiating product loading...");
+            Log.d("loadProducts", "Initiating product loading...");
             // Building Parameters
             loadingParams = new ArrayList<>();
             loadingParams.add(new BasicNameValuePair(USERNAME, username));

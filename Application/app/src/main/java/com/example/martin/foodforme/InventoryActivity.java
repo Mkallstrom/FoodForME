@@ -23,27 +23,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 
 
 public class InventoryActivity extends ActionBarActivity {
 
     private Scanner scanner;
-    AccountDB accountDB;
+    private AccountDB accountDB;
 
-    ArrayAdapter inventoryAdapter;
-    ArrayList<Product> shoppingList, requiredList, inventoryList;
+    private ArrayAdapter inventoryAdapter;
+    private ArrayList<Product> shoppingList,
+            requirementList,
+            inventoryList;
 
-    int REMOVE = 1,
-            EDIT = 2,
-            REQUIREMENT = 3;
+    private static final int REMOVE = 1,
+                        EDIT = 2,
+                        REQUIREMENT = 3;
 
-    ListView listView;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +51,12 @@ public class InventoryActivity extends ActionBarActivity {
         setContentView(R.layout.activity_inventory);
         Context context = this;
         accountDB = (AccountDB) getApplicationContext();
-        if(!accountDB.isLocal())setTitle(accountDB.getUsername() + "'s Inventory");
+        if(!accountDB.isLocal())setTitle(accountDB.getAccountUsername() + "'s Inventory");
         else setTitle("Inventory");
 
         inventoryList = accountDB.returnInventory();
         shoppingList = accountDB.returnShoppingList();
-        requiredList = accountDB.returnRequirements();
+        requirementList = accountDB.returnRequirements();
 
         inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
         accountDB.setAdapter("inventory", inventoryAdapter);
@@ -114,7 +113,7 @@ public class InventoryActivity extends ActionBarActivity {
         if(itemID == REMOVE)
         {
             Product product = inventoryList.get(info.position);
-            accountDB.removeProduct(product,"inventory");
+            accountDB.deleteProduct(product, "inventory");
             inventoryAdapter.notifyDataSetChanged();
             setEmptyText();
 
@@ -132,7 +131,7 @@ public class InventoryActivity extends ActionBarActivity {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = inventoryList.get(info.position);
                             item.setAmount(Integer.toString(amount));
-                            accountDB.removeProduct(item, "inventory");
+                            accountDB.deleteProduct(item, "inventory");
                             accountDB.addProduct(item.getName(), item.getExpiryDate(), Integer.parseInt(item.getAmount()), item.getCode(), item.expires(), "inventory");
                             inventoryAdapter.notifyDataSetChanged();
                             Collections.sort(inventoryList);
@@ -147,23 +146,23 @@ public class InventoryActivity extends ActionBarActivity {
         else if(itemID == REQUIREMENT)
         {
 
-            Product requiredItem = null;
-            if(!requiredList.isEmpty())
+            Product requiredProduct = null;
+            if(!requirementList.isEmpty())
             {
-                for (Product p : requiredList)
+                for (Product p : requirementList)
                 {
                     if (inventoryList.get(info.position).getCode().equals(p.getCode()))
                     {
-                        requiredItem = p;
+                        requiredProduct = p;
                     }
                 }
             }
 
-            if(requiredItem!=null)
+            if(requiredProduct!=null)
             {
-                requiredItem.setAmount(Integer.toString(Integer.parseInt(requiredItem.getAmount())+1));
-                accountDB.removeProduct(requiredItem,"requirements");
-                accountDB.addProduct(requiredItem.getName(), requiredItem.getExpiryDate(), Integer.parseInt(requiredItem.getAmount()), requiredItem.getCode(), requiredItem.expires(), "requirements");
+                requiredProduct.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount())+1));
+                accountDB.deleteProduct(requiredProduct, "requirements");
+                accountDB.addProduct(requiredProduct.getName(), requiredProduct.getExpiryDate(), Integer.parseInt(requiredProduct.getAmount()), requiredProduct.getCode(), requiredProduct.expires(), "requirements");
             }
             else
             {
@@ -231,7 +230,7 @@ public class InventoryActivity extends ActionBarActivity {
         if(boughtItem!=null)
         {
             boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
-            accountDB.removeProduct(boughtItem,"shoppinglist");
+            accountDB.deleteProduct(boughtItem, "shoppinglist");
             if(Integer.parseInt(boughtItem.getAmount()) > 0)
             {
                 accountDB.addProduct(boughtItem.getName(),boughtItem.getExpiryDate(),Integer.parseInt(boughtItem.getAmount()),boughtItem.getCode(),boughtItem.expires(), "shoppinglist");

@@ -20,10 +20,13 @@ import java.util.ArrayList;
 
 public class RequirementActivity extends ActionBarActivity {
 
-    ArrayList<Product> requiredList;
-    ListView requiredListView;
-    ArrayAdapter requiredAdapter;
-    AccountDB accountDB;
+    private ArrayList<Product> requirementList;
+
+    private ListView requirementListView;
+
+    private ArrayAdapter requirementAdapter;
+
+    private AccountDB accountDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +34,19 @@ public class RequirementActivity extends ActionBarActivity {
         setContentView(R.layout.activity_requirement);
         Context context = this;
         accountDB = (AccountDB) getApplicationContext();
-        if(!accountDB.isLocal())setTitle(accountDB.getUsername() + "'s Requirements");
+        if(!accountDB.isLocal())setTitle(accountDB.getAccountUsername() + "'s Requirements");
         else setTitle("Requirements");
 
-        requiredList = accountDB.returnRequirements();
+        requirementList = accountDB.returnRequirements();
 
-        requiredAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,requiredList);
+        requirementAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout, requirementList);
 
-        requiredListView = (ListView) findViewById(R.id.requirementlistView);
-        requiredListView.setAdapter(requiredAdapter);
-        accountDB.setAdapter("requirements", requiredAdapter);
-        registerForContextMenu(requiredListView);
+        requirementListView = (ListView) findViewById(R.id.requirementlistView);
+        requirementListView.setAdapter(requirementAdapter);
+        accountDB.setAdapter("requirements", requirementAdapter);
+        registerForContextMenu(requirementListView);
 
-        requiredListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        requirementListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
@@ -61,7 +64,7 @@ public class RequirementActivity extends ActionBarActivity {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
         if(v == findViewById(R.id.requirementlistView))
         {
-            menu.setHeaderTitle("Edit " + requiredList.get(info.position).getName());
+            menu.setHeaderTitle("Edit " + requirementList.get(info.position).getName());
             menu.add(0, 1, 0, "Edit Amount");
             menu.add(0, 2, 0, "Remove");
         }
@@ -77,14 +80,14 @@ public class RequirementActivity extends ActionBarActivity {
             txtUrl.setInputType(InputType.TYPE_CLASS_NUMBER);
 
             new AlertDialog.Builder(this)
-                    .setTitle(requiredList.get(info.position).getName())
+                    .setTitle(requirementList.get(info.position).getName())
                     .setView(txtUrl)
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
-                            Product item = requiredList.get(info.position);
+                            Product item = requirementList.get(info.position);
                             item.setAmount(Integer.toString(amount));
-                            accountDB.removeProduct(item, "requirements");
+                            accountDB.deleteProduct(item, "requirements");
                             accountDB.addProduct(item.getName(), item.getExpiryDate(), Integer.parseInt(item.getAmount()), item.getCode(), item.expires(), "requirements");
                         }
                     })
@@ -95,8 +98,8 @@ public class RequirementActivity extends ActionBarActivity {
                     .show();
 
         } else if(itemID == 2) {
-            Product shoppingItem = requiredList.get(info.position);
-            accountDB.removeProduct(shoppingItem, "requirements");
+            Product shoppingItem = requirementList.get(info.position);
+            accountDB.deleteProduct(shoppingItem, "requirements");
 
 
         } else {return false;}

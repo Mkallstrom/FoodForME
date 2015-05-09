@@ -24,11 +24,13 @@ import java.util.Collections;
 public class ShoppingListActivity extends ActionBarActivity {
 
     private Scanner scanner;
-    AccountDB accountDB;
-    ArrayList<Product> shoppingList, requiredList, inventoryList;
-    ArrayAdapter shoppingAdapter;
+    private AccountDB accountDB;
+    private ArrayList<Product> shoppingList,
+            requirementList,
+            inventoryList;
+    private ArrayAdapter shoppingAdapter;
 
-    ListView shoppingListView;
+    private ListView shoppingListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +39,12 @@ public class ShoppingListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_shopping_list);
         Context context = this;
         accountDB = (AccountDB) getApplicationContext();
-        if(!accountDB.isLocal())setTitle(accountDB.getUsername() + "'s Shopping List");
+        if(!accountDB.isLocal())setTitle(accountDB.getAccountUsername() + "'s Shopping List");
         else setTitle("Shopping List");
 
         inventoryList = accountDB.returnInventory();
         shoppingList = accountDB.returnShoppingList();
-        requiredList = accountDB.returnRequirements();
+        requirementList = accountDB.returnRequirements();
 
         shoppingAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout,shoppingList);
         accountDB.setAdapter("shoppinglist", shoppingAdapter);
@@ -96,7 +98,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
                             Product item = shoppingList.get(info.position);
-                            accountDB.removeProduct(item, "shoppinglist");
+                            accountDB.deleteProduct(item, "shoppinglist");
                             item.setAmount(Integer.toString(amount));
                             accountDB.addProduct(item.getName(),item.getExpiryDate(),Integer.parseInt(item.getAmount()),item.getCode(),item.expires(),"shoppinglist");
                             shoppingAdapter.notifyDataSetChanged();
@@ -110,7 +112,7 @@ public class ShoppingListActivity extends ActionBarActivity {
 
         } else if(itemID == 2) {
             Product shoppingItem = shoppingList.get(info.position);
-            accountDB.removeProduct(shoppingItem,"shoppinglist");
+            accountDB.deleteProduct(shoppingItem, "shoppinglist");
             shoppingAdapter.notifyDataSetChanged();
 
 
@@ -190,7 +192,7 @@ public class ShoppingListActivity extends ActionBarActivity {
         if(boughtItem!=null)
         {
             boughtItem.setAmount(Integer.toString(Integer.parseInt(boughtItem.getAmount())-1));
-            accountDB.removeProduct(boughtItem, "shoppinglist");
+            accountDB.deleteProduct(boughtItem, "shoppinglist");
             if(Integer.parseInt(boughtItem.getAmount()) > 0)
             {
                 accountDB.addProduct(boughtItem.getName(), boughtItem.getExpiryDate(), Integer.parseInt(boughtItem.getAmount()), boughtItem.getCode(), boughtItem.expires(), "shoppinglist");
@@ -223,7 +225,7 @@ public class ShoppingListActivity extends ActionBarActivity {
     {
         ArrayList shoppingCodes = new ArrayList();
         for(Product p : shoppingList) { shoppingCodes.add(p.getCode()); }
-        for(Product requiredProduct : requiredList)
+        for(Product requiredProduct : requirementList)
         {
             String requiredCode = requiredProduct.getCode();
             Product changedItem = null;
@@ -255,7 +257,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                 {
                     Toast.makeText(this,"Added " + Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - Integer.parseInt(changedItem.getAmount())) + " of " + changedItem.getName() + " to shopping list.",Toast.LENGTH_SHORT).show();
                     changedItem.setAmount(Integer.toString(Integer.parseInt(requiredProduct.getAmount()) - inventoryAmount));
-                    accountDB.removeProduct(changedItem,"shoppinglist");
+                    accountDB.deleteProduct(changedItem, "shoppinglist");
                     accountDB.addProduct(changedItem.getName(),changedItem.getExpiryDate(),Integer.parseInt(changedItem.getAmount()),changedItem.getCode(),changedItem.expires(),"shoppinglist");
                 }
             }

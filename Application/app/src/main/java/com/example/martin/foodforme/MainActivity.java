@@ -22,14 +22,14 @@ public class MainActivity extends ActionBarActivity {
 
     private Context context;
 
-    SharedPreferences account;
+    private SharedPreferences account;
 
-    String username;
-    String password;
+    private String username;
+    private String password;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
-    AccountDB accountDB;
+    private AccountDB accountDB;
 
 
     @Override
@@ -55,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
     private void connect(){
-        accountDB.setDetails(username, password);
+        accountDB.connectToDatabase(username, password);
         int connecting = 0;
         while(connecting == 0){
             connecting = accountDB.getConnection();
@@ -139,7 +139,7 @@ public class MainActivity extends ActionBarActivity {
 }
     public void copyToLocal(){
         progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setTitle(accountDB.getUsername());
+        progressDialog.setTitle(accountDB.getAccountUsername());
         progressDialog.setMessage("Copying products...");
         progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
         progressDialog.setProgress(0);
@@ -340,7 +340,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void loadProducts(){
         progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setTitle(accountDB.getUsername());
+        progressDialog.setTitle(accountDB.getAccountUsername());
         progressDialog.setMessage("Loading products...");
         progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
         progressDialog.setProgress(0);
@@ -351,7 +351,7 @@ public class MainActivity extends ActionBarActivity {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                accountDB.getProducts();
+                accountDB.loadProducts();
                 int loading = 0;
                 while(loading < 3){
                     loading = accountDB.getLoadingProgress();
@@ -383,7 +383,7 @@ public class MainActivity extends ActionBarActivity {
 
         public boolean existInDB(String user, String pass){
             accountDB.resetConnection();
-            accountDB.existAccountInDatabase(user, pass);
+            accountDB.existsAccountInDatabase(user, pass);
             int existsInDBConnection = 0;
             while(existsInDBConnection == 0) {
                 existsInDBConnection = accountDB.getConnection();

@@ -20,10 +20,10 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
     private int resource;
     private ArrayList<Product> products;
     LayoutInflater inflater;
-    int expiredColor = Color.rgb(255, 178, 178);
-    int expiringShortColor = Color.rgb(255, 255, 178);
-    int expiringLongColor = Color.rgb(178, 255, 178);
-    int nonExpiringColor = Color.rgb(178, 178, 255);
+    private static final int expiredColor = Color.rgb(255, 178, 178);
+    private static final int expiringShortColor = Color.rgb(255, 255, 178);
+    private static final int expiringLongColor = Color.rgb(178, 255, 178);
+    private static final int nonExpiringColor = Color.rgb(178, 178, 255);
 
     public ListArrayAdapter (Context context, int resource, ArrayList products)
     {

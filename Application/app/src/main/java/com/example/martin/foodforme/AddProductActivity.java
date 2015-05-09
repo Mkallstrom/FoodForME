@@ -52,21 +52,21 @@ import java.util.List;
 
 public class AddProductActivity extends ActionBarActivity {
     //Attributes
-    SharedPreferences localBarcodes;
-    TextView codeView;
-    EditText productName;
-    EditText productAmount;
+    private SharedPreferences localBarcodes;
+    private TextView codeView;
+    private EditText productName;
+    private EditText productAmount;
 
-    String productString;
-    String barcode;
-    String databaseName;
+    private String productString;
+    private String barcode;
+    private String databaseName;
 
-    Context context;
-    Boolean databaseHasProduct = false;
-    Boolean localHasProduct = false;
-    Boolean connection = false;
-    JSONObject json;
-    JSONParser jsonParser = new JSONParser();
+    private Context context;
+    private Boolean databaseHasProduct = false;
+    private Boolean localHasProduct = false;
+    private Boolean connection = false;
+    private JSONObject json;
+    private JSONParser jsonParser = new JSONParser();
 
     public static final String DATA_PATH = Environment
             .getExternalStorageDirectory().toString() + "/FoodForME/";
@@ -87,7 +87,7 @@ public class AddProductActivity extends ActionBarActivity {
     private static final String TAG_PRODUCT = "product";
     private static final String TAG_BARCODE = "barcode";
 
-    AccountDB accountDB;
+    private AccountDB accountDB;
 
     //Methods
     @Override
@@ -98,7 +98,7 @@ public class AddProductActivity extends ActionBarActivity {
         setContentView(R.layout.activity_add_product);
         context = this;
         accountDB = (AccountDB) getApplicationContext();
-        if(!accountDB.isLocal()) setTitle(accountDB.getUsername() + " - Add Product");
+        if(!accountDB.isLocal()) setTitle(accountDB.getAccountUsername() + " - Add Product");
         else setTitle("Add Product");
 
         String[] paths = new String[]{DATA_PATH, DATA_PATH + "tessdata/"};

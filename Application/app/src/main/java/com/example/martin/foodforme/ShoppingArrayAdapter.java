@@ -21,8 +21,8 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
     private ArrayList<Product> products;
     LayoutInflater inflater;
 
-    int requiredColor = Color.rgb(255, 178, 178);
-    int manualColor = Color.rgb(255, 255, 178);
+    private static final int requiredColor = Color.rgb(255, 178, 178);
+    private static final int manualColor = Color.rgb(255, 255, 178);
 
     public ShoppingArrayAdapter (Context context, int resource, ArrayList products)
     {

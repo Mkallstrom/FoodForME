@@ -20,7 +20,7 @@ public class Product implements Comparable<Product>{
     private int expiryMonth;
     private int expiryDay;
 
-    private String DUMMY_DATE = "9999-99-99"; // sets a dummy date for products without expiration
+    private static final String DUMMY_DATE = "9999-99-99"; // sets a dummy date for products without expiration
 
     /**
      * Public constructor for a Product object
