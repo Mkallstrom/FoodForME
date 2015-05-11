@@ -130,8 +130,8 @@ public class InventoryActivity extends ActionBarActivity {
                     .setView(txtUrl)
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            int amount = Integer.parseInt(txtUrl.getText().toString());
-                            if(amount>999999999)
+                            int amount = txtUrl.getText().toString().length();
+                            if(amount>9)
                             {
                                 amount = 999999999;
                             }
