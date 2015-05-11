@@ -89,7 +89,7 @@ public class RequirementActivity extends ActionBarActivity {
                             int amount = txtUrl.getText().toString().length();
                             if(amount>9)
                             {
-                                amount = 9;
+                                amount = 999999999;
                             }
                             Product item = requirementList.get(info.position);
                             item.setAmount(Integer.toString(amount));
