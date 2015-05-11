@@ -678,8 +678,8 @@ public class AddProductActivity extends ActionBarActivity {
                 if (databaseHasProduct) {
                     if (!databaseName.equals(productString))// if the product is in the database and the name does not match the new String
                     {
-                        Log.d("Saving: ", productString);
-                        new SaveProductDetails().execute();
+                        Log.d("AddProductAct", productString + " has different name in database.");
+                        //new SaveProductDetails().execute();
                     }                                                                        // Saves the new String to the database
                 }
             } else if (success == 0) {

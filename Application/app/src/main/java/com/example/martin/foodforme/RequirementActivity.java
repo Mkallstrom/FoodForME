@@ -85,6 +85,10 @@ public class RequirementActivity extends ActionBarActivity {
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
+                            if(amount>999999999)
+                            {
+                                amount = 999999999;
+                            }
                             Product item = requirementList.get(info.position);
                             item.setAmount(Integer.toString(amount));
                             accountDB.deleteProduct(item, "requirements");
@@ -97,7 +101,7 @@ public class RequirementActivity extends ActionBarActivity {
                     })
                     .show();
 
-        } else if(itemID == 2) {
+        } else if (itemID == 2) {
             Product shoppingItem = requirementList.get(info.position);
             accountDB.deleteProduct(shoppingItem, "requirements");
 

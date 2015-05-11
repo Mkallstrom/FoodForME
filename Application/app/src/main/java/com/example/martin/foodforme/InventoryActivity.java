@@ -129,6 +129,10 @@ public class InventoryActivity extends ActionBarActivity {
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
+                            if(amount>999999999)
+                            {
+                                amount = 999999999;
+                            }
                             Product item = inventoryList.get(info.position);
                             item.setAmount(Integer.toString(amount));
                             accountDB.deleteProduct(item, "inventory");

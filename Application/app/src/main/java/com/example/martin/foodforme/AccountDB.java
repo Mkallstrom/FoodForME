@@ -233,6 +233,8 @@ public class AccountDB extends Application {
         indexRequirements = Integer.parseInt(requirementSP.getString(INDEX,""));
         indexShoppingList = Integer.parseInt(shoppingSP.getString(INDEX, ""));
 
+        clearProducts();
+
         Map<String,?> keys = inventorySP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals(INDEX))
@@ -432,8 +434,8 @@ public class AccountDB extends Application {
                     Log.d("addProduct", "List invalid.");
                     return;
             }
-            AddToDatabase ip = new AddToDatabase(accountUsername, newProduct.toString(),newProduct.getKey(),list);
-            ip.execute();
+            AddToDatabase addToDatabase = new AddToDatabase(accountUsername, newProduct.toString(),newProduct.getKey(),list);
+            addToDatabase.execute();
 
         }
     }
@@ -1157,6 +1159,21 @@ public class AccountDB extends Application {
     }
 
     /**
+     * Reloads products.
+     */
+    public void refreshProducts(){
+        if(local){
+            loadSharedPreferences();
+        }
+        else {
+            loadProducts();
+        }
+        inventoryAdapter.notifyDataSetChanged();
+        shoppinglistAdapter.notifyDataSetChanged();
+        requirementsAdapter.notifyDataSetChanged();
+    }
+
+    /**
      * Sets a list adapter.
      * @param list - The list to set the adapter for.
      * @param adapter - The adapter.
@@ -1184,7 +1201,12 @@ public class AccountDB extends Application {
         connection = 0;
     }
 
-
+    /**
+     * Gets whether a requirement is unfulfilled, partially fulfilled, or fulfilled.
+     * @param requiredAmount - The amount of the product required.
+     * @param code - The barcode of the product required.
+     * @return - 0 if the amount of the item in the inventory is equal to the amount required. 1 if it is more than 0 but not equal. 2 if none are in the inventory.
+     */
     public int getRequirementStatus(int requiredAmount, String code){
         int currentAmount = 0;
         for(Product inventoryItem : inventoryList)
@@ -1212,6 +1234,11 @@ public class AccountDB extends Application {
         }
     }
 
+    /**
+     * Gets the amount required of a product.
+     * @param code - The code of the product.
+     * @return - The amount required of the product.
+     */
     public int getRequiredAmount (String code){
         int requiredAmount = 0;
         for(Product requirement : requirementsList)
