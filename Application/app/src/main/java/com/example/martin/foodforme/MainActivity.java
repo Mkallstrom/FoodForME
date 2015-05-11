@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity {
                     .show();
         }
         else {
-            setTitle(username);
+            setTitle("FoodForMe: " + username);
             loadProducts();
         }
     }
