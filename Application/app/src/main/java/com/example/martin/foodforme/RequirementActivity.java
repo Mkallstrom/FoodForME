@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 
 public class RequirementActivity extends ActionBarActivity {
 
+    private ProgressDialog progressDialog;
     private ArrayList<Product> requirementList;
 
     private ListView requirementListView;
@@ -136,6 +138,45 @@ public class RequirementActivity extends ActionBarActivity {
         // Namn, date, key, amount, code
         return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3], Boolean.parseBoolean(strings[4]));
 
+    }
+
+    /**
+     * Update all products in the list to the database.
+     */
+    public boolean refresh(MenuItem item){
+
+        progressDialog = new ProgressDialog(RequirementActivity.this);
+        progressDialog.setTitle(accountDB.getAccountUsername());
+        progressDialog.setMessage("Refreshing...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(3);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.refreshProducts();
+                int loading = 0;
+                while(loading < 3){
+                    loading = accountDB.getLoadingProgress();
+                    progressDialog.setProgress(loading);
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
+
+        this.progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+                requirementAdapter.notifyDataSetChanged();
+            }
+        });
+        return true;
     }
 
 }

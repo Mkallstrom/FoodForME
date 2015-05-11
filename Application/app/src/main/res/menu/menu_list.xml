@@ -4,4 +4,11 @@
     tools:context="com.example.martin.foodforme.ShoppingListActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
+
+    <item android:id="@+id/action_search"
+        android:icon="@android:drawable/stat_notify_sync"
+        android:title="@string/refresh"
+        app:showAsAction="ifRoom"
+        android:onClick="refresh"
+        />
 </menu>

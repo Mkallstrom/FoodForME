@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.martin.foodforme.Network.isNetworkAvailable;
+
 public class AccountDB extends Application {
     //Attributes
     private String accountUsername;
@@ -205,6 +207,7 @@ public class AccountDB extends Application {
         {
             return;
         }
+        loadingProgress = 0;
         firstRun = true;
         Log.d("AccountDB", "Loading data from shared preferences.");
         inventorySP = getSharedPreferences("inventorySP", 0);
@@ -242,6 +245,7 @@ public class AccountDB extends Application {
                 inventoryList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
+        loadingProgress = 1;
         keys = shoppingSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals(INDEX))
@@ -249,6 +253,7 @@ public class AccountDB extends Application {
                 shoppingList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
+        loadingProgress = 2;
         keys = requirementSP.getAll();
         for(Map.Entry<String,?> entry : keys.entrySet()){
             if(!entry.getKey().equals(INDEX))
@@ -256,6 +261,7 @@ public class AccountDB extends Application {
                 requirementsList.add(parseProduct(entry.getValue().toString(), entry.getKey()));
             }
         }
+        loadingProgress = 3;
     }
 
     /**
@@ -1166,11 +1172,10 @@ public class AccountDB extends Application {
             loadSharedPreferences();
         }
         else {
-            loadProducts();
+           // if(isNetworkAvailable(this)) {
+                loadProducts();
+           // }
         }
-        inventoryAdapter.notifyDataSetChanged();
-        shoppinglistAdapter.notifyDataSetChanged();
-        requirementsAdapter.notifyDataSetChanged();
     }
 
     /**

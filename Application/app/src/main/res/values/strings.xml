@@ -14,5 +14,7 @@
     <string name="title_activity_all_products">AllProductsActivity</string>
     <string name="title_activity_search_products">SearchProductsActivity</string>
     <string name="title_activity_item_not_found">item_not_found</string>
+    <string name="refresh">refresh</string>
+
 
 </resources>

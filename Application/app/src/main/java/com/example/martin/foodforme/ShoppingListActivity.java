@@ -1,6 +1,7 @@
 package com.example.martin.foodforme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import java.util.Collections;
 
 public class ShoppingListActivity extends ActionBarActivity {
 
+    private ProgressDialog progressDialog;
     private Scanner scanner;
     private AccountDB accountDB;
     private ArrayList<Product> shoppingList,
@@ -71,6 +73,43 @@ public class ShoppingListActivity extends ActionBarActivity {
 
     }
 
+    /**
+     * Update all products in the list to the database.
+     */
+    public boolean refresh(MenuItem item){
+
+        progressDialog = new ProgressDialog(ShoppingListActivity.this);
+        progressDialog.setTitle(accountDB.getAccountUsername());
+        progressDialog.setMessage("Refreshing...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(3);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.refreshProducts();
+                int loading = 0;
+                while(loading < 3){
+                    loading = accountDB.getLoadingProgress();
+                    progressDialog.setProgress(loading);
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
+        this.progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+                shoppingAdapter.notifyDataSetChanged();
+            }
+        });
+        return true;
+    }
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;

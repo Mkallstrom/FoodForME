@@ -151,8 +151,8 @@ public class MainActivity extends ActionBarActivity {
             default:
                 return false;
 
-}
-}
+        }
+    }
 
     /**
      * Copies all current products in the inventory, shopping list, and requirements list to the local shared preferences.

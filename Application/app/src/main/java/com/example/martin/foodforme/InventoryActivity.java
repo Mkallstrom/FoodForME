@@ -3,6 +3,7 @@ package com.example.martin.foodforme;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import java.util.Collections;
 
 public class InventoryActivity extends ActionBarActivity {
 
+    private ProgressDialog progressDialog;
     private Scanner scanner;
     private AccountDB accountDB;
 
@@ -280,7 +282,7 @@ public class InventoryActivity extends ActionBarActivity {
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Long nextAlarm = calendar.getTimeInMillis();
         am.setRepeating(AlarmManager.RTC_WAKEUP, nextAlarm, 1000 * 60 * 60 * 24, pi);
-        Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm-System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
+        Log.v("Alarm", "Alarm set to " + calendar.toString() + " which is in " + Long.toString((nextAlarm - System.currentTimeMillis()) / (1000 * 60)) + " minutes.");
     }
 
     /**
@@ -293,6 +295,45 @@ public class InventoryActivity extends ActionBarActivity {
         intent.putExtra("result", message);         //Send the result to the add product activity.
         this.startActivityForResult(intent, 100);
 
+    }
+
+    /**
+     * Update all products in the list to the database.
+     */
+    public boolean refresh(MenuItem item){
+
+        progressDialog = new ProgressDialog(InventoryActivity.this);
+        progressDialog.setTitle(accountDB.getAccountUsername());
+        progressDialog.setMessage("Refreshing...");
+        progressDialog.setProgressStyle(progressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0);
+        progressDialog.setMax(3);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                accountDB.refreshProducts();
+                int loading = 0;
+                while(loading < 3){
+                    loading = accountDB.getLoadingProgress();
+                    progressDialog.setProgress(loading);
+                }
+                progressDialog.dismiss();
+            }
+        };
+
+        new Thread(runnable).start();
+        this.progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+                inventoryAdapter.notifyDataSetChanged();
+            }
+        });
+
+        return true;
     }
 
 }
