@@ -97,6 +97,10 @@ public class ShoppingListActivity extends ActionBarActivity {
                     .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             int amount = Integer.parseInt(txtUrl.getText().toString());
+                            if(amount>999999999)
+                            {
+                                amount = 999999999;
+                            }
                             Product item = shoppingList.get(info.position);
                             accountDB.deleteProduct(item, "shoppinglist");
                             item.setAmount(Integer.toString(amount));
@@ -110,7 +114,7 @@ public class ShoppingListActivity extends ActionBarActivity {
                     })
                     .show();
 
-        } else if(itemID == 2) {
+        } else if (itemID == 2) {
             Product shoppingItem = shoppingList.get(info.position);
             accountDB.deleteProduct(shoppingItem, "shoppinglist");
             shoppingAdapter.notifyDataSetChanged();

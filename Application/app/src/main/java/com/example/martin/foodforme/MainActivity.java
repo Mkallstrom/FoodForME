@@ -54,6 +54,10 @@ public class MainActivity extends ActionBarActivity {
             accountDB.loadSharedPreferences();
         }
     }
+
+    /**
+     * Attempts to connect to the database. Will fail and ask to try again or abandon attempt and use local data if no connection is available.
+     */
     private void connect(){
         accountDB.connectToDatabase(username, password);
         int connecting = 0;
@@ -93,18 +97,30 @@ public class MainActivity extends ActionBarActivity {
         return true;
     }
 
+    /**
+     * Goes to inventory activity.
+     * @param view - Required attribute.
+     */
     public void toInventory(View view){
         accountDB.checkLocal();
         Intent intent = new Intent(this, InventoryActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Goes to shopping list activity.
+     * @param view - Required attribute.
+     */
     public void toList(View view){
         accountDB.checkLocal();
         Intent intent = new Intent(this, ShoppingListActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Goes to requirements activity.
+     * @param view - Required attribute.
+     */
     public void toRequirement(View view){
         accountDB.checkLocal();
         Intent intent = new Intent(this, RequirementActivity.class);
@@ -137,6 +153,10 @@ public class MainActivity extends ActionBarActivity {
 
 }
 }
+
+    /**
+     * Copies all current products in the inventory, shopping list, and requirements list to the local shared preferences.
+     */
     public void copyToLocal(){
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle(accountDB.getAccountUsername());
@@ -163,6 +183,10 @@ public class MainActivity extends ActionBarActivity {
         new Thread(runnable).start();
         accountDB.copyToLocal();
     }
+
+    /**
+     * Disconnects from the database. Switches to using the product data in the local shared preferences.
+     */
     public void disconnect(){
         SharedPreferences account = getSharedPreferences("account",MODE_PRIVATE);
         SharedPreferences.Editor accountEditor = account.edit();
@@ -172,6 +196,10 @@ public class MainActivity extends ActionBarActivity {
         accountDB.disconnect();
     }
 
+    /**
+     * Creates a new account in the database. If there is a current database connection, the new account will be empty.
+     * If there was no current database connection, the current local data is copied to the new account.
+     */
     public void createAccount(){
         if(!Network.isNetworkAvailable(this)){
             accountDB.resetConnection();
@@ -211,6 +239,12 @@ public class MainActivity extends ActionBarActivity {
                 })
                 .show();
     }
+
+    /**
+     * Saves the products in the local shared preferences to the account in the database.
+     * @param name - Username of the account.
+     * @param password - Password of the account.
+     */
     private void saveAccount(String name, String password){
 
         final String username = name, pass = password;
@@ -242,13 +276,11 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void onDismiss(DialogInterface arg0) {
-                if(progressDialog.getProgress()!=-1) {
+                if (progressDialog.getProgress() != -1) {
                     InfoDialog id = new InfoDialog("Account successfully created.", context);
                     setTitle(username);
                     id.message();
-                }
-                else
-                {
+                } else {
                     InfoDialog id = new InfoDialog("Account could not be created.", context);
                     id.message();
                 }
@@ -258,7 +290,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Store the account info on phone
+     * Stores the account information in the local shared preferences.
      * @param username - the username for the database
      * @param password - password for username to login with
      */
@@ -271,14 +303,8 @@ public class MainActivity extends ActionBarActivity {
         accountEditor.commit();
     }
 
-
-
-
-
-
-
     /**
-     * Connect to an existing account! If the user and password matches.
+     * Connects to an account in the database.
      */
     public void connectAccount(){
         if(!Network.isNetworkAvailable(this)){
@@ -338,6 +364,9 @@ public class MainActivity extends ActionBarActivity {
                 .show();
     }
 
+    /**
+     * Loads all products for the account from the database.
+     */
     private void loadProducts(){
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setTitle(accountDB.getAccountUsername());
