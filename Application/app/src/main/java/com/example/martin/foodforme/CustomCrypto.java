@@ -12,6 +12,10 @@ import javax.crypto.spec.PBEParameterSpec;
 
 import android.util.Base64;
 
+/**
+ * Based on: http://stackoverflow.com/questions/1132567/encrypt-password-in-configuration-files
+ */
+
 public class CustomCrypto {
 
     private static final char[] PASSWORD = "enfldsgbnlsngdlksdsgm".toCharArray();
