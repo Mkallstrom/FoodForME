@@ -1184,6 +1184,46 @@ public class AccountDB extends Application {
         connection = 0;
     }
 
+
+    public int getRequirementStatus(int requiredAmount, String code){
+        int currentAmount = 0;
+        for(Product inventoryItem : inventoryList)
+        {
+            if(inventoryItem.getCode().equals(code))
+            {
+                currentAmount += Integer.parseInt(inventoryItem.getAmount());
+            }
+        }
+        if(currentAmount < requiredAmount)
+        {
+            if(currentAmount == 0)
+            {
+                return 2; // No products.
+            }
+            else
+            {
+                return 1; // Partial amount;
+            }
+
+        }
+        else
+        {
+            return 0; // Enough items in inventory.
+        }
+    }
+
+    public int getRequiredAmount (String code){
+        int requiredAmount = 0;
+        for(Product requirement : requirementsList)
+        {
+            if(requirement.getCode().equals(code))
+            {
+                requiredAmount += Integer.parseInt(requirement.getAmount());
+            }
+        }
+        return requiredAmount;
+    }
+
     /**
      * Creates and returns a product by parsing a string and giving it the given key.
      * @param string - The data of the product.

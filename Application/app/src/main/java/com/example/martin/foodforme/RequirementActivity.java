@@ -39,7 +39,7 @@ public class RequirementActivity extends ActionBarActivity {
 
         requirementList = accountDB.returnRequirements();
 
-        requirementAdapter = new ShoppingArrayAdapter(context,R.layout.shoppinglayout, requirementList);
+        requirementAdapter = new RequirementArrayAdapter(context,R.layout.shoppinglayout, requirementList, accountDB);
 
         requirementListView = (ListView) findViewById(R.id.requirementlistView);
         requirementListView.setAdapter(requirementAdapter);

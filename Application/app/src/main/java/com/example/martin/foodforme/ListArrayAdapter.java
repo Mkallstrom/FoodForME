@@ -19,19 +19,21 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
     private Context context;
     private int resource;
     private ArrayList<Product> products;
-    LayoutInflater inflater;
+    private LayoutInflater inflater;
+    private AccountDB accountDB;
     private static final int expiredColor = Color.rgb(255, 178, 178);
     private static final int expiringShortColor = Color.rgb(255, 255, 178);
     private static final int expiringLongColor = Color.rgb(178, 255, 178);
     private static final int nonExpiringColor = Color.rgb(178, 178, 255);
 
-    public ListArrayAdapter (Context context, int resource, ArrayList products)
+    public ListArrayAdapter (Context context, int resource, ArrayList products, AccountDB accountDB)
     {
         super(context, resource, products);
         this.context=context;
         this.resource=resource;
         this.products=products;
         inflater=((Activity)context).getLayoutInflater();
+        this.accountDB = accountDB;
     }
 
     @Override
@@ -46,7 +48,14 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
 
         title.setText(products.get(position).getName());
         number.setText(products.get(position).getExpiryDate());
+
+        int requiredAmount = accountDB.getRequiredAmount(products.get(position).getCode());
         amount.setText(products.get(position).getAmount());
+        if(requiredAmount>0)
+        {
+            amount.setText(amount.getText() + "/" + requiredAmount);
+        }
+
         int expiringIn = products.get(position).daysUntilExpired();
 
         if(products.get(position).expires())

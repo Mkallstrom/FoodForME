@@ -58,7 +58,7 @@ public class InventoryActivity extends ActionBarActivity {
         shoppingList = accountDB.returnShoppingList();
         requirementList = accountDB.returnRequirements();
 
-        inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList);
+        inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList, accountDB);
         accountDB.setAdapter("inventory", inventoryAdapter);
 
         listView = (ListView) findViewById(R.id.inventoryListView);
@@ -263,10 +263,10 @@ public class InventoryActivity extends ActionBarActivity {
     private void setAlarm()
     {
         Calendar calendar = Calendar.getInstance();
-        /*if(calendar.get(Calendar.HOUR)>=4){
-            calendar.add(Calendar.DATE, 1);
-        }*/
         calendar.set(Calendar.AM_PM, Calendar.PM);
+        if(calendar.get(Calendar.HOUR)>=4){
+            calendar.add(Calendar.DATE, 1);
+        }
         calendar.set(Calendar.HOUR, 4);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
