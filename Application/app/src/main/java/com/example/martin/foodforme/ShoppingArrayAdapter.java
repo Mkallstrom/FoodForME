@@ -2,7 +2,6 @@ package com.example.martin.foodforme;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,8 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
     private ArrayList<Product> products;
     LayoutInflater inflater;
 
-    private static final int requiredColor = Color.rgb(255, 178, 178);
-    private static final int manualColor = Color.rgb(255, 255, 178);
+    private static int requiredBar;
+    private static int manualBar;
 
     public ShoppingArrayAdapter (Context context, int resource, ArrayList products)
     {
@@ -31,6 +30,8 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
         this.resource=resource;
         this.products=products;
         inflater=((Activity)context).getLayoutInflater();
+        requiredBar = (R.drawable.barred);
+        manualBar = (R.drawable.baryellow);
     }
 
     @Override
@@ -44,8 +45,8 @@ public class ShoppingArrayAdapter extends ArrayAdapter<Product> {
         title.setText(products.get(position).getName());
         number.setText(products.get(position).getAmount());
 
-        if(products.get(position).getCode().equals("0")) row.setBackgroundColor(manualColor);
-        else row.setBackgroundColor(requiredColor);
+        if(products.get(position).getCode().equals("0")) row.setBackgroundResource(manualBar);
+        else row.setBackgroundResource(requiredBar);
 
         return row;
     }

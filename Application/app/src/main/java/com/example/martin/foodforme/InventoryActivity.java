@@ -60,7 +60,7 @@ public class InventoryActivity extends ActionBarActivity {
         shoppingList = accountDB.returnShoppingList();
         requirementList = accountDB.returnRequirements();
 
-        inventoryAdapter = new ListArrayAdapter(context,R.layout.productlayout, inventoryList, accountDB);
+        inventoryAdapter = new InventoryArrayAdapter(context,R.layout.productlayout, inventoryList, accountDB);
         accountDB.setAdapter("inventory", inventoryAdapter);
 
         listView = (ListView) findViewById(R.id.inventoryListView);

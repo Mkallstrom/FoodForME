@@ -2,7 +2,6 @@ package com.example.martin.foodforme;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +21,11 @@ public class RequirementArrayAdapter extends ArrayAdapter<Product> {
     private LayoutInflater inflater;
     private AccountDB accountDB;
 
-    private static final int haveNoneColor = Color.rgb(255, 178, 178);
-    private static final int haveSomeColor = Color.rgb(255, 255, 178);
-    private static final int haveAllColor = Color.rgb(178, 255, 178);
+    private static int haveAllBar;
+    private static int haveSomeBar;
+    private static int haveNoneBar;
 
-    private int[] colors = {haveAllColor, haveSomeColor, haveNoneColor};
+    private int[] bars = new int[3];
 
     public RequirementArrayAdapter (Context context, int resource, ArrayList products, AccountDB accountDB)
     {
@@ -36,6 +35,12 @@ public class RequirementArrayAdapter extends ArrayAdapter<Product> {
         this.products=products;
         this.accountDB = accountDB;
         inflater=((Activity)context).getLayoutInflater();
+        haveAllBar = (R.drawable.bargreen);
+        haveSomeBar = (R.drawable.baryellow);
+        haveNoneBar = (R.drawable.barred);
+        bars[0] = haveAllBar;
+        bars[1] = haveSomeBar;
+        bars[2] = haveNoneBar;
     }
 
     @Override
@@ -49,7 +54,7 @@ public class RequirementArrayAdapter extends ArrayAdapter<Product> {
         title.setText(products.get(position).getName());
         number.setText(products.get(position).getAmount());
 
-        row.setBackgroundColor(colors[accountDB.getRequirementStatus(products.get(position))]);
+        row.setBackgroundResource(bars[accountDB.getRequirementStatus(products.get(position))]);
 
         return row;
     }
