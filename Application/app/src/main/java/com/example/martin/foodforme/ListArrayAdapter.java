@@ -49,7 +49,7 @@ public class ListArrayAdapter extends ArrayAdapter<Product> {
         title.setText(products.get(position).getName());
         number.setText(products.get(position).getExpiryDate());
 
-        int requiredAmount = accountDB.getRequiredAmount(products.get(position).getCode());
+        int requiredAmount = accountDB.getRequiredAmount(products.get(position));
         amount.setText(products.get(position).getAmount());
         if(requiredAmount>0)
         {

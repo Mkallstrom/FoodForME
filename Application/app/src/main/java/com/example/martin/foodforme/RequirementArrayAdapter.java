@@ -49,7 +49,7 @@ public class RequirementArrayAdapter extends ArrayAdapter<Product> {
         title.setText(products.get(position).getName());
         number.setText(products.get(position).getAmount());
 
-        row.setBackgroundColor(colors[accountDB.getRequirementStatus(Integer.parseInt(products.get(position).getAmount()), products.get(position).getCode())]);
+        row.setBackgroundColor(colors[accountDB.getRequirementStatus(products.get(position))]);
 
         return row;
     }

@@ -133,12 +133,6 @@ public class RequirementActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-    private Product parseSharedPreferences(String string, String key)
-    {  String[] strings = string.split("\\|");
-        // Namn, date, key, amount, code
-        return new Product(strings[0],strings[1],key,Integer.parseInt(strings[2]),strings[3], Boolean.parseBoolean(strings[4]));
-
-    }
 
     /**
      * Update all products in the list to the database.

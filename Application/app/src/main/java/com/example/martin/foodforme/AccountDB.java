@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.martin.foodforme.Network.isNetworkAvailable;
-
 public class AccountDB extends Application {
     //Attributes
     private String accountUsername;
@@ -1208,20 +1206,28 @@ public class AccountDB extends Application {
 
     /**
      * Gets whether a requirement is unfulfilled, partially fulfilled, or fulfilled.
-     * @param requiredAmount - The amount of the product required.
-     * @param code - The barcode of the product required.
+     * @param requiredItem - The required product.
      * @return - 0 if the amount of the item in the inventory is equal to the amount required. 1 if it is more than 0 but not equal. 2 if none are in the inventory.
      */
-    public int getRequirementStatus(int requiredAmount, String code){
+    public int getRequirementStatus(Product requiredItem){
         int currentAmount = 0;
-        for(Product inventoryItem : inventoryList)
+        if(requiredItem.getCode().equals(noBarcode))
         {
-            if(inventoryItem.getCode().equals(code))
-            {
-                currentAmount += Integer.parseInt(inventoryItem.getAmount());
+            for (Product inventoryItem : inventoryList) {
+                if (inventoryItem.getName().equals(requiredItem.getName())) {
+                    currentAmount += Integer.parseInt(inventoryItem.getAmount());
+                }
             }
         }
-        if(currentAmount < requiredAmount)
+        else
+        {
+            for (Product inventoryItem : inventoryList) {
+                if (inventoryItem.getCode().equals(requiredItem.getCode())) {
+                    currentAmount += Integer.parseInt(inventoryItem.getAmount());
+                }
+            }
+        }
+        if(currentAmount < Integer.parseInt(requiredItem.getAmount()))
         {
             if(currentAmount == 0)
             {
@@ -1241,16 +1247,25 @@ public class AccountDB extends Application {
 
     /**
      * Gets the amount required of a product.
-     * @param code - The code of the product.
+     * @param inventoryItem - The product.
      * @return - The amount required of the product.
      */
-    public int getRequiredAmount (String code){
+    public int getRequiredAmount (Product inventoryItem){
         int requiredAmount = 0;
-        for(Product requirement : requirementsList)
+        if(inventoryItem.getCode().equals(noBarcode))
         {
-            if(requirement.getCode().equals(code))
-            {
-                requiredAmount += Integer.parseInt(requirement.getAmount());
+            for (Product requirement : requirementsList) {
+                if (requirement.getName().equals(inventoryItem.getName())) {
+                    requiredAmount += Integer.parseInt(requirement.getAmount());
+                }
+            }
+        }
+        else
+        {
+            for (Product requirement : requirementsList) {
+                if (requirement.getCode().equals(inventoryItem.getCode())) {
+                    requiredAmount += Integer.parseInt(requirement.getAmount());
+                }
             }
         }
         return requiredAmount;
