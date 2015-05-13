@@ -275,22 +275,34 @@ public class ShoppingListActivity extends ActionBarActivity {
             String requiredCode = requiredProduct.getCode();
             Product changedItem = null;
             int inventoryAmount = 0, shoppinglistAmount = 0;
-            for(Product inventoryProduct : inventoryList)
+            if(requiredProduct.getCode().equals(accountDB.getNoBarcode()))
             {
-                if(inventoryProduct.getCode().equals(requiredCode))
-                {
-                    inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
+                for (Product inventoryProduct : inventoryList) {
+                    if (inventoryProduct.getCode().equals(accountDB.getNoBarcode()) && inventoryProduct.getName().equals(requiredProduct.getName())) {
+                        inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
+                    }
+                }
+                for (Product shoppinglistProduct : shoppingList) {
+                    if (shoppinglistProduct.getCode().equals(accountDB.getNoBarcode()) && shoppinglistProduct.getName().equals(shoppinglistProduct.getName())) {
+                        shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
+                        changedItem = shoppinglistProduct;
+                    }
                 }
             }
-            for(Product shoppinglistProduct : shoppingList)
+            else
             {
-                if(shoppinglistProduct.getCode().equals(requiredCode))
-                {
-                    shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
-                    changedItem = shoppinglistProduct;
+                for (Product inventoryProduct : inventoryList) {
+                    if (inventoryProduct.getCode().equals(requiredCode)) {
+                        inventoryAmount += Integer.parseInt(inventoryProduct.getAmount());
+                    }
+                }
+                for (Product shoppinglistProduct : shoppingList) {
+                    if (shoppinglistProduct.getCode().equals(requiredCode)) {
+                        shoppinglistAmount += Integer.parseInt(shoppinglistProduct.getAmount());
+                        changedItem = shoppinglistProduct;
+                    }
                 }
             }
-
             if(Integer.parseInt(requiredProduct.getAmount()) > (shoppinglistAmount+inventoryAmount)) // Increase amount
             {
                 if(!shoppingCodes.contains(requiredCode))

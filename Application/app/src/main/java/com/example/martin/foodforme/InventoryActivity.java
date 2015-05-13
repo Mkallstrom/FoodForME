@@ -159,9 +159,19 @@ public class InventoryActivity extends ActionBarActivity {
             {
                 for (Product p : requirementList)
                 {
-                    if (inventoryList.get(info.position).getCode().equals(p.getCode()))
+                    if(inventoryList.get(info.position).getCode().equals(accountDB.getNoBarcode()))
                     {
-                        requiredProduct = p;
+                        if (inventoryList.get(info.position).getName().equals(p.getName()))
+                        {
+                            requiredProduct = p;
+                        }
+                    }
+                    else
+                    {
+                        if (inventoryList.get(info.position).getCode().equals(p.getCode()))
+                        {
+                            requiredProduct = p;
+                        }
                     }
                 }
             }
