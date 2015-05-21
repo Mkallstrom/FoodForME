@@ -3,7 +3,9 @@
 /*
  * Following code will list all the products
  */
- 
+ function toUtf8(&$v, $k) {
+	$v = utf8_encode($v);
+}
 // array for JSON response
 $response = array();
  
@@ -35,13 +37,15 @@ if (mysql_num_rows($result) > 0) {
     $response["success"] = 1;
  
     // echoing JSON response
+    array_walk_recursive($response, 'toUtf8');
     echo json_encode($response);
 } else {
     // no products found
     $response["success"] = 0;
     $response["message"] = "No products found";
- 
+
     // echo no users JSON
+    array_walk_recursive($response, 'toUtf8');
     echo json_encode($response);
 }
 ?>

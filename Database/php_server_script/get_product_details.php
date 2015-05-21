@@ -4,6 +4,10 @@
  * Following code will get single product details
  */
 
+function toUtf8(&$v, $k) {
+	$v = utf8_encode($v);
+}
+
 $response = array();
 
 require_once __DIR__ . '/db_connect.php';
@@ -43,5 +47,6 @@ if(isset($_GET["barcode"])) {
        $response["message"] = "Required field(s) is missing";
 }
 
+array_walk_recursive($response, 'toUtf8');
 echo json_encode($response);
 ?>

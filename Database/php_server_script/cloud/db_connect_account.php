@@ -16,7 +16,7 @@ class DB_CONNECT {
       * Function to connect with database
       */
       function connect() {
-      	   require_once __DIR__ . '/db_config_root_refrigerator.php';
+      	   require_once __DIR__ . '/db_config_root_account.php';
 	       
       	   // added @ to remove warning 
 	       $con = @mysql_connect(DB_SERVER, DB_USER, DB_PASSWORD) or die(mysql_error());
